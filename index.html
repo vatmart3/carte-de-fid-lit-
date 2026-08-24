@@ -7,7 +7,7 @@
 <title>La Carte du Boucher</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap">
 <style id="appstyle">
 /* ─────────── remise à zéro ─────────── */
 *,*::before,*::after{box-sizing:border-box}
@@ -25,7 +25,7 @@ a{color:inherit}
    l'argent. Ambre : les points et les récompenses. Rien d'autre. */
 :root{
   --ground:#F4F4F5; --surface-1:#FFFFFF; --surface-2:#FAFAFA; --surface-3:#F0F0F1;
-  --ink:#171718; --ink-2:#45454A; --muted:#86868C;
+  --ink:#171718; --ink-2:#45454A; --muted:#6B6B73;
   --hair:#E6E6E8; --hair-2:#D6D6DA;
   --rouge:#C42B2B; --rouge-fill:#D93636; --rouge-on:#FFFFFF; --rouge-soft:#FDECEC;
   --ambre:#9A6A11; --ambre-fill:#E9A93C; --ambre-on:#231705; --ambre-soft:#FDF3E2;
@@ -36,7 +36,9 @@ a{color:inherit}
   --veil:rgba(244,244,245,.85);
   --lift:0 1px 2px rgba(23,23,24,.05);
   --lift-2:0 8px 30px -12px rgba(23,23,24,.22);
-  --titre:"Anton", "Arial Narrow", sans-serif;
+  /* Une seule famille, large et ouverte : la plupart des clients de la
+     boutique ont passé soixante-dix ans, un condensé gras les perd. */
+  --titre:"Zen Kaku Gothic New", ui-sans-serif, system-ui, sans-serif;
   --sans:"Zen Kaku Gothic New", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   --mono:"Zen Kaku Gothic New", ui-sans-serif, system-ui, sans-serif;
   --r:16px; --r-sm:11px; --r-xs:8px;
@@ -44,7 +46,7 @@ a{color:inherit}
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
     --ground:#0F0F10; --surface-1:#18181A; --surface-2:#1D1D20; --surface-3:#26262A;
-    --ink:#F4F4F5; --ink-2:#C4C4CA; --muted:#8A8A92;
+    --ink:#F4F4F5; --ink-2:#C4C4CA; --muted:#9A9AA2;
     --hair:#26262A; --hair-2:#34343A;
     --rouge:#FF7070; --rouge-fill:#D93636; --rouge-on:#FFFFFF; --rouge-soft:#2A1618;
     --ambre:#F0BC66; --ambre-fill:#E9A93C; --ambre-on:#231705; --ambre-soft:#2A2113;
@@ -59,7 +61,7 @@ a{color:inherit}
 }
 :root[data-theme="dark"]{
   --ground:#0F0F10; --surface-1:#18181A; --surface-2:#1D1D20; --surface-3:#26262A;
-  --ink:#F4F4F5; --ink-2:#C4C4CA; --muted:#8A8A92;
+  --ink:#F4F4F5; --ink-2:#C4C4CA; --muted:#9A9AA2;
   --hair:#26262A; --hair-2:#34343A;
   --rouge:#FF7070; --rouge-fill:#D93636; --rouge-on:#FFFFFF; --rouge-soft:#2A1618;
   --ambre:#F0BC66; --ambre-fill:#E9A93C; --ambre-on:#231705; --ambre-soft:#2A2113;
@@ -80,16 +82,16 @@ a{color:inherit}
 /* ─────────── socle ─────────── */
 body{
   font-family:var(--sans); background:var(--ground); color:var(--ink);
-  line-height:1.6; font-size:16px; min-height:100vh; -webkit-font-smoothing:antialiased;
+  line-height:1.65; font-size:17px; min-height:100vh; -webkit-font-smoothing:antialiased;
 }
 :focus-visible{outline:2px solid var(--rouge-fill); outline-offset:2px; border-radius:6px}
 @media (prefers-reduced-motion: reduce){*{animation:none !important;transition:none !important}}
 
 h1,h2,h3{text-wrap:balance;line-height:1.1;font-weight:400}
 .num{font-variant-numeric:tabular-nums;font-feature-settings:"tnum";letter-spacing:.01em}
-.eyebrow{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.eyebrow{font-size:12.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:700}
 .muted{color:var(--muted)}
-.small{font-size:13.5px}
+.small{font-size:14.5px}
 .sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
 
 /* ─────────── bandeau ─────────── */
@@ -97,13 +99,13 @@ h1,h2,h3{text-wrap:balance;line-height:1.1;font-weight:400}
 .topbar-in{max-width:1180px;margin:0 auto;padding:12px 18px;display:flex;align-items:center;gap:14px}
 .mark{display:flex;align-items:center;gap:11px;min-width:0;text-decoration:none}
 .mark-glyph{
-  width:36px;height:36px;flex:none;border-radius:10px;display:grid;place-items:center;
-  font-family:var(--titre);font-size:19px;background:var(--rouge-fill);color:var(--rouge-on);
+  width:38px;height:38px;flex:none;border-radius:10px;display:grid;place-items:center;
+  font-weight:700;font-size:18px;background:var(--rouge-fill);color:var(--rouge-on);
 }
 .mark-txt{min-width:0}
-.mark-name{display:block;font-family:var(--titre);font-size:19px;letter-spacing:.01em;line-height:1.15;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-transform:uppercase}
-.mark-sub{display:block;font-size:11px;color:var(--muted);font-weight:500;letter-spacing:.02em}
+.mark-name{display:block;font-family:var(--titre);font-weight:700;font-size:17px;line-height:1.2;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mark-sub{display:block;font-size:12px;color:var(--muted);font-weight:500}
 .topbar-sp{flex:1}
 
 /* ─────────── commandes ─────────── */
@@ -130,8 +132,8 @@ h1,h2,h3{text-wrap:balance;line-height:1.1;font-weight:400}
 
 /* ─────────── saisie ─────────── */
 .field{display:flex;flex-direction:column;gap:8px}
-.field > label{font-size:14px;font-weight:700;color:var(--ink)}
-.field .hint{font-size:13px;color:var(--muted);line-height:1.55}
+.field > label{font-size:15px;font-weight:700;color:var(--ink)}
+.field .hint{font-size:14px;color:var(--muted);line-height:1.6}
 input[type=text],input[type=tel],input[type=email],input[type=date],input[type=number],input[type=password],input[type=search],select,textarea{
   width:100%;padding:14px 15px;border-radius:var(--r-sm);border:1px solid var(--hair-2);
   background:var(--surface-1);color:var(--ink);transition:border-color .15s, box-shadow .15s;
@@ -143,16 +145,16 @@ input:-webkit-autofill,input:-webkit-autofill:focus{
 }
 .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 @media (max-width:560px){.grid-2{grid-template-columns:1fr}}
-.check{display:flex;gap:12px;align-items:flex-start;font-size:14px;color:var(--ink-2);line-height:1.55}
+.check{display:flex;gap:12px;align-items:flex-start;font-size:15px;color:var(--ink-2);line-height:1.55}
 .check input{margin-top:3px;accent-color:var(--rouge-fill);width:18px;height:18px;flex:none}
-.err{color:var(--crit);font-size:13.5px;font-weight:700}
+.err{color:var(--crit);font-size:14.5px;font-weight:700}
 
 /* ─────────── surfaces ─────────── */
 .panel{background:var(--surface-1);border:1px solid var(--hair);border-radius:var(--r);box-shadow:var(--lift)}
 .panel-pad{padding:22px}
 @media (max-width:520px){.panel-pad{padding:18px}}
 .sect-head{display:flex;align-items:baseline;gap:12px;margin-bottom:16px;flex-wrap:wrap}
-.sect-head h2{font-family:var(--titre);font-size:22px;text-transform:uppercase;letter-spacing:.01em}
+.sect-head h2{font-family:var(--titre);font-weight:700;font-size:20px}
 .sect-head .sp{flex:1}
 .stack{display:flex;flex-direction:column;gap:16px}
 .stack-sm{display:flex;flex-direction:column;gap:10px}
@@ -161,8 +163,8 @@ input:-webkit-autofill,input:-webkit-autofill:focus{
 /* ─────────── parcours client ─────────── */
 .client-wrap{max-width:500px;margin:0 auto;padding:22px 18px 90px;display:flex;flex-direction:column;gap:16px}
 .hero{text-align:center;padding:16px 0 4px}
-.hero h1{font-family:var(--titre);font-size:clamp(38px,11vw,54px);text-transform:uppercase;line-height:.98;letter-spacing:-.01em}
-.hero p{color:var(--ink-2);margin-top:14px;font-size:15.5px;max-width:34ch;margin-inline:auto;line-height:1.6}
+.hero h1{font-family:var(--titre);font-weight:700;font-size:clamp(30px,8.5vw,40px);line-height:1.15}
+.hero p{color:var(--ink-2);margin-top:16px;font-size:16.5px;max-width:34ch;margin-inline:auto;line-height:1.65}
 .hero-rule{display:none}
 
 /* ─────────── la carte ─────────── */
@@ -173,17 +175,17 @@ input:-webkit-autofill,input:-webkit-autofill:focus{
 }
 @keyframes pose{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 .loyalty-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
-.loyalty-shop{font-family:var(--titre);font-size:19px;text-transform:uppercase;line-height:1.1}
-.loyalty-city{font-size:12px;opacity:.75;margin-top:3px;font-weight:500}
-.tier{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;
+.loyalty-shop{font-family:var(--titre);font-weight:700;font-size:19px;line-height:1.25}
+.loyalty-city{font-size:13px;opacity:.85;margin-top:3px;font-weight:500}
+.tier{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;
   padding:6px 12px;border-radius:99px;background:rgba(255,255,255,.2);color:#fff;white-space:nowrap}
 .loyalty-pts{display:flex;align-items:baseline;gap:10px;margin-top:34px}
-.loyalty-pts b{font-family:var(--titre);font-size:76px;line-height:.82;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
-.loyalty-pts span{font-size:13px;text-transform:uppercase;letter-spacing:.08em;opacity:.8;font-weight:700}
-.loyalty-name{margin-top:26px;font-size:17px;font-weight:700}
+.loyalty-pts b{font-family:var(--titre);font-weight:700;font-size:62px;line-height:1;font-variant-numeric:tabular-nums}
+.loyalty-pts span{font-size:14px;text-transform:uppercase;letter-spacing:.06em;opacity:.85;font-weight:700}
+.loyalty-name{margin-top:24px;font-size:18px;font-weight:700}
 .loyalty-foot{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;margin-top:2px}
-.loyalty-no{font-size:22px;font-weight:700;letter-spacing:.16em;font-variant-numeric:tabular-nums;opacity:.9}
-.loyalty-since{font-size:11px;opacity:.7;text-align:right;line-height:1.5;font-weight:500}
+.loyalty-no{font-size:25px;font-weight:700;letter-spacing:.12em;font-variant-numeric:tabular-nums;opacity:.95}
+.loyalty-since{font-size:12px;opacity:.8;text-align:right;line-height:1.5;font-weight:500}
 
 /* ─────────── jauge ─────────── */
 .rail-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:10px}
@@ -200,43 +202,43 @@ input:-webkit-autofill,input:-webkit-autofill:focus{
   font-size:12px;font-weight:700;background:var(--surface-3);color:var(--muted);font-variant-numeric:tabular-nums}
 .rw-row.on .rw-seal{background:var(--ambre-fill);color:var(--ambre-on)}
 .rw-txt{flex:1;min-width:0}
-.rw-txt b{display:block;font-size:15px;font-weight:700;line-height:1.35}
-.rw-txt span{font-size:13px;color:var(--muted);display:block;margin-top:2px}
+.rw-txt b{display:block;font-size:16px;font-weight:700;line-height:1.4}
+.rw-txt span{font-size:14px;color:var(--muted);display:block;margin-top:3px}
 .rw-row.on .rw-txt span{color:var(--ambre)}
 
 /* ─────────── ticket ─────────── */
 .receipt{display:flex;flex-direction:column}
 .receipt li{display:grid;grid-template-columns:auto 1fr auto;gap:2px 12px;padding:14px 0;border-bottom:1px solid var(--hair)}
 .receipt li:last-child{border-bottom:0}
-.receipt .d{color:var(--muted);font-size:13px;font-weight:500;white-space:nowrap}
-.receipt .w{grid-column:2;color:var(--ink);font-size:14.5px;font-weight:500}
+.receipt .d{color:var(--muted);font-size:14px;font-weight:500;white-space:nowrap}
+.receipt .w{grid-column:2;color:var(--ink);font-size:15.5px;font-weight:500}
 .receipt .a{grid-row:1;grid-column:3;text-align:right;font-weight:700;font-variant-numeric:tabular-nums}
-.receipt .p{grid-row:2;grid-column:3;text-align:right;color:var(--ambre);font-size:13px;font-weight:700}
+.receipt .p{grid-row:2;grid-column:3;text-align:right;color:var(--ambre);font-size:14px;font-weight:700}
 .receipt .p.neg{color:var(--rouge)}
-.empty{text-align:center;padding:30px 14px;color:var(--muted);font-size:14px}
+.empty{text-align:center;padding:30px 14px;color:var(--muted);font-size:15px}
 
 /* ─────────── compteurs ─────────── */
 .stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
 .stat-row div{background:var(--surface-1);border:1px solid var(--hair);border-radius:var(--r-sm);padding:16px 8px;text-align:center}
-.stat-row b{display:block;font-family:var(--titre);font-size:26px;font-variant-numeric:tabular-nums;line-height:1}
-.stat-row span{font-size:11.5px;color:var(--muted);font-weight:500;margin-top:6px;display:block}
+.stat-row b{display:block;font-family:var(--titre);font-weight:700;font-size:24px;font-variant-numeric:tabular-nums;line-height:1.2}
+.stat-row span{font-size:12.5px;color:var(--muted);font-weight:500;margin-top:7px;display:block}
 .codebox{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
   padding:16px;border-radius:var(--r-sm);background:var(--ambre-soft)}
-.codebox .c{font-family:var(--titre);font-size:24px;letter-spacing:.06em;color:var(--ambre);display:block;margin-top:2px}
+.codebox .c{font-family:var(--titre);font-weight:700;font-size:23px;letter-spacing:.04em;color:var(--ambre);display:block;margin-top:2px}
 .bday{display:flex;gap:12px;align-items:center;padding:16px;border-radius:var(--r-sm);background:var(--ambre-soft);font-size:14px;line-height:1.5}
 
 /* ─────────── espace boucher ─────────── */
 .admin-wrap{max-width:1180px;margin:0 auto;padding:20px 18px 90px}
 .tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-bottom:20px;scrollbar-width:thin}
-.tab{padding:10px 16px;border-radius:99px;font-size:14px;font-weight:700;color:var(--muted);white-space:nowrap;
+.tab{padding:11px 18px;border-radius:99px;font-size:15px;font-weight:700;color:var(--muted);white-space:nowrap;
   border:1px solid transparent;transition:background .15s,color .15s}
 .tab:hover{background:var(--surface-3);color:var(--ink)}
 .tab[aria-selected="true"]{background:var(--ink);color:var(--ground)}
 .tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(175px,1fr));gap:10px}
 .tile{background:var(--surface-1);border:1px solid var(--hair);border-radius:var(--r-sm);padding:18px;display:flex;flex-direction:column;gap:4px}
-.tile .k{font-size:13px;color:var(--muted);font-weight:500;min-height:2.6em}
-.tile .v{font-family:var(--titre);font-size:34px;line-height:1;font-variant-numeric:tabular-nums}
-.tile .s{font-size:13px;color:var(--muted)}
+.tile .k{font-size:14px;color:var(--muted);font-weight:500;min-height:2.6em}
+.tile .v{font-family:var(--titre);font-weight:700;font-size:30px;line-height:1.15;font-variant-numeric:tabular-nums}
+.tile .s{font-size:13.5px;color:var(--muted)}
 .tile .s.up{color:var(--good);font-weight:700}
 .cols{display:grid;grid-template-columns:1.4fr 1fr;gap:16px;align-items:start}
 @media (max-width:900px){.cols{grid-template-columns:1fr}}
@@ -254,20 +256,20 @@ input:-webkit-autofill,input:-webkit-autofill:focus{
   padding:6px 10px;border-radius:var(--r-xs);white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .12s;z-index:5}
 .bar:hover .tip,.bar:focus-visible .tip{opacity:1}
 .chart-x{display:flex;gap:4px;margin-top:8px}
-.chart-x span{flex:1;text-align:center;font-size:11px;color:var(--muted);font-weight:500;overflow:hidden}
+.chart-x span{flex:1;text-align:center;font-size:12px;color:var(--muted);font-weight:500;overflow:hidden}
 
 /* classement */
 .rank{display:flex;flex-direction:column;gap:14px}
 .rank-row{display:grid;grid-template-columns:1fr auto;gap:6px 12px;align-items:baseline}
-.rank-row .n{font-size:15px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.rank-row .v{font-size:13px;font-variant-numeric:tabular-nums;color:var(--muted);font-weight:500}
+.rank-row .n{font-size:16px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rank-row .v{font-size:14px;font-variant-numeric:tabular-nums;color:var(--muted);font-weight:500}
 .rank-row .b{grid-column:1/-1;height:8px;border-radius:99px;background:var(--surface-3);overflow:hidden}
 .rank-row .b i{display:block;height:100%;border-radius:99px;background:var(--rouge-fill)}
 
 /* tableau */
 .tbl-wrap{overflow-x:auto;border:1px solid var(--hair);border-radius:var(--r);background:var(--surface-1)}
-.tbl{font-size:14.5px;min-width:680px}
-.tbl th{text-align:left;font-size:12.5px;color:var(--muted);font-weight:700;padding:14px 16px;
+.tbl{font-size:15px;min-width:700px}
+.tbl th{text-align:left;font-size:13px;color:var(--muted);font-weight:700;padding:14px 16px;
   border-bottom:1px solid var(--hair);white-space:nowrap;background:var(--surface-2)}
 .tbl th.r,.tbl td.r{text-align:right}
 .tbl td{padding:14px 16px;border-bottom:1px solid var(--hair);vertical-align:middle}
@@ -275,9 +277,9 @@ input:-webkit-autofill,input:-webkit-autofill:focus{
 .tbl tbody tr{cursor:pointer;transition:background .12s}
 .tbl tbody tr:hover{background:var(--surface-2)}
 .tbl .no{font-weight:700;font-variant-numeric:tabular-nums}
-.tbl .num{font-size:14px}
-.pill{display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:99px;
-  font-size:12.5px;font-weight:700;white-space:nowrap;background:var(--surface-3);color:var(--ink-2)}
+.tbl .num{font-size:14.5px}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:99px;
+  font-size:13px;font-weight:700;white-space:nowrap;background:var(--surface-3);color:var(--ink-2)}
 .pill.brass{background:var(--ambre-soft);color:var(--ambre)}
 .pill.good{background:var(--good-soft);color:var(--good)}
 .pill.crit{background:var(--crit-soft);color:var(--crit)}
@@ -287,10 +289,10 @@ input:-webkit-autofill,input:-webkit-autofill:focus{
 /* caisse */
 .till-found{display:flex;align-items:center;gap:14px;padding:16px;border-radius:var(--r-sm);background:var(--surface-2);border:1px solid var(--hair)}
 .till-found .av{width:46px;height:46px;border-radius:50%;display:grid;place-items:center;
-  font-family:var(--titre);font-size:19px;flex:none;background:var(--rouge-fill);color:var(--rouge-on)}
+  font-weight:700;font-size:17px;flex:none;background:var(--rouge-fill);color:var(--rouge-on)}
 .chips{display:flex;flex-wrap:wrap;gap:8px}
-.chip{padding:10px 15px;border-radius:99px;border:1px solid var(--hair-2);background:var(--surface-1);
-  font-size:14px;font-weight:500;transition:background .12s,border-color .12s}
+.chip{padding:11px 16px;border-radius:99px;border:1px solid var(--hair-2);background:var(--surface-1);
+  font-size:15px;font-weight:500;transition:background .12s,border-color .12s}
 .chip:hover{background:var(--surface-3)}
 .chip[aria-pressed="true"]{background:var(--rouge-fill);border-color:var(--rouge-fill);color:var(--rouge-on)}
 
@@ -301,7 +303,7 @@ input:-webkit-autofill,input:-webkit-autofill:focus{
   border-radius:var(--r) var(--r) 0 0;box-shadow:var(--lift-2);border:1px solid var(--hair)}
 @media (min-width:700px){.modal{border-radius:var(--r)}}
 .modal-head{display:flex;align-items:center;gap:12px;padding:20px 22px;border-bottom:1px solid var(--hair);position:sticky;top:0;background:var(--surface-1);z-index:2}
-.modal-head h3{font-family:var(--titre);font-size:21px;text-transform:uppercase;flex:1}
+.modal-head h3{font-family:var(--titre);font-weight:700;font-size:19px;flex:1}
 .modal-body{padding:22px;display:flex;flex-direction:column;gap:16px}
 
 /* avis */
@@ -314,10 +316,10 @@ input:-webkit-autofill,input:-webkit-autofill:focus{
 @keyframes rise{from{opacity:0;transform:translate(-50%,10px)}to{opacity:1;transform:translate(-50%,0)}}
 
 /* bandeaux et pied */
-.banner{display:flex;gap:12px;align-items:flex-start;padding:15px 16px;border-radius:var(--r-sm);
-  font-size:14px;line-height:1.55;color:var(--ink-2);background:var(--surface-2);border:1px solid var(--hair)}
+.banner{display:flex;gap:12px;align-items:flex-start;padding:16px;border-radius:var(--r-sm);
+  font-size:15px;line-height:1.55;color:var(--ink-2);background:var(--surface-2);border:1px solid var(--hair)}
 .banner.warn{background:var(--warn-soft);border-color:transparent;color:var(--warn)}
-.foot{text-align:center;font-size:13px;color:var(--muted);padding:28px 0 0;line-height:1.8}
+.foot{text-align:center;font-size:13.5px;color:var(--muted);padding:28px 0 0;line-height:1.8}
 .foot b{color:var(--ink-2);font-weight:700}
 .linklike{color:var(--rouge);font-weight:700;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
 
@@ -344,7 +346,7 @@ var HEAD =
   '<title>La Carte du Boucher</title>\n' +
   '<link rel="preconnect" href="https://fonts.googleapis.com">\n' +
   '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n' +
-  '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap">\n';
+  '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap">\n';
 
 var DB = null;          // la base
 var migrated = false;   // une base d'un format antérieur a été mise à niveau
@@ -695,9 +697,13 @@ function esc(s) {
   });
 }
 function today() { return new Date().toISOString().slice(0, 10); }
-function eur(n) { return (Math.round(n * 100) / 100).toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " €"; }
-function eur0(n) { return Math.round(n).toLocaleString("fr-FR") + " €"; }
-function nb(n) { return Number(n || 0).toLocaleString("fr-FR"); }
+/* Le français groupe les milliers par une espace fine insécable que toutes les
+   polices ne dessinent pas : sans elle, « 2 058 » s'affiche « 2058 ». On la
+   remplace par une insécable ordinaire, présente partout. */
+function esp(t) { return String(t).replace(/\u202F/g, "\u00A0"); }
+function eur(n) { return esp((Math.round(n * 100) / 100).toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })) + " €"; }
+function eur0(n) { return esp(Math.round(n).toLocaleString("fr-FR")) + " €"; }
+function nb(n) { return esp(Number(n || 0).toLocaleString("fr-FR")); }
 var MOIS = ["janv.", "févr.", "mars", "avril", "mai", "juin", "juil.", "août", "sept.", "oct.", "nov.", "déc."];
 var MOIS_L = ["janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août", "septembre", "octobre", "novembre", "décembre"];
 function dShort(iso) { if (!iso) return "—"; var p = iso.split("-"); return Number(p[2]) + " " + MOIS[Number(p[1]) - 1]; }
