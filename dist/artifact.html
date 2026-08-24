@@ -1502,7 +1502,8 @@ function sbPanel() {
                : '<br><b>Attention :</b> la connexion n\'est enregistrée que sur cet appareil. ' +
                  'Inscrivez l\'adresse et la clé dans le bloc <span class="num">sbcfg</span> ' +
                  'du fichier avant de mettre en ligne, sinon vos clients n\'auront rien.') + '</p>' +
-        '<button class="btn btn-sm btn-danger" data-act="sb-forget">Oublier cette connexion</button>'
+        '<div class="btn-row"><button class="btn btn-sm" data-act="sb-check">Vérifier l\'installation</button>' +
+        '<button class="btn btn-sm btn-danger" data-act="sb-forget">Oublier cette connexion</button></div>'
       : '<form data-act="save-sb" class="stack">' +
         '<p class="small muted">Reliez l\'application à un projet Supabase pour que chaque client ' +
         'consulte sa carte depuis son téléphone. Les deux valeurs sont dans Supabase → Settings → API.</p>' +
@@ -1514,6 +1515,38 @@ function sbPanel() {
         '<div id="sb-err"></div>' +
         '<button class="btn btn-primary btn-full" type="submit">Tester et connecter</button></form>') +
     '</section>';
+}
+
+/* Vérifie, depuis le navigateur, que la base est bien installée ET bien fermée.
+   Chaque contrôle public est fait avec la clé publique, jamais avec la session. */
+function diagRun() {
+  var out = [];
+  var add = function (ok, txt) { out.push({ ok: ok, txt: txt }); };
+
+  return rpc("public_shop", {}).then(function (d) {
+    if (d && d.name) add(true, "Schéma installé — boutique « " + d.name + " »");
+    else add(false, "Le schéma répond mais aucun réglage : rejouez supabase/schema.sql.");
+  })["catch"](function (e) {
+    add(false, "Projet injoignable ou schéma absent — " + errMsg(e));
+  }).then(function () {
+    return sbFetch("/rest/v1/clients?select=id&limit=1", {}, false).then(function () {
+      add(false, "ALERTE : le fichier clients est lisible sans connexion. Rejouez schema.sql.");
+    })["catch"](function () { add(true, "Fichier clients fermé au public"); });
+  }).then(function () {
+    return rpc("record_purchase", { p_id: "0", p_amount: 1, p_label: "contrôle" }, false)
+      .then(function () { add(false, "ALERTE : un visiteur peut créditer des points. Rejouez schema.sql."); })
+      ["catch"](function (e) {
+        var m = (e && e.message) || "";
+        if (m === "client_inconnu") add(false, "ALERTE : l'encaissement n'est pas réservé au personnel. Rejouez schema.sql.");
+        else add(true, "Encaissement réservé au personnel");
+      });
+  }).then(function () {
+    if (!SB.token) { add(true, "Compte boucher : non connecté ici, contrôle ignoré"); return; }
+    return rpc("is_staff", {}, true).then(function (r) {
+      add(!!r, r ? "Compte « " + SB.email + " » reconnu comme personnel"
+                 : "Compte connecté mais absent de la table staff : ajoutez-le, sinon il ne verra rien.");
+    })["catch"](function (e) { add(false, "Contrôle du compte impossible — " + errMsg(e)); });
+  }).then(function () { return out; });
 }
 
 function csv(rows) {
@@ -1639,6 +1672,23 @@ var ACTS = {
     saveSession();
     if (Store.mode === "supabase") { sbLogout(); location.replace(location.pathname); return; }
     go("home");
+  },
+  "sb-check": function () {
+    modal("Vérification de la base", '<p class="empty">Contrôles en cours…</p>', { nofocus: true });
+    diagRun().then(function (r) {
+      var bad = r.filter(function (x) { return !x.ok; }).length;
+      modal("Vérification de la base",
+        '<ul class="rw">' + r.map(function (x) {
+          return '<div class="rw-row"><span class="rw-seal" style="' +
+            (x.ok ? "background:var(--good);color:#fff;border-style:solid;border-color:var(--good)"
+                  : "background:var(--crit);color:#fff;border-style:solid;border-color:var(--crit)") + '">' +
+            (x.ok ? "✓" : "!") + '</span><span class="rw-txt"><b>' + esc(x.txt) + '</b></span></div>';
+        }).join("") + '</ul>' +
+        '<div class="banner' + (bad ? " warn" : "") + '"><span aria-hidden="true">' + (bad ? "!" : "i") + '</span><span>' +
+        (bad ? "Reprenez l\'étape correspondante de DEPLOIEMENT.md, puis relancez la vérification."
+             : "Installation conforme : les données ne sont accessibles qu\'au personnel et à chaque client pour sa propre carte.") +
+        '</span></div>', { nofocus: true });
+    });
   },
   "sb-forget": function () {
     lsDel(LS_SB); lsDel(LS_AUTH);

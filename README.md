@@ -114,8 +114,14 @@ Hors ligne, il tient dans un seul objet :
 ```sh
 npx http-server . -p 8080     # puis http://localhost:8080
 node scripts/seed.mjs         # régénère le jeu de démonstration (déterministe)
-node scripts/build-artifact.mjs   # produit dist/artifact.html pour la mise en ligne
+node scripts/build-artifact.mjs   # produit dist/artifact.html pour la démo publiée
 ```
+
+`index.html` est le fichier de production : son bloc `sbcfg` pointe sur le
+projet Supabase de la boutique, et c'est lui qu'on dépose sur l'hébergeur. Pour
+essayer l'application sans base, vider ce bloc (`{"url":"","key":""}`) sur une
+copie : elle repasse en mode local avec le jeu de démonstration. Le build de la
+démo publiée le fait automatiquement.
 
 - `index.html` — l'application complète (source de vérité : structure, style, logique, base de démonstration).
 - `supabase/schema.sql` — tables, règles d'accès et fonctions de la base en ligne.

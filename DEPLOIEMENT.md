@@ -30,10 +30,15 @@ Supabase + Netlify), 10 à 15 € par an si vous voulez un nom de domaine à vou
 5. Dans **Authentication → Providers → Email**, désactiver
    **Enable sign-ups**. Personne ne peut plus créer de compte de son côté.
 
+> **Déjà fait pour ce dépôt.** `index.html` est configuré sur le projet
+> `edgivtkpqyziucjyzffs`. Il reste les étapes 1, 3 et 5. Une fois le schéma
+> installé, ouvrir Espace boucher → Réglages → Base en ligne →
+> **Vérifier l'installation** : les quatre contrôles doivent être verts.
+
 ## 2. Relier l'application à la base
 
-Ouvrir `index.html` et remplir la deuxième ligne du bloc de configuration,
-tout en bas du fichier, juste avant les données :
+Pour un autre projet : ouvrir `index.html` et remplir le bloc de configuration,
+en bas du fichier, juste avant les données :
 
 ```html
 <script id="sbcfg" type="application/json">{"url":"https://xxxxxxxx.supabase.co","key":"eyJhbGciOi..."}</script>
@@ -44,7 +49,7 @@ Les deux valeurs sont dans Supabase → **Settings → API** :
 | Champ | Valeur Supabase |
 |---|---|
 | `url` | **Project URL** |
-| `key` | **anon public** — la clé publique |
+| `key` | **Publishable key** (`sb_publishable_…`), ou l'ancienne **anon public** |
 
 > La clé `anon` est faite pour être publique : elle est présente dans le code de
 > toutes les applications web de ce type. Ce qui protège les données, ce sont
@@ -95,6 +100,19 @@ mention « Créez votre carte en 30 secondes » : n'importe quel générateur de
 code en ligne fait l'affaire à partir de l'adresse du site.
 
 ---
+
+## Vérifier que tout est bien fermé
+
+Espace boucher → Réglages → Base en ligne → **Vérifier l'installation**.
+Quatre contrôles, exécutés depuis le navigateur avec la clé publique :
+
+1. le schéma répond et renvoie les réglages de la boutique ;
+2. le fichier clients est **inaccessible** sans connexion ;
+3. l'encaissement est **refusé** à un visiteur ;
+4. le compte connecté est bien inscrit dans `staff`.
+
+Un contrôle rouge indique précisément quelle étape reprendre. À relancer après
+toute modification du schéma.
 
 ## Ce que la base garantit
 
