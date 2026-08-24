@@ -6,7 +6,8 @@ page autonome — aucun serveur à installer.
 
 **Démo en ligne :** https://claude.ai/code/artifact/5dfed855-fac8-4e64-895c-2cf7f198fd90
 **Code d'accès boucher :** `4726` (modifiable dans Réglages → Code d'accès)
-**Mise en production :** [DEPLOIEMENT.md](DEPLOIEMENT.md) — Supabase + hébergement statique, une heure.
+**Mise en production :** [DEPLOIEMENT.md](DEPLOIEMENT.md) — Supabase + Vercel, une heure.
+**Conformité :** [RGPD.md](RGPD.md) — ce que l'application assure, ce qui reste à la charge de la boutique.
 
 ---
 
@@ -17,7 +18,8 @@ page autonome — aucun serveur à installer.
 | **Créer ma carte** | Nom, téléphone, date de naissance obligatoires ; e-mail et code parrain facultatifs. Case d'accord explicite avant enregistrement. |
 | **Numéro de carte** | Attribué automatiquement à partir de 1001. C'est ce numéro que le client donne en caisse. |
 | **Ma carte** | Solde de points, statut (Nouveau → Fidèle → Habitué → Ambassadeur), jauge vers la prochaine récompense, liste des récompenses débloquées et verrouillées, historique complet des achats (date, détail, montant, points), compteurs (passages, total dépensé, points cumulés). |
-| **Anniversaire** | Rappel affiché le mois de l'anniversaire ; le boucher crédite le cadeau en un clic. |
+| **Anniversaire** | Jour et mois seulement — l'année n'est jamais demandée. Rappel affiché le mois venu ; le boucher crédite le cadeau en un clic. |
+| **Mes données** | Le client corrige ses informations, télécharge tout son dossier, accepte ou refuse les offres, et supprime sa carte — lui-même, sans passer par la boutique. |
 | **Parrainage** | Chaque client a un code personnel (`NAD-1001`). Le filleul le saisit à l'inscription : les deux sont crédités automatiquement. |
 
 Le client retrouve sa carte avec son numéro **ou** son téléphone. Son appareil
@@ -32,7 +34,8 @@ la mémorise ensuite.
 | **Clients** | Fichier complet, recherche instantanée, tris, statut d'activité. Fiche détaillée : historique, encaissement, utilisation d'une récompense, ajout/retrait manuel de points avec motif, modification, suppression. Création de carte au comptoir. |
 | **Anniversaires** | Ceux du mois (avec repérage du jour même) et ceux du mois suivant, pour anticiper. Cadeau limité à une fois par an et par client. |
 | **Parrainage** | Qui a parrainé qui, chiffre d'affaires apporté par les filleuls, points distribués. |
-| **Réglages** | Nom / ville / accroche de la boutique, barème (points par euro, bienvenue, anniversaire, parrain, filleul), éditeur de récompenses, changement du code d'accès, export CSV clients et achats, sauvegarde et restauration JSON, effacement des données de démonstration. |
+| **Réglages** | Nom / ville / accroche de la boutique, barème (points par euro, bienvenue, anniversaire, parrain, filleul), éditeur de récompenses, compte d'accès, export CSV clients et achats, sauvegarde et restauration JSON. |
+| **Données personnelles** | Identité légale de la boutique (alimente les mentions légales et la politique de confidentialité), durée de conservation, signalement et purge des fiches trop anciennes, contrôle de l'installation. |
 
 ## Barème par défaut
 

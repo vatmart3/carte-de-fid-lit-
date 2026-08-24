@@ -87,8 +87,10 @@ PEOPLE.forEach((p, i) => {
     points -= r.p;
   }
   hist.sort((x, y) => (x.t < y.t ? 1 : -1));
+  const [, bm, bd] = p[3].split("-").map(Number);   // minimisation : jour et mois seulement
   clients.push({
-    id, name: p[0], phone: p[1], email: p[2], bday: p[3],
+    id, name: p[0], phone: p[1], email: p[2], bday_day: bd, bday_month: bm,
+    consent_at: dayStr(age) + "T09:00:00Z", notice: "v1", marketing: rnd() > .4,
     created: dayStr(age), points, lifetime, spent: Math.round(spent * 100) / 100,
     visits, code: code(p[0], id), by: "", demo: true, hist
   });

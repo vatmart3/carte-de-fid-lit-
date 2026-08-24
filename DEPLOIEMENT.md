@@ -17,6 +17,9 @@ Supabase + Vercel), 10 à 15 € par an si vous voulez un nom de domaine à vous
 1. Sur https://supabase.com, créer un projet (région **Europe (Paris)** ou
    **Frankfurt** : les données restent en Europe, c'est ce qu'attend le RGPD).
    Noter le mot de passe de la base, il ne sera plus affiché.
+   **Projet déjà créé ?** Vérifier la région dans **Settings → General →
+   Region**. Si elle est américaine, mieux vaut recréer le projet en Europe :
+   cela évite toute question de transfert hors Union européenne.
 2. Ouvrir **SQL Editor** → **New query**, coller tout le contenu du fichier
    [`supabase/schema.sql`](supabase/schema.sql), puis **Run**.
    Le message attendu est « Success. No rows returned ».
@@ -128,6 +131,18 @@ mention « Créez votre carte en 30 secondes » : n'importe quel générateur de
 code en ligne fait l'affaire à partir de l'adresse du site.
 
 ---
+
+## 5. Se mettre en règle (RGPD)
+
+Une fois le site en ligne, ouvrir **Réglages → Données personnelles** et
+compléter raison sociale, adresse, SIRET, directeur de la publication et
+contact : ces informations alimentent les mentions légales et la politique de
+confidentialité que les clients peuvent consulter. Tant qu'elles sont vides,
+les pages affichent « à compléter », ce qui n'est pas conforme.
+
+Le reste — registre des traitements, contrats de sous-traitance, affichette au
+comptoir, conduite à tenir en cas de fuite — est détaillé dans
+[RGPD.md](RGPD.md), avec un registre prérempli à imprimer.
 
 ## Vérifier que tout est bien fermé
 
