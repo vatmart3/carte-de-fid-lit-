@@ -132,6 +132,28 @@ code en ligne fait l'affaire à partir de l'adresse du site.
 
 ---
 
+## 4 bis. Le scanner
+
+Le bouton **Scanner** de l'écran d'encaissement ouvre l'appareil photo du
+boucher. Trois conditions :
+
+1. **Le site doit être en HTTPS** — c'est le cas sur Vercel, automatiquement.
+2. **Le navigateur demande l'autorisation** la première fois. Il faut accepter ;
+   si on refuse par erreur, l'autorisation se rétablit dans les réglages du
+   navigateur, à la ligne du site.
+3. **`scanner.js` doit être déposé à côté de `index.html`** — la configuration
+   Vercel du dépôt s'en charge. Si vous déployez à la main, copiez
+   `vendor/jsqr.min.js` sous le nom `scanner.js` dans le même dossier.
+
+Si l'appareil photo est indisponible, le scanner propose de **prendre une photo
+du code**, ce qui marche partout. Et le numéro de carte reste saisissable au
+clavier : le scanner fait gagner du temps, il n'est jamais un passage obligé.
+
+Sur la démonstration hébergée chez Claude, la page tourne dans un cadre isolé
+qui ne donne pas accès à l'appareil photo : le scanner n'y fonctionne que sur
+les navigateurs équipés d'un lecteur natif. C'est une limite de la vitrine, pas
+de l'application déployée.
+
 ## 5. Se mettre en règle (RGPD)
 
 Une fois le site en ligne, ouvrir **Réglages → Données personnelles** et

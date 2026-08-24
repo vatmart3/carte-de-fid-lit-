@@ -12,5 +12,10 @@ if (!cfg.url || !cfg.key) {
   console.error("\n  ⚠  Aucune base configurée dans le bloc sbcfg de index.html.");
   console.error("     Le site publié fonctionnera en mode local, sans base partagée.\n");
 }
+// Le décodeur de QR voyage à part : seul l'espace boucher le télécharge,
+// et seulement au moment où il ouvre le scanner.
+fs.copyFileSync("vendor/jsqr.min.js", "public/scanner.js");
+
 console.log("public/index.html —", (fs.statSync("public/index.html").size / 1024).toFixed(1), "Ko");
+console.log("public/scanner.js —", (fs.statSync("public/scanner.js").size / 1024).toFixed(1), "Ko (chargé à la demande)");
 console.log("base :", cfg.url || "(aucune)");

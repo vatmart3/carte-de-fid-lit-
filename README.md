@@ -19,6 +19,7 @@ page autonome — aucun serveur à installer.
 | **Numéro de carte** | Attribué automatiquement à partir de 1001. C'est ce numéro que le client donne en caisse. |
 | **Ma carte** | Solde de points, statut (Nouveau → Fidèle → Habitué → Ambassadeur), jauge vers la prochaine récompense, liste des récompenses débloquées et verrouillées, historique complet des achats (date, détail, montant, points), compteurs (passages, total dépensé, points cumulés). |
 | **Anniversaire** | Jour et mois seulement — l'année n'est jamais demandée. Rappel affiché le mois venu ; le boucher crédite le cadeau en un clic. |
+| **Code à scanner** | Chaque carte porte un QR code, affiché sous le solde. Le boucher le scanne pour ouvrir directement l'encaissement de ce client. Le code contient le numéro de carte, jamais le lien personnel : une photo de la carte n'ouvre pas le compte. |
 | **Mes données** | Le client corrige ses informations, télécharge tout son dossier, accepte ou refuse les offres, et supprime sa carte — lui-même, sans passer par la boutique. |
 | **Parrainage** | Chaque client a un code personnel (`NAD-1001`). Le filleul le saisit à l'inscription : les deux sont crédités automatiquement. |
 
@@ -35,7 +36,7 @@ session côté navigateur — ce n'est pas qu'un rideau devant l'écran.
 | Onglet | Contenu |
 |---|---|
 | **Tableau de bord** | Nombre de clients (+ nouveaux du mois), passages, encaissé total et mensuel, panier moyen, points en circulation, récompenses utilisées. Graphique de l'encaissé sur 14 jours, meilleurs clients, journal des opérations, alerte sur les clients sans passage depuis plus de 3 mois. |
-| **Encaisser** | Recherche par numéro, téléphone ou nom → montant (+ raccourcis 10/15/20/30/50/80 €) et détail de l'achat (raccourcis Bœuf, Agneau, Volaille…). Validation : points crédités, solde et compteur de passages mis à jour instantanément côté client. Récompense disponible et cadeau d'anniversaire proposés au même endroit. |
+| **Encaisser** | Bouton **Scanner** : l'appareil photo lit le code du client et ouvre sa fiche, curseur déjà dans le champ montant. Repli par photo si la caméra est refusée. Sinon recherche par numéro, téléphone ou nom → montant (+ raccourcis 10/15/20/30/50/80 €) et détail de l'achat (raccourcis Bœuf, Agneau, Volaille…). Validation : points crédités, solde et compteur de passages mis à jour instantanément côté client. Récompense disponible et cadeau d'anniversaire proposés au même endroit. |
 | **Clients** | Fichier complet, recherche instantanée, tris, statut d'activité. Fiche détaillée : historique, encaissement, utilisation d'une récompense, ajout/retrait manuel de points avec motif, modification, suppression. Création de carte au comptoir. |
 | **Anniversaires** | Ceux du mois (avec repérage du jour même) et ceux du mois suivant, pour anticiper. Cadeau limité à une fois par an et par client. |
 | **Parrainage** | Qui a parrainé qui, chiffre d'affaires apporté par les filleuls, points distribués. |
@@ -137,9 +138,16 @@ démo publiée le fait automatiquement.
 - `DEPLOIEMENT.md` — mise en ligne pas à pas.
 - `dist/artifact.html` — la même application sans l'enveloppe `<html>/<head>/<body>`, format attendu par l'hébergement en ligne. Généré, ne pas modifier à la main.
 - `scripts/seed.mjs` — générateur du jeu de démonstration.
-- `vercel.json` + `scripts/build-site.mjs` — publication : seul `index.html` est
-  mis en ligne, avec les en-têtes de sécurité (CSP restreinte au projet Supabase
+- `vercel.json` + `scripts/build-site.mjs` — publication : `index.html` et
+  `scanner.js`, avec les en-têtes de sécurité (CSP restreinte au projet Supabase
   et aux polices Google, testée avec l'application complète).
+- `vendor/jsqr.min.js` — lecteur de QR codes ([jsQR](https://github.com/cozmo/jsqr),
+  licence Apache 2.0, texte dans `vendor/jsqr-LICENSE.txt`). Publié sous le nom
+  `scanner.js` et **chargé uniquement quand le boucher ouvre le scanner** : il pèse
+  plus lourd que toute l'application, les clients ne le téléchargent jamais.
+  Le générateur de codes, lui, est écrit dans l'application ; ses matrices ont été
+  comparées module par module à une implémentation de référence sur les dix
+  versions utilisées.
 
 Hébergement statique possible tel quel (GitHub Pages, Netlify, OVH…) : déposer
 `index.html`, l'application tourne alors en mode local.
