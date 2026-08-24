@@ -1,0 +1,1608 @@
+<title>La Carte du Boucher</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,400;6..96,600;6..96,700&family=IBM+Plex+Mono:wght@400;500;600&family=Instrument+Sans:wght@400;500;600;700&display=swap">
+<style id="appstyle">
+/* ─────────── reset ─────────── */
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body,h1,h2,h3,h4,p,figure,blockquote,dl,dd,ul,ol{margin:0}
+ul,ol{padding:0;list-style:none}
+img,svg{max-width:100%;display:block}
+button,input,select,textarea{font:inherit;color:inherit}
+button{background:none;border:0;cursor:pointer}
+table{border-collapse:collapse;width:100%}
+a{color:inherit}
+
+/* ─────────── tokens ─────────── */
+:root{
+  --paper:#EFEEEA; --surface:#FFFFFF; --surface-2:#F7F6F2; --surface-3:#EAE8E2;
+  --ink:#1A1613; --ink-2:#4C463D; --muted:#7C756B;
+  --line:#DEDAD1; --line-2:#C8C2B7;
+  --accent:#8C1D2B; --accent-fill:#8C1D2B; --accent-on:#FFF6F3; --accent-soft:#F5E4E4;
+  --brass:#8E6C1F; --brass-fill:#A9812F; --brass-soft:#F4EBD7;
+  --good:#2E6A4E; --good-soft:#E2EFE7;
+  --warn:#8E6212; --warn-soft:#F7ECD6;
+  --crit:#A32B22; --crit-soft:#F7E3E0;
+  --card-1:#3A1218; --card-2:#20090D; --card-ink:#F6EDE6; --card-rule:#B08A3C;
+  --shadow:0 1px 2px rgba(26,22,19,.05), 0 8px 24px -12px rgba(26,22,19,.18);
+  --shadow-lift:0 2px 4px rgba(26,22,19,.06), 0 18px 40px -18px rgba(26,22,19,.28);
+  --r:14px; --r-sm:9px;
+  --display:"Bodoni Moda", "Times New Roman", serif;
+  --sans:"Instrument Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono:"IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#121313; --surface:#1B1C1D; --surface-2:#212223; --surface-3:#2A2B2C;
+    --ink:#EDE8E1; --ink-2:#C3BCB3; --muted:#8F887E;
+    --line:#303132; --line-2:#414243;
+    --accent:#E4757E; --accent-fill:#A02434; --accent-on:#FFF1F0; --accent-soft:#331A1D;
+    --brass:#D8B366; --brass-fill:#8A6A22; --brass-soft:#2E2718;
+    --good:#69B58F; --good-soft:#1B2A23;
+    --warn:#D6A44C; --warn-soft:#2C2417;
+    --crit:#E4746A; --crit-soft:#2E1B18;
+    --card-1:#3E141B; --card-2:#1A070A; --card-ink:#F6EDE6; --card-rule:#B08A3C;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.7);
+    --shadow-lift:0 2px 4px rgba(0,0,0,.45), 0 18px 40px -18px rgba(0,0,0,.8);
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#121313; --surface:#1B1C1D; --surface-2:#212223; --surface-3:#2A2B2C;
+  --ink:#EDE8E1; --ink-2:#C3BCB3; --muted:#8F887E;
+  --line:#303132; --line-2:#414243;
+  --accent:#E4757E; --accent-fill:#A02434; --accent-on:#FFF1F0; --accent-soft:#331A1D;
+  --brass:#D8B366; --brass-fill:#8A6A22; --brass-soft:#2E2718;
+  --good:#69B58F; --good-soft:#1B2A23;
+  --warn:#D6A44C; --warn-soft:#2C2417;
+  --crit:#E4746A; --crit-soft:#2E1B18;
+  --card-1:#3E141B; --card-2:#1A070A; --card-ink:#F6EDE6; --card-rule:#B08A3C;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.7);
+  --shadow-lift:0 2px 4px rgba(0,0,0,.45), 0 18px 40px -18px rgba(0,0,0,.8);
+}
+
+/* ─────────── base ─────────── */
+body{
+  font-family:var(--sans); background:var(--paper); color:var(--ink);
+  line-height:1.5; font-size:16px; min-height:100vh;
+  -webkit-font-smoothing:antialiased;
+}
+:focus-visible{outline:2px solid var(--accent); outline-offset:2px; border-radius:4px}
+@media (prefers-reduced-motion: reduce){*{animation-duration:.01ms !important;transition-duration:.01ms !important}}
+
+h1,h2,h3{text-wrap:balance;line-height:1.15}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums;font-feature-settings:"tnum"}
+.eyebrow{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.muted{color:var(--muted)}
+.small{font-size:13px}
+.sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+
+/* ─────────── chrome ─────────── */
+.topbar{
+  position:sticky;top:0;z-index:40;background:color-mix(in srgb, var(--paper) 88%, transparent);
+  backdrop-filter:saturate(1.4) blur(10px); border-bottom:1px solid var(--line);
+}
+.topbar-in{max-width:1180px;margin:0 auto;padding:12px 18px;display:flex;align-items:center;gap:14px}
+.mark{display:flex;align-items:center;gap:10px;min-width:0;text-decoration:none}
+.mark-glyph{
+  width:34px;height:34px;border-radius:8px;flex:none;
+  background:linear-gradient(160deg,var(--card-1),var(--card-2));
+  color:var(--card-ink);display:grid;place-items:center;
+  font-family:var(--display);font-weight:700;font-size:17px;
+  box-shadow:inset 0 0 0 1px rgba(176,138,60,.55);
+}
+.mark-txt{min-width:0}
+.mark-name{display:block;font-family:var(--display);font-weight:600;font-size:17px;letter-spacing:.02em;line-height:1.1;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mark-sub{display:block;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.topbar-sp{flex:1}
+
+/* ─────────── buttons ─────────── */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:7px;
+  padding:11px 16px;border-radius:10px;font-weight:600;font-size:14.5px;
+  border:1px solid var(--line-2);background:var(--surface);color:var(--ink);
+  transition:background .15s, border-color .15s, transform .06s, box-shadow .15s;
+  text-align:center;
+}
+.btn:hover{background:var(--surface-2);border-color:var(--muted)}
+.btn:active{transform:translateY(1px)}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+.btn-primary{background:var(--accent-fill);border-color:var(--accent-fill);color:var(--accent-on);box-shadow:var(--shadow)}
+.btn-primary:hover{background:color-mix(in srgb,var(--accent-fill) 88%, #000);border-color:color-mix(in srgb,var(--accent-fill) 88%, #000)}
+.btn-brass{background:var(--brass-fill);border-color:var(--brass-fill);color:#FFF8EA}
+.btn-brass:hover{background:color-mix(in srgb,var(--brass-fill) 88%, #000);border-color:color-mix(in srgb,var(--brass-fill) 88%, #000)}
+.btn-ghost{background:transparent;border-color:transparent;color:var(--ink-2)}
+.btn-ghost:hover{background:var(--surface-2);border-color:var(--line)}
+.btn-sm{padding:7px 11px;font-size:13px;border-radius:8px}
+.btn-danger{color:var(--crit);border-color:color-mix(in srgb,var(--crit) 35%, var(--line))}
+.btn-danger:hover{background:var(--crit-soft)}
+.btn-full{width:100%}
+.btn-row{display:flex;gap:10px;flex-wrap:wrap}
+
+/* ─────────── forms ─────────── */
+.field{display:flex;flex-direction:column;gap:6px}
+.field > label{font-size:13px;font-weight:600;color:var(--ink-2)}
+.field .hint{font-size:12px;color:var(--muted)}
+input[type=text],input[type=tel],input[type=email],input[type=date],input[type=number],input[type=password],select,textarea{
+  width:100%;padding:11px 12px;border-radius:10px;border:1px solid var(--line-2);
+  background:var(--surface);transition:border-color .15s, box-shadow .15s;
+}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+input::placeholder,textarea::placeholder{color:var(--muted)}
+input:-webkit-autofill,input:-webkit-autofill:focus{
+  -webkit-text-fill-color:var(--ink);
+  -webkit-box-shadow:0 0 0 40px var(--surface) inset;
+  caret-color:var(--ink);
+}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media (max-width:560px){.grid-2{grid-template-columns:1fr}}
+.check{display:flex;gap:10px;align-items:flex-start;font-size:13px;color:var(--ink-2)}
+.check input{margin-top:3px;accent-color:var(--accent-fill);width:16px;height:16px;flex:none}
+.err{color:var(--crit);font-size:13px;font-weight:600}
+
+/* ─────────── surfaces ─────────── */
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow)}
+.panel-pad{padding:20px}
+.sect-head{display:flex;align-items:baseline;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+.sect-head h2{font-family:var(--display);font-size:20px;font-weight:600;letter-spacing:.01em}
+.sect-head .sp{flex:1}
+.stack{display:flex;flex-direction:column;gap:16px}
+.stack-sm{display:flex;flex-direction:column;gap:10px}
+.divide{height:1px;background:var(--line);border:0;margin:0}
+
+/* ─────────── client shell ─────────── */
+.client-wrap{max-width:520px;margin:0 auto;padding:22px 18px 90px;display:flex;flex-direction:column;gap:18px}
+.hero{text-align:center;padding:12px 0 4px}
+.hero h1{font-family:var(--display);font-size:clamp(30px,8vw,42px);font-weight:600;letter-spacing:.01em}
+.hero p{color:var(--ink-2);margin-top:10px;font-size:15.5px;max-width:34ch;margin-inline:auto}
+.hero-rule{width:54px;height:2px;background:var(--brass-fill);margin:16px auto 0;border-radius:2px}
+
+/* ─────────── the card ─────────── */
+.loyalty{
+  position:relative;border-radius:16px;overflow:hidden;color:var(--card-ink);
+  background:
+    repeating-linear-gradient(115deg, rgba(255,255,255,.028) 0 2px, transparent 2px 7px),
+    linear-gradient(155deg, var(--card-1) 0%, var(--card-2) 100%);
+  box-shadow:var(--shadow-lift), inset 0 0 0 1px rgba(176,138,60,.4);
+  padding:20px;
+}
+.loyalty::after{
+  content:"";position:absolute;inset:8px;border:1px solid rgba(176,138,60,.32);border-radius:10px;pointer-events:none;
+}
+.loyalty-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;position:relative}
+.loyalty-shop{font-family:var(--display);font-size:15px;letter-spacing:.16em;text-transform:uppercase;font-weight:600}
+.loyalty-city{font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;opacity:.62;margin-top:3px}
+.tier{
+  font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;
+  padding:5px 9px;border-radius:99px;background:rgba(176,138,60,.16);
+  color:#E8C87E;border:1px solid rgba(176,138,60,.5);white-space:nowrap;
+}
+.loyalty-pts{display:flex;align-items:baseline;gap:9px;margin-top:24px;position:relative}
+.loyalty-pts b{font-family:var(--display);font-size:52px;font-weight:600;line-height:.95;letter-spacing:-.01em;font-variant-numeric:tabular-nums}
+.loyalty-pts span{font-size:12px;letter-spacing:.16em;text-transform:uppercase;opacity:.7;font-weight:600}
+.loyalty-name{margin-top:20px;font-size:16px;font-weight:600;letter-spacing:.03em;position:relative}
+.loyalty-foot{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;margin-top:6px;position:relative}
+.loyalty-no{font-family:var(--mono);font-size:21px;letter-spacing:.24em;font-weight:500}
+.loyalty-since{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;opacity:.6;text-align:right}
+
+/* ─────────── progress rail ─────────── */
+.rail-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:9px}
+.rail-head strong{font-size:14.5px}
+.rail{height:9px;border-radius:99px;background:var(--surface-3);overflow:hidden}
+.rail-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--brass-fill),color-mix(in srgb,var(--brass-fill) 70%, #E0B85F));transition:width .5s cubic-bezier(.2,.7,.3,1)}
+.rail-foot{margin-top:9px;font-size:13px;color:var(--muted)}
+
+/* ─────────── rewards ─────────── */
+.rw{display:flex;flex-direction:column;gap:8px}
+.rw-row{
+  display:flex;align-items:center;gap:13px;padding:13px 14px;border-radius:11px;
+  border:1px solid var(--line);background:var(--surface-2);
+}
+.rw-row.on{border-color:color-mix(in srgb,var(--brass-fill) 55%, var(--line));background:var(--brass-soft)}
+.rw-seal{
+  width:38px;height:38px;flex:none;border-radius:50%;display:grid;place-items:center;
+  font-family:var(--mono);font-size:12px;font-weight:600;
+  background:var(--surface-3);color:var(--muted);border:1px dashed var(--line-2);
+}
+.rw-row.on .rw-seal{background:var(--brass-fill);color:#FFF8EA;border:1px solid var(--brass-fill);border-style:solid}
+.rw-txt{flex:1;min-width:0}
+.rw-txt b{display:block;font-size:14.5px;font-weight:600}
+.rw-txt span{font-size:12.5px;color:var(--muted)}
+.rw-row.on .rw-txt span{color:var(--brass)}
+
+/* ─────────── receipt ─────────── */
+.receipt{font-family:var(--mono);font-size:13px}
+.receipt li{display:grid;grid-template-columns:auto 1fr auto;gap:4px 12px;padding:11px 0;border-bottom:1px dashed var(--line)}
+.receipt li:last-child{border-bottom:0}
+.receipt .d{color:var(--muted);font-size:12px}
+.receipt .w{grid-column:2;color:var(--ink-2);font-size:12.5px}
+.receipt .a{grid-row:1;grid-column:3;text-align:right;font-weight:600;font-variant-numeric:tabular-nums}
+.receipt .p{grid-row:2;grid-column:3;text-align:right;color:var(--brass);font-size:12px;font-weight:600}
+.receipt .p.neg{color:var(--accent)}
+.empty{text-align:center;padding:26px 14px;color:var(--muted);font-size:14px}
+
+/* ─────────── misc client ─────────── */
+.stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border-radius:11px;overflow:hidden}
+.stat-row div{background:var(--surface);padding:13px 10px;text-align:center}
+.stat-row b{display:block;font-family:var(--display);font-size:21px;font-weight:600;font-variant-numeric:tabular-nums}
+.stat-row span{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.codebox{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
+  padding:13px 15px;border-radius:11px;background:var(--accent-soft);
+  border:1px dashed color-mix(in srgb,var(--accent) 40%, var(--line));
+}
+.codebox .c{font-family:var(--mono);font-size:19px;font-weight:600;letter-spacing:.12em;color:var(--accent)}
+.bday{display:flex;gap:11px;align-items:center;padding:13px 15px;border-radius:11px;background:var(--brass-soft);border:1px solid color-mix(in srgb,var(--brass-fill) 40%, var(--line));font-size:14px}
+
+/* ─────────── admin ─────────── */
+.admin-wrap{max-width:1180px;margin:0 auto;padding:20px 18px 80px}
+.tabs{display:flex;gap:5px;overflow-x:auto;padding-bottom:4px;margin-bottom:20px;scrollbar-width:thin}
+.tab{
+  padding:9px 14px;border-radius:9px;font-size:14px;font-weight:600;color:var(--muted);white-space:nowrap;
+  border:1px solid transparent;transition:background .15s,color .15s;
+}
+.tab:hover{background:var(--surface-2);color:var(--ink)}
+.tab[aria-selected="true"]{background:var(--surface);color:var(--ink);border-color:var(--line);box-shadow:var(--shadow)}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(168px,1fr));gap:12px}
+.tile{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:15px;display:flex;flex-direction:column;gap:5px}
+.tile .k{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.tile .v{font-family:var(--display);font-size:29px;font-weight:600;line-height:1.05;font-variant-numeric:tabular-nums}
+.tile .s{font-size:12.5px;color:var(--muted)}
+.tile .s.up{color:var(--good);font-weight:600}
+.cols{display:grid;grid-template-columns:1.35fr 1fr;gap:16px;align-items:start}
+@media (max-width:900px){.cols{grid-template-columns:1fr}}
+
+/* chart */
+.chart{display:flex;align-items:flex-end;gap:2px;height:132px;padding-top:20px;position:relative}
+.chart-grid{position:absolute;inset:20px 0 18px;pointer-events:none}
+.chart-grid i{position:absolute;left:0;right:0;height:1px;background:var(--line);opacity:.75}
+.bar{flex:1;min-width:0;position:relative;display:flex;flex-direction:column;justify-content:flex-end;height:100%;border-radius:4px}
+.bar:hover{background:var(--surface-2)}
+.bar i{display:block;background:var(--accent-fill);border-radius:4px 4px 0 0;min-height:2px;transition:filter .15s}
+.bar.zero i{background:var(--line-2)}
+.bar:hover i{filter:brightness(1.15)}
+.bar .tip{
+  position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);
+  background:var(--ink);color:var(--paper);font-size:11.5px;font-family:var(--mono);
+  padding:5px 8px;border-radius:6px;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .12s;z-index:5;
+}
+.bar:hover .tip,.bar:focus-visible .tip{opacity:1}
+.chart-x{display:flex;gap:2px;margin-top:7px}
+.chart-x span{flex:1;text-align:center;font-size:10px;color:var(--muted);font-family:var(--mono);overflow:hidden}
+.chart-peak{position:absolute;top:0;font-size:11px;font-family:var(--mono);color:var(--muted);transform:translateX(-50%);white-space:nowrap}
+
+/* ranked bars */
+.rank{display:flex;flex-direction:column;gap:9px}
+.rank-row{display:grid;grid-template-columns:1fr auto;gap:3px 12px;align-items:baseline}
+.rank-row .n{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rank-row .v{font-family:var(--mono);font-size:13px;font-variant-numeric:tabular-nums;color:var(--ink-2)}
+.rank-row .b{grid-column:1/-1;height:6px;border-radius:3px;background:var(--surface-3);overflow:hidden}
+.rank-row .b i{display:block;height:100%;background:var(--accent-fill);border-radius:3px}
+
+/* table */
+.tbl-wrap{overflow-x:auto;border-radius:12px;border:1px solid var(--line);background:var(--surface)}
+.tbl{font-size:14px;min-width:640px}
+.tbl th{
+  text-align:left;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);
+  font-weight:600;padding:11px 14px;border-bottom:1px solid var(--line);background:var(--surface-2);white-space:nowrap;
+}
+.tbl th.r,.tbl td.r{text-align:right}
+.tbl td{padding:11px 14px;border-bottom:1px solid var(--line);vertical-align:middle}
+.tbl tr:last-child td{border-bottom:0}
+.tbl tbody tr{cursor:pointer;transition:background .12s}
+.tbl tbody tr:hover{background:var(--surface-2)}
+.tbl .no{font-family:var(--mono);font-weight:600;letter-spacing:.06em}
+.tbl .num{font-size:13.5px}
+.pill{
+  display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:99px;
+  font-size:11.5px;font-weight:600;letter-spacing:.02em;white-space:nowrap;
+  background:var(--surface-3);color:var(--ink-2);
+}
+.pill.brass{background:var(--brass-soft);color:var(--brass)}
+.pill.good{background:var(--good-soft);color:var(--good)}
+.pill.crit{background:var(--crit-soft);color:var(--crit)}
+.pill.warn{background:var(--warn-soft);color:var(--warn)}
+.pill i{width:6px;height:6px;border-radius:50%;background:currentColor;flex:none}
+
+/* till */
+.till-found{display:flex;align-items:center;gap:13px;padding:13px 15px;border-radius:11px;background:var(--good-soft);border:1px solid color-mix(in srgb,var(--good) 32%, var(--line))}
+.till-found .av{width:42px;height:42px;border-radius:50%;background:var(--surface);display:grid;place-items:center;font-family:var(--display);font-size:17px;font-weight:600;flex:none;border:1px solid var(--line)}
+.chips{display:flex;flex-wrap:wrap;gap:7px}
+.chip{padding:7px 12px;border-radius:99px;border:1px solid var(--line-2);background:var(--surface);font-size:13px;font-weight:500;transition:background .12s}
+.chip:hover{background:var(--surface-2)}
+.chip[aria-pressed="true"]{background:var(--accent-fill);border-color:var(--accent-fill);color:var(--accent-on)}
+.keypad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.keypad button{padding:15px 0;border-radius:10px;border:1px solid var(--line-2);background:var(--surface);font-family:var(--mono);font-size:19px;font-weight:500}
+.keypad button:hover{background:var(--surface-2)}
+.amount-display{
+  font-family:var(--display);font-size:44px;font-weight:600;text-align:center;padding:14px 0;
+  font-variant-numeric:tabular-nums;letter-spacing:-.01em;
+}
+.amount-display.zero{color:var(--muted)}
+
+/* modal */
+.scrim{position:fixed;inset:0;background:rgba(20,16,14,.5);backdrop-filter:blur(2px);z-index:60;display:flex;align-items:flex-end;justify-content:center;padding:0}
+@media (min-width:700px){.scrim{align-items:center;padding:24px}}
+.modal{
+  background:var(--surface);width:100%;max-width:600px;max-height:92vh;overflow-y:auto;
+  border-radius:16px 16px 0 0;box-shadow:var(--shadow-lift);border:1px solid var(--line);
+}
+@media (min-width:700px){.modal{border-radius:16px}}
+.modal-head{display:flex;align-items:center;gap:12px;padding:18px 20px;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--surface);z-index:2}
+.modal-head h3{font-family:var(--display);font-size:19px;font-weight:600;flex:1}
+.modal-body{padding:20px;display:flex;flex-direction:column;gap:16px}
+
+/* toast */
+.toast{
+  position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:90;
+  background:var(--ink);color:var(--paper);padding:12px 18px;border-radius:11px;
+  font-size:14px;font-weight:600;box-shadow:var(--shadow-lift);max-width:calc(100vw - 32px);
+  animation:rise .25s cubic-bezier(.2,.8,.3,1);
+}
+.toast.ok{background:#1F5A42;color:#EAF6EF}
+.toast.bad{background:#8A2A22;color:#FCEDEA}
+@keyframes rise{from{opacity:0;transform:translate(-50%,12px)}to{opacity:1;transform:translate(-50%,0)}}
+
+/* banners + footer */
+.banner{display:flex;gap:11px;align-items:flex-start;padding:12px 15px;border-radius:11px;font-size:13.5px;border:1px solid var(--line);background:var(--surface-2);color:var(--ink-2)}
+.banner.warn{background:var(--warn-soft);border-color:color-mix(in srgb,var(--warn) 32%, var(--line));color:var(--warn)}
+.foot{text-align:center;font-size:12px;color:var(--muted);padding:26px 0 0;line-height:1.7}
+.foot b{color:var(--ink-2)}
+.linklike{color:var(--accent);font-weight:600;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+</style>
+<div id="app"></div>
+<script id="db" type="application/json">{"v":1,"shop":{"name":"Boucherie Sept-la-Ville","city":"Sept-la-Ville","tagline":"Artisan boucher — viandes de pays","ppe":1,"welcome":20,"birthday":50,"godfather":50,"godchild":25,"rewards":[{"p":100,"label":"500 g de merguez maison offerts"},{"p":200,"label":"10 € de remise sur votre achat"},{"p":350,"label":"Un poulet fermier offert"},{"p":500,"label":"Plateau apéritif charcuterie offert"},{"p":800,"label":"30 € de remise + le colis du boucher"}],"tiers":[{"min":0,"label":"Nouveau"},{"min":300,"label":"Fidèle"},{"min":800,"label":"Habitué"},{"min":1500,"label":"Ambassadeur"}]},"admin":{"pin":"4726"},"seq":1016,"clients":[{"id":"1001","name":"Nadia Belkacem","phone":"0612480377","email":"nadia.belkacem@example.fr","bday":"1985-03-12","created":"2025-10-26","points":1109,"lifetime":1209,"spent":1089.14,"visits":20,"code":"NAD-1001","by":"","demo":true,"hist":[{"t":"2026-08-09","a":0,"p":-100,"w":"500 g de merguez maison offerts","k":"reward"},{"t":"2026-07-17","a":77.67,"p":78,"w":"Saucisson, jambon","k":"buy"},{"t":"2026-07-16","a":70.58,"p":71,"w":"Boudin blanc, pâté","k":"buy"},{"t":"2026-07-04","a":52.47,"p":52,"w":"Bavette, merguez","k":"buy"},{"t":"2026-06-29","a":84.63,"p":85,"w":"Brochettes, chipolatas","k":"buy"},{"t":"2026-06-21","a":57.28,"p":57,"w":"Côte de bœuf","k":"buy"},{"t":"2026-06-12","a":0,"p":50,"w":"Parrainage de Fatou Diallo","k":"ref"},{"t":"2026-06-11","a":68.93,"p":69,"w":"Escalopes de dinde","k":"buy"},{"t":"2026-05-29","a":83.42,"p":83,"w":"Rôti de veau","k":"buy"},{"t":"2026-05-11","a":91.98,"p":92,"w":"Rôti de veau","k":"buy"},{"t":"2026-03-01","a":43.03,"p":43,"w":"Épaule d'agneau","k":"buy"},{"t":"2026-02-15","a":12.54,"p":13,"w":"Côte de bœuf","k":"buy"},{"t":"2026-02-13","a":22.2,"p":22,"w":"Épaule d'agneau","k":"buy"},{"t":"2026-02-08","a":31.86,"p":32,"w":"Filet mignon de porc","k":"buy"},{"t":"2026-01-24","a":34.91,"p":35,"w":"Côte de bœuf","k":"buy"},{"t":"2026-01-12","a":51.98,"p":52,"w":"Boudin blanc, pâté","k":"buy"},{"t":"2025-12-29","a":55.73,"p":56,"w":"Merguez, brochettes, charbon","k":"buy"},{"t":"2025-12-27","a":13.32,"p":13,"w":"Côte de bœuf","k":"buy"},{"t":"2025-12-24","a":81.68,"p":82,"w":"Épaule d'agneau","k":"buy"},{"t":"2025-12-07","a":32.31,"p":32,"w":"Gigot d'agneau","k":"buy"},{"t":"2025-11-25","a":75.22,"p":75,"w":"Entrecôte, frites maison","k":"buy"},{"t":"2025-10-30","a":47.4,"p":47,"w":"Steak haché x6","k":"buy"},{"t":"2025-10-28","a":0,"p":50,"w":"Parrainage de Karim Ould","k":"ref"},{"t":"2025-10-26","a":0,"p":20,"w":"Bienvenue — carte créée","k":"welcome"}]},{"id":"1002","name":"Jean-Pierre Marchand","phone":"0687112094","email":"","bday":"1962-11-04","created":"2026-03-06","points":1883,"lifetime":1883,"spent":1864.96,"visits":34,"code":"JEA-1002","by":"","demo":true,"hist":[{"t":"2026-08-18","a":33.45,"p":33,"w":"Filet mignon de porc","k":"buy"},{"t":"2026-08-13","a":17.78,"p":18,"w":"Escalopes de dinde","k":"buy"},{"t":"2026-08-09","a":82.55,"p":83,"w":"Escalopes de dinde","k":"buy"},{"t":"2026-08-02","a":92.99,"p":93,"w":"Escalopes de dinde","k":"buy"},{"t":"2026-08-01","a":63.65,"p":64,"w":"Bavette, merguez","k":"buy"},{"t":"2026-07-19","a":82.42,"p":82,"w":"Épaule d'agneau","k":"buy"},{"t":"2026-07-18","a":85.97,"p":86,"w":"Merguez, brochettes, charbon","k":"buy"},{"t":"2026-07-13","a":64.32,"p":64,"w":"Plat préparé : tajine","k":"buy"},{"t":"2026-07-07","a":85.45,"p":85,"w":"Steak haché x6","k":"buy"},{"t":"2026-07-03","a":46.12,"p":46,"w":"Saucisson, jambon","k":"buy"},{"t":"2026-07-02","a":27.67,"p":28,"w":"Bavette, merguez","k":"buy"},{"t":"2026-06-19","a":94.68,"p":95,"w":"Filet mignon de porc","k":"buy"},{"t":"2026-06-16","a":27.77,"p":28,"w":"Entrecôte, frites maison","k":"buy"},{"t":"2026-06-10","a":91.81,"p":92,"w":"Plat préparé : tajine","k":"buy"},{"t":"2026-06-06","a":86.04,"p":86,"w":"Steak haché x6","k":"buy"},{"t":"2026-05-31","a":24.38,"p":24,"w":"Saucisson, jambon","k":"buy"},{"t":"2026-05-27","a":27.29,"p":27,"w":"Côte de bœuf","k":"buy"},{"t":"2026-05-21","a":43.04,"p":43,"w":"Entrecôte, frites maison","k":"buy"},{"t":"2026-05-19","a":17.4,"p":17,"w":"Épaule d'agneau","k":"buy"},{"t":"2026-05-11","a":55.49,"p":55,"w":"Rôti de veau","k":"buy"},{"t":"2026-05-10","a":23.4,"p":23,"w":"Saucisson, jambon","k":"buy"},{"t":"2026-04-26","a":36.46,"p":36,"w":"Entrecôte, frites maison","k":"buy"},{"t":"2026-04-24","a":46.75,"p":47,"w":"Plat préparé : tajine","k":"buy"},{"t":"2026-04-21","a":37.02,"p":37,"w":"Rôti de veau","k":"buy"},{"t":"2026-04-20","a":88.42,"p":88,"w":"Gigot d'agneau","k":"buy"},{"t":"2026-04-07","a":73.77,"p":74,"w":"Escalopes de dinde","k":"buy"},{"t":"2026-03-31","a":27.63,"p":28,"w":"Poulet fermier, lardons","k":"buy"},{"t":"2026-03-31","a":66.61,"p":67,"w":"Filet mignon de porc","k":"buy"},{"t":"2026-03-28","a":60.72,"p":61,"w":"Bavette, merguez","k":"buy"},{"t":"2026-03-20","a":19.35,"p":19,"w":"Côte de bœuf","k":"buy"},{"t":"2026-03-19","a":20.47,"p":20,"w":"Rôti de veau","k":"buy"},{"t":"2026-03-16","a":43.24,"p":43,"w":"Escalopes de dinde","k":"buy"},{"t":"2026-03-13","a":81.13,"p":81,"w":"Steak haché x6","k":"buy"},{"t":"2026-03-12","a":89.72,"p":90,"w":"Rôti de veau","k":"buy"},{"t":"2026-03-06","a":0,"p":20,"w":"Bienvenue — carte créée","k":"welcome"}]},{"id":"1003","name":"Sofia Ramos","phone":"0755201388","email":"sofia.ramos@example.fr","bday":"1991-08-27","created":"2025-11-30","points":1800,"lifetime":1800,"spent":1729.99,"visits":33,"code":"SOF-1003","by":"","demo":true,"hist":[{"t":"2026-08-23","a":13.51,"p":14,"w":"Entrecôte, frites maison","k":"buy"},{"t":"2026-08-18","a":35.46,"p":35,"w":"Boudin blanc, pâté","k":"buy"},{"t":"2026-08-13","a":52.35,"p":52,"w":"Boudin blanc, pâté","k":"buy"},{"t":"2026-08-11","a":54.73,"p":55,"w":"Gigot d'agneau","k":"buy"},{"t":"2026-07-31","a":69.29,"p":69,"w":"Entrecôte, frites maison","k":"buy"},{"t":"2026-07-23","a":13.85,"p":14,"w":"Steak haché x6","k":"buy"},{"t":"2026-07-14","a":38.48,"p":38,"w":"Filet mignon de porc","k":"buy"},{"t":"2026-07-09","a":33.02,"p":33,"w":"Plat préparé : tajine","k":"buy"},{"t":"2026-07-04","a":90.01,"p":90,"w":"Saucisson, jambon","k":"buy"},{"t":"2026-07-02","a":55.08,"p":55,"w":"Gigot d'agneau","k":"buy"},{"t":"2026-06-24","a":53.86,"p":54,"w":"Escalopes de dinde","k":"buy"},{"t":"2026-06-23","a":50.97,"p":51,"w":"Poulet fermier, lardons","k":"buy"},{"t":"2026-06-16","a":39.35,"p":39,"w":"Épaule d'agneau","k":"buy"},{"t":"2026-06-08","a":62.29,"p":62,"w":"Saucisson, jambon","k":"buy"},{"t":"2026-06-08","a":41.37,"p":41,"w":"Bavette, merguez","k":"buy"},{"t":"2026-05-30","a":25.74,"p":26,"w":"Épaule d'agneau","k":"buy"},{"t":"2026-05-27","a":81.07,"p":81,"w":"Poulet fermier, lardons","k":"buy"},{"t":"2026-05-13","a":27.04,"p":27,"w":"Plat préparé : tajine","k":"buy"},{"t":"2026-04-28","a":25.34,"p":25,"w":"Steak haché x6","k":"buy"},{"t":"2026-04-22","a":94.97,"p":95,"w":"Filet mignon de porc","k":"buy"},{"t":"2026-04-20","a":54.57,"p":55,"w":"Épaule d'agneau","k":"buy"},{"t":"2026-04-18","a":55.19,"p":55,"w":"Côte de bœuf","k":"buy"},{"t":"2026-03-07","a":59.8,"p":60,"w":"Rôti de veau","k":"buy"},{"t":"2026-02-22","a":60.31,"p":60,"w":"Brochettes, chipolatas","k":"buy"},{"t":"2026-02-15","a":0,"p":50,"w":"Parrainage de Mehdi Nasri","k":"ref"},{"t":"2026-01-31","a":42.82,"p":43,"w":"Filet mignon de porc","k":"buy"},{"t":"2026-01-26","a":32.74,"p":33,"w":"Plat préparé : tajine","k":"buy"},{"t":"2026-01-20","a":80.12,"p":80,"w":"Escalopes de dinde","k":"buy"},{"t":"2026-01-17","a":81.72,"p":82,"w":"Brochettes, chipolatas","k":"buy"},{"t":"2026-01-01","a":82.65,"p":83,"w":"Rôti de veau","k":"buy"},{"t":"2026-01-01","a":29.62,"p":30,"w":"Gigot d'agneau","k":"buy"},{"t":"2026-01-01","a":82.81,"p":83,"w":"Boudin blanc, pâté","k":"buy"},{"t":"2025-12-29","a":17.23,"p":17,"w":"Steak haché x6","k":"buy"},{"t":"2025-12-01","a":92.63,"p":93,"w":"Poulet fermier, lardons","k":"buy"},{"t":"2025-11-30","a":0,"p":20,"w":"Bienvenue — carte créée","k":"welcome"}]},{"id":"1004","name":"Thérèse Aubry","phone":"0645930211","email":"","bday":"1949-05-19","created":"2026-06-24","points":308,"lifetime":308,"spent":288.56,"visits":5,"code":"THE-1004","by":"","demo":true,"hist":[{"t":"2026-07-27","a":55.8,"p":56,"w":"Poulet fermier, lardons","k":"buy"},{"t":"2026-07-12","a":54.06,"p":54,"w":"Boudin blanc, pâté","k":"buy"},{"t":"2026-07-07","a":80.29,"p":80,"w":"Boudin blanc, pâté","k":"buy"},{"t":"2026-07-06","a":67.1,"p":67,"w":"Épaule d'agneau","k":"buy"},{"t":"2026-07-02","a":31.31,"p":31,"w":"Gigot d'agneau","k":"buy"},{"t":"2026-06-24","a":0,"p":20,"w":"Bienvenue — carte créée","k":"welcome"}]},{"id":"1005","name":"Karim Ould","phone":"0699421750","email":"karim.ould@example.fr","bday":"1988-08-30","created":"2025-10-28","points":2067,"lifetime":2067,"spent":2023.5,"visits":38,"code":"KAR-1005","by":"1001","demo":true,"hist":[{"t":"2026-08-15","a":59.43,"p":59,"w":"Merguez, brochettes, charbon","k":"buy"},{"t":"2026-08-14","a":27.22,"p":27,"w":"Épaule d'agneau","k":"buy"},{"t":"2026-08-11","a":42.48,"p":42,"w":"Poulet fermier, lardons","k":"buy"},{"t":"2026-08-05","a":55.48,"p":55,"w":"Plat préparé : tajine","k":"buy"},{"t":"2026-07-30","a":75.99,"p":76,"w":"Escalopes de dinde","k":"buy"},{"t":"2026-07-23","a":64.49,"p":64,"w":"Filet mignon de porc","k":"buy"},{"t":"2026-07-12","a":14.86,"p":15,"w":"Épaule d'agneau","k":"buy"},{"t":"2026-07-10","a":21.94,"p":22,"w":"Bavette, merguez","k":"buy"},{"t":"2026-06-04","a":93.89,"p":94,"w":"Poulet fermier, lardons","k":"buy"},{"t":"2026-05-22","a":86.44,"p":86,"w":"Bavette, merguez","k":"buy"},{"t":"2026-05-18","a":39.96,"p":40,"w":"Boudin blanc, pâté","k":"buy"},{"t":"2026-05-11","a":77.26,"p":77,"w":"Poulet fermier, lardons","k":"buy"},{"t":"2026-05-10","a":30.18,"p":30,"w":"Saucisson, jambon","k":"buy"},{"t":"2026-05-08","a":12.12,"p":12,"w":"Brochettes, chipolatas","k":"buy"},{"t":"2026-05-08","a":57.73,"p":58,"w":"Merguez, brochettes, charbon","k":"buy"},{"t":"2026-04-28","a":67.9,"p":68,"w":"Filet mignon de porc","k":"buy"},{"t":"2026-04-03","a":37.51,"p":38,"w":"Steak haché x6","k":"buy"},{"t":"2026-03-27","a":22.54,"p":23,"w":"Côte de bœuf","k":"buy"},{"t":"2026-03-24","a":44.73,"p":45,"w":"Steak haché x6","k":"buy"},{"t":"2026-03-16","a":68.34,"p":68,"w":"Épaule d'agneau","k":"buy"},{"t":"2026-03-06","a":29.52,"p":30,"w":"Merguez, brochettes, charbon","k":"buy"},{"t":"2026-03-06","a":51.3,"p":51,"w":"Escalopes de dinde","k":"buy"},{"t":"2026-02-23","a":14.71,"p":15,"w":"Gigot d'agneau","k":"buy"},{"t":"2026-02-21","a":33.62,"p":34,"w":"Filet mignon de porc","k":"buy"},{"t":"2026-02-13","a":38.97,"p":39,"w":"Rôti de veau","k":"buy"},{"t":"2026-01-26","a":71.24,"p":71,"w":"Entrecôte, frites maison","k":"buy"},{"t":"2026-01-09","a":35.83,"p":36,"w":"Boudin blanc, pâté","k":"buy"},{"t":"2025-12-30","a":71.79,"p":72,"w":"Brochettes, chipolatas","k":"buy"},{"t":"2025-12-24","a":80.69,"p":81,"w":"Côte de bœuf","k":"buy"},{"t":"2025-12-24","a":86.45,"p":86,"w":"Épaule d'agneau","k":"buy"},{"t":"2025-12-16","a":51.37,"p":51,"w":"Côte de bœuf","k":"buy"},{"t":"2025-12-11","a":52.38,"p":52,"w":"Brochettes, chipolatas","k":"buy"},{"t":"2025-12-08","a":74.02,"p":74,"w":"Merguez, brochettes, charbon","k":"buy"},{"t":"2025-11-27","a":56.28,"p":56,"w":"Gigot d'agneau","k":"buy"},{"t":"2025-11-27","a":26.86,"p":27,"w":"Bavette, merguez","k":"buy"},{"t":"2025-11-18","a":94.89,"p":95,"w":"Côte de bœuf","k":"buy"},{"t":"2025-11-17","a":79.09,"p":79,"w":"Merguez, brochettes, charbon","k":"buy"},{"t":"2025-11-05","a":74,"p":74,"w":"Boudin blanc, pâté","k":"buy"},{"t":"2025-10-28","a":0,"p":25,"w":"Parrainé par Nadia Belkacem","k":"ref"},{"t":"2025-10-28","a":0,"p":20,"w":"Bienvenue — carte créée","k":"welcome"}]},{"id":"1006","name":"Marie Lefevre","phone":"0633870142","email":"m.lefevre@example.fr","bday":"1976-01-23","created":"2025-11-30","points":2439,"lifetime":2439,"spent":2371.99,"visits":45,"code":"MAR-1006","by":"","demo":true,"hist":[{"t":"2026-08-17","a":63.73,"p":64,"w":"Entrecôte, frites maison","k":"buy"},{"t":"2026-07-30","a":54.46,"p":54,"w":"Boudin blanc, pâté","k":"buy"},{"t":"2026-07-27","a":90.98,"p":91,"w":"Saucisson, jambon","k":"buy"},{"t":"2026-07-26","a":55.11,"p":55,"w":"Rôti de veau","k":"buy"},{"t":"2026-07-25","a":26.2,"p":26,"w":"Plat préparé : tajine","k":"buy"},{"t":"2026-07-13","a":69.29,"p":69,"w":"Côte de bœuf","k":"buy"},{"t":"2026-07-12","a":50.16,"p":50,"w":"Steak haché x6","k":"buy"},{"t":"2026-07-10","a":20.95,"p":21,"w":"Rôti de veau","k":"buy"},{"t":"2026-07-08","a":92.35,"p":92,"w":"Épaule d'agneau","k":"buy"},{"t":"2026-06-30","a":45.41,"p":45,"w":"Entrecôte, frites maison","k":"buy"},{"t":"2026-06-28","a":36.55,"p":37,"w":"Steak haché x6","k":"buy"},{"t":"2026-06-24","a":76.48,"p":76,"w":"Steak haché x6","k":"buy"},{"t":"2026-06-20","a":49.55,"p":50,"w":"Merguez, brochettes, charbon","k":"buy"},{"t":"2026-06-08","a":34.23,"p":34,"w":"Steak haché x6","k":"buy"},{"t":"2026-05-31","a":94.22,"p":94,"w":"Steak haché x6","k":"buy"},{"t":"2026-05-23","a":25.95,"p":26,"w":"Escalopes de dinde","k":"buy"},{"t":"2026-05-14","a":35.15,"p":35,"w":"Entrecôte, frites maison","k":"buy"},{"t":"2026-05-13","a":46.11,"p":46,"w":"Poulet fermier, lardons","k":"buy"},{"t":"2026-05-08","a":60.66,"p":61,"w":"Filet mignon de porc","k":"buy"},{"t":"2026-05-06","a":71.71,"p":72,"w":"Merguez, brochettes, charbon","k":"buy"},{"t":"2026-04-25","a":62.47,"p":62,"w":"Entrecôte, frites maison","k":"buy"},{"t":"2026-04-19","a":76.52,"p":77,"w":"Bavette, merguez","k":"buy"},{"t":"2026-04-14","a":39.74,"p":40,"w":"Saucisson, jambon","k":"buy"},{"t":"2026-04-13","a":81.08,"p":81,"w":"Plat préparé : tajine","k":"buy"},{"t":"2026-04-10","a":52.99,"p":53,"w":"Gigot d'agneau","k":"buy"},{"t":"2026-04-04","a":91.09,"p":91,"w":"Brochettes, chipolatas","k":"buy"},{"t":"2026-03-28","a":25.07,"p":25,"w":"Rôti de veau","k":"buy"},{"t":"2026-03-27","a":23.57,"p":24,"w":"Rôti de veau","k":"buy"},{"t":"2026-03-25","a":52.39,"p":52,"w":"Gigot d'agneau","k":"buy"},{"t":"2026-03-21","a":47.01,"p":47,"w":"Merguez, brochettes, charbon","k":"buy"},{"t":"2026-03-16","a":31.1,"p":31,"w":"Filet mignon de porc","k":"buy"},{"t":"2026-02-25","a":69.92,"p":70,"w":"Rôti de veau","k":"buy"},{"t":"2026-02-24","a":22.28,"p":22,"w":"Entrecôte, frites maison","k":"buy"},{"t":"2026-02-17","a":22.94,"p":23,"w":"Bavette, merguez","k":"buy"},{"t":"2026-02-12","a":83.85,"p":84,"w":"Poulet fermier, lardons","k":"buy"},{"t":"2026-02-06","a":33.79,"p":34,"w":"Entrecôte, frites maison","k":"buy"},{"t":"2026-02-02","a":71.24,"p":71,"w":"Saucisson, jambon","k":"buy"},{"t":"2026-01-24","a":45.07,"p":45,"w":"Boudin blanc, pâté","k":"buy"},{"t":"2026-01-16","a":56.37,"p":56,"w":"Boudin blanc, pâté","k":"buy"},{"t":"2026-01-08","a":23.3,"p":23,"w":"Poulet fermier, lardons","k":"buy"},{"t":"2026-01-03","a":74.32,"p":74,"w":"Saucisson, jambon","k":"buy"},{"t":"2025-12-18","a":34.39,"p":34,"w":"Merguez, brochettes, charbon","k":"buy"},{"t":"2025-12-12","a":81.58,"p":82,"w":"Filet mignon de porc","k":"buy"},{"t":"2025-12-11","a":35.38,"p":35,"w":"Plat préparé : tajine","k":"buy"},{"t":"2025-12-05","a":35.28,"p":35,"w":"Gigot d'agneau","k":"buy"},{"t":"2025-11-30","a":0,"p":20,"w":"Bienvenue — carte créée","k":"welcome"},{"t":"2025-11-08","a":0,"p":50,"w":"Parrainage de Lucas Berthier","k":"ref"}]},{"id":"1007","name":"Antoine Duclos","phone":"0611903466","email":"","bday":"1994-09-08","created":"2026-06-20","points":229,"lifetime":329,"spent":308.58,"visits":5,"code":"ANT-1007","by":"","demo":true,"hist":[{"t":"2026-08-15","a":68.46,"p":68,"w":"Filet mignon de porc","k":"buy"},{"t":"2026-07-24","a":63.63,"p":64,"w":"Plat préparé : tajine","k":"buy"},{"t":"2026-07-20","a":71.06,"p":71,"w":"Entrecôte, frites maison","k":"buy"},{"t":"2026-07-19","a":0,"p":-100,"w":"500 g de merguez maison offerts","k":"reward"},{"t":"2026-07-19","a":18.77,"p":19,"w":"Rôti de veau","k":"buy"},{"t":"2026-07-06","a":86.66,"p":87,"w":"Boudin blanc, pâté","k":"buy"},{"t":"2026-06-20","a":0,"p":20,"w":"Bienvenue — carte créée","k":"welcome"}]},{"id":"1008","name":"Fatou Diallo","phone":"0781224509","email":"fatou.d@example.fr","bday":"1983-12-15","created":"2026-06-12","points":466,"lifetime":466,"spent":421.09,"visits":7,"code":"FAT-1008","by":"1001","demo":true,"hist":[{"t":"2026-08-22","a":67.02,"p":67,"w":"Brochettes, chipolatas","k":"buy"},{"t":"2026-07-31","a":39.34,"p":39,"w":"Escalopes de dinde","k":"buy"},{"t":"2026-07-25","a":81.37,"p":81,"w":"Brochettes, chipolatas","k":"buy"},{"t":"2026-07-18","a":32.08,"p":32,"w":"Plat préparé : tajine","k":"buy"},{"t":"2026-07-03","a":72.59,"p":73,"w":"Brochettes, chipolatas","k":"buy"},{"t":"2026-06-28","a":74.12,"p":74,"w":"Entrecôte, frites maison","k":"buy"},{"t":"2026-06-27","a":54.57,"p":55,"w":"Rôti de veau","k":"buy"},{"t":"2026-06-12","a":0,"p":25,"w":"Parrainé par Nadia Belkacem","k":"ref"},{"t":"2026-06-12","a":0,"p":20,"w":"Bienvenue — carte créée","k":"welcome"}]},{"id":"1009","name":"Gilbert Sanchez","phone":"0620558741","email":"","bday":"1957-08-06","created":"2026-03-11","points":498,"lifetime":598,"spent":579.34,"visits":10,"code":"GIL-1009","by":"","demo":true,"hist":[{"t":"2026-07-28","a":84.12,"p":84,"w":"Épaule d'agneau","k":"buy"},{"t":"2026-07-24","a":87.23,"p":87,"w":"Saucisson, jambon","k":"buy"},{"t":"2026-07-20","a":35.38,"p":35,"w":"Entrecôte, frites maison","k":"buy"},{"t":"2026-07-13","a":76.07,"p":76,"w":"Escalopes de dinde","k":"buy"},{"t":"2026-07-11","a":28.84,"p":29,"w":"Saucisson, jambon","k":"buy"},{"t":"2026-07-04","a":0,"p":-100,"w":"500 g de merguez maison offerts","k":"reward"},{"t":"2026-07-03","a":21.26,"p":21,"w":"Brochettes, chipolatas","k":"buy"},{"t":"2026-06-17","a":27.15,"p":27,"w":"Épaule d'agneau","k":"buy"},{"t":"2026-06-12","a":79.04,"p":79,"w":"Escalopes de dinde","k":"buy"},{"t":"2026-06-04","a":90.18,"p":90,"w":"Filet mignon de porc","k":"buy"},{"t":"2026-03-26","a":50.07,"p":50,"w":"Poulet fermier, lardons","k":"buy"},{"t":"2026-03-11","a":0,"p":20,"w":"Bienvenue — carte créée","k":"welcome"}]},{"id":"1010","name":"Hélène Prieur","phone":"0764310928","email":"helene.prieur@example.fr","bday":"1970-06-30","created":"2026-04-21","points":310,"lifetime":410,"spent":390.25,"visits":8,"code":"HEL-1010","by":"","demo":true,"hist":[{"t":"2026-08-07","a":0,"p":-100,"w":"500 g de merguez maison offerts","k":"reward"},{"t":"2026-08-06","a":16.28,"p":16,"w":"Entrecôte, frites maison","k":"buy"},{"t":"2026-07-25","a":31.31,"p":31,"w":"Gigot d'agneau","k":"buy"},{"t":"2026-07-21","a":27.77,"p":28,"w":"Brochettes, chipolatas","k":"buy"},{"t":"2026-06-30","a":93.14,"p":93,"w":"Merguez, brochettes, charbon","k":"buy"},{"t":"2026-06-08","a":38.25,"p":38,"w":"Steak haché x6","k":"buy"},{"t":"2026-06-07","a":66.91,"p":67,"w":"Escalopes de dinde","k":"buy"},{"t":"2026-06-04","a":37.83,"p":38,"w":"Steak haché x6","k":"buy"},{"t":"2026-04-28","a":78.76,"p":79,"w":"Poulet fermier, lardons","k":"buy"},{"t":"2026-04-21","a":0,"p":20,"w":"Bienvenue — carte créée","k":"welcome"}]},{"id":"1011","name":"Mehdi Nasri","phone":"0652118840","email":"","bday":"1996-02-11","created":"2026-02-15","points":617,"lifetime":617,"spent":571.98,"visits":13,"code":"MEH-1011","by":"1003","demo":true,"hist":[{"t":"2026-08-17","a":81.4,"p":81,"w":"Poulet fermier, lardons","k":"buy"},{"t":"2026-08-11","a":35.12,"p":35,"w":"Plat préparé : tajine","k":"buy"},{"t":"2026-08-01","a":21.29,"p":21,"w":"Bavette, merguez","k":"buy"},{"t":"2026-06-20","a":15.41,"p":15,"w":"Entrecôte, frites maison","k":"buy"},{"t":"2026-05-28","a":61.57,"p":62,"w":"Épaule d'agneau","k":"buy"},{"t":"2026-05-27","a":75.96,"p":76,"w":"Épaule d'agneau","k":"buy"},{"t":"2026-05-12","a":63.76,"p":64,"w":"Épaule d'agneau","k":"buy"},{"t":"2026-05-08","a":92.63,"p":93,"w":"Boudin blanc, pâté","k":"buy"},{"t":"2026-04-18","a":52.31,"p":52,"w":"Entrecôte, frites maison","k":"buy"},{"t":"2026-04-13","a":18.72,"p":19,"w":"Gigot d'agneau","k":"buy"},{"t":"2026-03-09","a":14.97,"p":15,"w":"Merguez, brochettes, charbon","k":"buy"},{"t":"2026-02-26","a":26.84,"p":27,"w":"Steak haché x6","k":"buy"},{"t":"2026-02-25","a":12,"p":12,"w":"Brochettes, chipolatas","k":"buy"},{"t":"2026-02-15","a":0,"p":25,"w":"Parrainé par Sofia Ramos","k":"ref"},{"t":"2026-02-15","a":0,"p":20,"w":"Bienvenue — carte créée","k":"welcome"}]},{"id":"1012","name":"Christine Vasseur","phone":"0627704513","email":"c.vasseur@example.fr","bday":"1968-10-02","created":"2026-01-15","points":1104,"lifetime":1104,"spent":1084.7,"visits":20,"code":"CHR-1012","by":"","demo":true,"hist":[{"t":"2026-08-07","a":74.73,"p":75,"w":"Entrecôte, frites maison","k":"buy"},{"t":"2026-08-03","a":55.81,"p":56,"w":"Côte de bœuf","k":"buy"},{"t":"2026-07-30","a":51.77,"p":52,"w":"Côte de bœuf","k":"buy"},{"t":"2026-06-23","a":41.27,"p":41,"w":"Rôti de veau","k":"buy"},{"t":"2026-06-21","a":89.29,"p":89,"w":"Gigot d'agneau","k":"buy"},{"t":"2026-05-29","a":91.93,"p":92,"w":"Plat préparé : tajine","k":"buy"},{"t":"2026-05-22","a":24.22,"p":24,"w":"Steak haché x6","k":"buy"},{"t":"2026-05-18","a":82.91,"p":83,"w":"Merguez, brochettes, charbon","k":"buy"},{"t":"2026-05-04","a":38.28,"p":38,"w":"Rôti de veau","k":"buy"},{"t":"2026-04-27","a":24.47,"p":24,"w":"Steak haché x6","k":"buy"},{"t":"2026-04-26","a":52.24,"p":52,"w":"Gigot d'agneau","k":"buy"},{"t":"2026-03-31","a":80.22,"p":80,"w":"Épaule d'agneau","k":"buy"},{"t":"2026-03-26","a":28.73,"p":29,"w":"Boudin blanc, pâté","k":"buy"},{"t":"2026-03-19","a":54.9,"p":55,"w":"Merguez, brochettes, charbon","k":"buy"},{"t":"2026-02-24","a":80.77,"p":81,"w":"Merguez, brochettes, charbon","k":"buy"},{"t":"2026-02-23","a":66.11,"p":66,"w":"Côte de bœuf","k":"buy"},{"t":"2026-02-16","a":49.16,"p":49,"w":"Escalopes de dinde","k":"buy"},{"t":"2026-02-05","a":55.97,"p":56,"w":"Saucisson, jambon","k":"buy"},{"t":"2026-02-01","a":17.78,"p":18,"w":"Entrecôte, frites maison","k":"buy"},{"t":"2026-01-23","a":24.14,"p":24,"w":"Saucisson, jambon","k":"buy"},{"t":"2026-01-15","a":0,"p":20,"w":"Bienvenue — carte créée","k":"welcome"}]},{"id":"1013","name":"Lucas Berthier","phone":"0745662301","email":"","bday":"1999-08-25","created":"2025-11-08","points":1307,"lifetime":1307,"spent":1261.09,"visits":24,"code":"LUC-1013","by":"1006","demo":true,"hist":[{"t":"2026-08-08","a":55.56,"p":56,"w":"Escalopes de dinde","k":"buy"},{"t":"2026-07-27","a":41.26,"p":41,"w":"Escalopes de dinde","k":"buy"},{"t":"2026-07-22","a":66.55,"p":67,"w":"Filet mignon de porc","k":"buy"},{"t":"2026-07-21","a":60.88,"p":61,"w":"Côte de bœuf","k":"buy"},{"t":"2026-07-05","a":12.1,"p":12,"w":"Merguez, brochettes, charbon","k":"buy"},{"t":"2026-05-27","a":15.21,"p":15,"w":"Escalopes de dinde","k":"buy"},{"t":"2026-05-05","a":40.27,"p":40,"w":"Escalopes de dinde","k":"buy"},{"t":"2026-04-27","a":68.97,"p":69,"w":"Escalopes de dinde","k":"buy"},{"t":"2026-04-27","a":75.45,"p":75,"w":"Poulet fermier, lardons","k":"buy"},{"t":"2026-04-15","a":61.72,"p":62,"w":"Filet mignon de porc","k":"buy"},{"t":"2026-04-11","a":36.63,"p":37,"w":"Boudin blanc, pâté","k":"buy"},{"t":"2026-04-06","a":19.59,"p":20,"w":"Côte de bœuf","k":"buy"},{"t":"2026-03-20","a":13.3,"p":13,"w":"Saucisson, jambon","k":"buy"},{"t":"2026-03-04","a":61.6,"p":62,"w":"Poulet fermier, lardons","k":"buy"},{"t":"2026-02-20","a":58.25,"p":58,"w":"Gigot d'agneau","k":"buy"},{"t":"2026-02-08","a":75.54,"p":76,"w":"Merguez, brochettes, charbon","k":"buy"},{"t":"2026-02-01","a":85.41,"p":85,"w":"Rôti de veau","k":"buy"},{"t":"2026-01-29","a":72.27,"p":72,"w":"Plat préparé : tajine","k":"buy"},{"t":"2026-01-27","a":88.86,"p":89,"w":"Brochettes, chipolatas","k":"buy"},{"t":"2026-01-15","a":77.21,"p":77,"w":"Bavette, merguez","k":"buy"},{"t":"2026-01-07","a":30.95,"p":31,"w":"Merguez, brochettes, charbon","k":"buy"},{"t":"2025-12-14","a":39.98,"p":40,"w":"Merguez, brochettes, charbon","k":"buy"},{"t":"2025-12-08","a":61.67,"p":62,"w":"Escalopes de dinde","k":"buy"},{"t":"2025-11-25","a":41.86,"p":42,"w":"Bavette, merguez","k":"buy"},{"t":"2025-11-08","a":0,"p":25,"w":"Parrainé par Marie Lefevre","k":"ref"},{"t":"2025-11-08","a":0,"p":20,"w":"Bienvenue — carte créée","k":"welcome"}]},{"id":"1014","name":"Aminata Sow","phone":"0698330176","email":"aminata.sow@example.fr","bday":"1980-04-17","created":"2025-08-30","points":1239,"lifetime":1339,"spent":1317.6,"visits":24,"code":"AMI-1014","by":"","demo":true,"hist":[{"t":"2026-07-30","a":61.94,"p":62,"w":"Plat préparé : tajine","k":"buy"},{"t":"2026-06-28","a":0,"p":-100,"w":"500 g de merguez maison offerts","k":"reward"},{"t":"2026-06-24","a":48.01,"p":48,"w":"Bavette, merguez","k":"buy"},{"t":"2026-06-21","a":27.56,"p":28,"w":"Bavette, merguez","k":"buy"},{"t":"2026-06-05","a":75.37,"p":75,"w":"Poulet fermier, lardons","k":"buy"},{"t":"2026-05-22","a":93.01,"p":93,"w":"Boudin blanc, pâté","k":"buy"},{"t":"2026-05-20","a":39.58,"p":40,"w":"Boudin blanc, pâté","k":"buy"},{"t":"2026-05-16","a":36.64,"p":37,"w":"Merguez, brochettes, charbon","k":"buy"},{"t":"2026-03-30","a":73.1,"p":73,"w":"Entrecôte, frites maison","k":"buy"},{"t":"2026-03-13","a":50.85,"p":51,"w":"Steak haché x6","k":"buy"},{"t":"2026-02-19","a":20.23,"p":20,"w":"Brochettes, chipolatas","k":"buy"},{"t":"2026-02-15","a":32.54,"p":33,"w":"Côte de bœuf","k":"buy"},{"t":"2026-02-09","a":77.91,"p":78,"w":"Filet mignon de porc","k":"buy"},{"t":"2026-01-29","a":76.29,"p":76,"w":"Escalopes de dinde","k":"buy"},{"t":"2025-12-02","a":87.44,"p":87,"w":"Épaule d'agneau","k":"buy"},{"t":"2025-11-22","a":33.93,"p":34,"w":"Bavette, merguez","k":"buy"},{"t":"2025-11-02","a":93.66,"p":94,"w":"Poulet fermier, lardons","k":"buy"},{"t":"2025-10-24","a":58.12,"p":58,"w":"Merguez, brochettes, charbon","k":"buy"},{"t":"2025-10-24","a":17.77,"p":18,"w":"Épaule d'agneau","k":"buy"},{"t":"2025-10-22","a":88.35,"p":88,"w":"Saucisson, jambon","k":"buy"},{"t":"2025-10-21","a":50.54,"p":51,"w":"Poulet fermier, lardons","k":"buy"},{"t":"2025-10-09","a":33.73,"p":34,"w":"Steak haché x6","k":"buy"},{"t":"2025-09-28","a":36.06,"p":36,"w":"Merguez, brochettes, charbon","k":"buy"},{"t":"2025-09-13","a":15.86,"p":16,"w":"Bavette, merguez","k":"buy"},{"t":"2025-09-03","a":89.11,"p":89,"w":"Brochettes, chipolatas","k":"buy"},{"t":"2025-08-30","a":0,"p":20,"w":"Bienvenue — carte créée","k":"welcome"}]},{"id":"1015","name":"Roger Delaunay","phone":"0632901488","email":"","bday":"1953-07-21","created":"2026-03-06","points":899,"lifetime":899,"spent":878.95,"visits":14,"code":"ROG-1015","by":"","demo":true,"hist":[{"t":"2026-07-30","a":56,"p":56,"w":"Saucisson, jambon","k":"buy"},{"t":"2026-07-27","a":64.7,"p":65,"w":"Plat préparé : tajine","k":"buy"},{"t":"2026-07-23","a":62.23,"p":62,"w":"Rôti de veau","k":"buy"},{"t":"2026-07-21","a":78.46,"p":78,"w":"Poulet fermier, lardons","k":"buy"},{"t":"2026-07-17","a":56.06,"p":56,"w":"Plat préparé : tajine","k":"buy"},{"t":"2026-07-09","a":86.71,"p":87,"w":"Boudin blanc, pâté","k":"buy"},{"t":"2026-06-29","a":65.72,"p":66,"w":"Côte de bœuf","k":"buy"},{"t":"2026-06-24","a":72.3,"p":72,"w":"Escalopes de dinde","k":"buy"},{"t":"2026-06-04","a":83.75,"p":84,"w":"Bavette, merguez","k":"buy"},{"t":"2026-03-29","a":34.42,"p":34,"w":"Rôti de veau","k":"buy"},{"t":"2026-03-21","a":22.24,"p":22,"w":"Bavette, merguez","k":"buy"},{"t":"2026-03-18","a":86.7,"p":87,"w":"Merguez, brochettes, charbon","k":"buy"},{"t":"2026-03-17","a":26.74,"p":27,"w":"Escalopes de dinde","k":"buy"},{"t":"2026-03-13","a":82.92,"p":83,"w":"Entrecôte, frites maison","k":"buy"},{"t":"2026-03-06","a":0,"p":20,"w":"Bienvenue — carte créée","k":"welcome"}]},{"id":"1016","name":"Julie Caron","phone":"0711458620","email":"julie.caron@example.fr","bday":"1990-08-24","created":"2026-02-06","points":1300,"lifetime":1400,"spent":1378.97,"visits":28,"code":"JUL-1016","by":"","demo":true,"hist":[{"t":"2026-08-18","a":0,"p":-100,"w":"500 g de merguez maison offerts","k":"reward"},{"t":"2026-08-13","a":62.49,"p":62,"w":"Épaule d'agneau","k":"buy"},{"t":"2026-08-13","a":46.5,"p":47,"w":"Merguez, brochettes, charbon","k":"buy"},{"t":"2026-08-06","a":36.65,"p":37,"w":"Brochettes, chipolatas","k":"buy"},{"t":"2026-08-01","a":61.9,"p":62,"w":"Boudin blanc, pâté","k":"buy"},{"t":"2026-07-28","a":91.49,"p":91,"w":"Steak haché x6","k":"buy"},{"t":"2026-07-28","a":19.89,"p":20,"w":"Poulet fermier, lardons","k":"buy"},{"t":"2026-06-24","a":53.68,"p":54,"w":"Rôti de veau","k":"buy"},{"t":"2026-06-23","a":22.13,"p":22,"w":"Merguez, brochettes, charbon","k":"buy"},{"t":"2026-06-17","a":16.99,"p":17,"w":"Saucisson, jambon","k":"buy"},{"t":"2026-06-09","a":14.54,"p":15,"w":"Bavette, merguez","k":"buy"},{"t":"2026-05-24","a":50.39,"p":50,"w":"Filet mignon de porc","k":"buy"},{"t":"2026-05-22","a":75.78,"p":76,"w":"Gigot d'agneau","k":"buy"},{"t":"2026-05-20","a":76.75,"p":77,"w":"Boudin blanc, pâté","k":"buy"},{"t":"2026-05-17","a":13.34,"p":13,"w":"Gigot d'agneau","k":"buy"},{"t":"2026-05-09","a":61.85,"p":62,"w":"Entrecôte, frites maison","k":"buy"},{"t":"2026-05-06","a":77.9,"p":78,"w":"Steak haché x6","k":"buy"},{"t":"2026-05-06","a":48.69,"p":49,"w":"Rôti de veau","k":"buy"},{"t":"2026-05-04","a":60.68,"p":61,"w":"Boudin blanc, pâté","k":"buy"},{"t":"2026-05-02","a":43.77,"p":44,"w":"Entrecôte, frites maison","k":"buy"},{"t":"2026-04-26","a":24.31,"p":24,"w":"Brochettes, chipolatas","k":"buy"},{"t":"2026-04-14","a":65.55,"p":66,"w":"Saucisson, jambon","k":"buy"},{"t":"2026-03-07","a":27.1,"p":27,"w":"Entrecôte, frites maison","k":"buy"},{"t":"2026-02-27","a":86.89,"p":87,"w":"Boudin blanc, pâté","k":"buy"},{"t":"2026-02-20","a":78.54,"p":79,"w":"Escalopes de dinde","k":"buy"},{"t":"2026-02-17","a":55.42,"p":55,"w":"Brochettes, chipolatas","k":"buy"},{"t":"2026-02-15","a":28.3,"p":28,"w":"Rôti de veau","k":"buy"},{"t":"2026-02-14","a":17.15,"p":17,"w":"Plat préparé : tajine","k":"buy"},{"t":"2026-02-08","a":60.3,"p":60,"w":"Brochettes, chipolatas","k":"buy"},{"t":"2026-02-06","a":0,"p":20,"w":"Bienvenue — carte créée","k":"welcome"}]}],"log":[{"t":"2026-08-24","m":"Encaissement 42,50 € — n° 1001"},{"t":"2026-08-23","m":"Carte n° 1016 créée"},{"t":"2026-08-21","m":"Récompense utilisée — n° 1004"}],"meta":{"seeded":true,"built":"2026-08-24"}}</script>
+<script id="appjs">
+(function () {
+"use strict";
+
+/* ══════════════════════════ 1. Socle ══════════════════════════ */
+
+var HEAD =
+  '<meta charset="utf-8">\n' +
+  '<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n' +
+  '<meta name="color-scheme" content="light dark">\n' +
+  '<title>La Carte du Boucher</title>\n' +
+  '<link rel="preconnect" href="https://fonts.googleapis.com">\n' +
+  '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n' +
+  '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,400;6..96,600;6..96,700&family=IBM+Plex+Mono:wght@400;500;600&family=Instrument+Sans:wght@400;500;600;700&display=swap">\n';
+
+var DB = null;          // la base
+var S = null;           // état d'écran (non persisté en base)
+var busy = false;
+
+var LS_DB = "cdb.db.v1", LS_ME = "cdb.me", SS = "cdb.session";
+
+function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+function lsDel(k) { try { localStorage.removeItem(k); } catch (e) {} }
+function ssGet(k) { try { return sessionStorage.getItem(k); } catch (e) { return null; } }
+function ssSet(k, v) { try { sessionStorage.setItem(k, v); } catch (e) {} }
+
+/* Le magasin de données : version publiée partagée, ou copie locale. */
+var Store = {
+  mode: "local",        // "cloud" = base partagée (toutes les tablettes voient la même)
+  api: null,
+  readonly: false
+};
+
+function embedded() {
+  try { return JSON.parse(document.getElementById("db").textContent); }
+  catch (e) { return null; }
+}
+
+function migrate(d) {
+  if (!d || !d.shop) return null;
+  d.clients = d.clients || [];
+  d.log = d.log || [];
+  d.clients.forEach(function (c) { c.hist = c.hist || []; });
+  return d;
+}
+
+/* Reconstruit le document complet : c'est lui qui devient la nouvelle version publiée. */
+function renderDoc(state) {
+  var css = document.getElementById("appstyle").textContent;
+  var js = document.getElementById("appjs").textContent;
+  var json = JSON.stringify(state).replace(/</g, "\\u003c");
+  return "<!doctype html>\n<html lang=\"fr\">\n<head>\n" + HEAD + "<style id=\"appstyle\">" + css + "</style>\n</head>\n<body>\n" +
+    "<div id=\"app\"></div>\n" +
+    "<script id=\"db\" type=\"application/json\">" + json + "<\/script>\n" +
+    "<script id=\"appjs\">" + js + "<\/script>\n</body>\n</html>";
+}
+
+function localSave() { lsSet(LS_DB, JSON.stringify(DB)); }
+
+/* Enregistre la base. En mode partagé, la page republie une nouvelle version d'elle-même. */
+function persist(flash) {
+  if (busy) return;
+  DB.updated = today();
+  if (Store.mode !== "cloud") {
+    localSave();
+    render();
+    if (flash) toast(flash, "ok");
+    return;
+  }
+  busy = true;
+  setBusy(true);
+  S.flash = flash || "";
+  saveSession();
+  Store.api.publish(renderDoc(DB)).then(function () {
+    /* la vue est rechargée par la plateforme : rien à faire */
+  })["catch"](function (e) {
+    busy = false; setBusy(false);
+    var code = (e && e.code) || "upstream_error";
+    if (code === "conflict") return;                    // une autre vue a publié : rechargement en cours
+    if (code === "rate_limited") { toast("Trop d'enregistrements d'affilée. Réessayez dans quelques secondes.", "bad"); return; }
+    if (code === "not_writer" || code === "not_granted" || code === "not_declared" ||
+        code === "capability_disabled" || code === "capability_removed" || code === "consent_required") {
+      Store.mode = "local"; Store.readonly = true; localSave(); render();
+      toast("Enregistré sur cet appareil uniquement (accès en lecture seule).", "ok");
+      return;
+    }
+    toast("Enregistrement impossible : " + code, "bad");
+  });
+}
+
+function setBusy(on) {
+  document.body.style.cursor = on ? "progress" : "";
+  var b = document.querySelectorAll("button, input, select, textarea");
+  for (var i = 0; i < b.length; i++) { if (on) b[i].setAttribute("disabled", ""); else b[i].removeAttribute("disabled"); }
+}
+
+function saveSession() { ssSet(SS, JSON.stringify(S)); }
+function loadSession() {
+  var d = { view: "home", tab: "dash", cid: "", admin: false, flash: "", till: {} };
+  try { var p = JSON.parse(ssGet(SS) || "null"); if (p) for (var k in p) d[k] = p[k]; } catch (e) {}
+  return d;
+}
+
+/* ══════════════════════════ 2. Utilitaires ══════════════════════════ */
+
+function esc(s) {
+  return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+    return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+  });
+}
+function today() { return new Date().toISOString().slice(0, 10); }
+function eur(n) { return (Math.round(n * 100) / 100).toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " €"; }
+function eur0(n) { return Math.round(n).toLocaleString("fr-FR") + " €"; }
+function nb(n) { return Number(n || 0).toLocaleString("fr-FR"); }
+var MOIS = ["janv.", "févr.", "mars", "avril", "mai", "juin", "juil.", "août", "sept.", "oct.", "nov.", "déc."];
+var MOIS_L = ["janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août", "septembre", "octobre", "novembre", "décembre"];
+function dShort(iso) { if (!iso) return "—"; var p = iso.split("-"); return Number(p[2]) + " " + MOIS[Number(p[1]) - 1]; }
+function dFull(iso) { if (!iso) return "—"; var p = iso.split("-"); return Number(p[2]) + " " + MOIS_L[Number(p[1]) - 1] + " " + p[0]; }
+function daysAgo(iso) { if (!iso) return 9999; return Math.round((new Date(today()) - new Date(iso)) / 864e5); }
+function initials(n) { return n.trim().split(/\s+/).map(function (w) { return w[0]; }).join("").slice(0, 2).toUpperCase(); }
+function normPhone(p) { return String(p || "").replace(/[^0-9+]/g, ""); }
+function prettyPhone(p) { var s = normPhone(p); return s.length === 10 ? s.replace(/(\d{2})(?=\d)/g, "$1 ").trim() : s; }
+function slug(n) { return n.normalize("NFD").replace(/[^A-Za-z]/g, "").slice(0, 3).toUpperCase(); }
+
+function tierOf(life) {
+  var t = DB.shop.tiers, cur = t[0];
+  for (var i = 0; i < t.length; i++) if (life >= t[i].min) cur = t[i];
+  return cur.label;
+}
+function rewards() { return (DB.shop.rewards || []).slice().sort(function (a, b) { return a.p - b.p; }); }
+function nextReward(pts) {
+  var r = rewards();
+  for (var i = 0; i < r.length; i++) if (r[i].p > pts) return r[i];
+  return null;
+}
+function unlocked(pts) { return rewards().filter(function (r) { return r.p <= pts; }); }
+function byId(id) { return DB.clients.filter(function (c) { return c.id === String(id); })[0] || null; }
+function findClient(q) {
+  q = String(q || "").trim().toLowerCase();
+  if (!q) return null;
+  var ph = normPhone(q);
+  return DB.clients.filter(function (c) {
+    return c.id === q || (ph.length >= 9 && normPhone(c.phone) === ph) || (c.code || "").toLowerCase() === q;
+  })[0] || null;
+}
+function search(q) {
+  q = String(q || "").trim().toLowerCase();
+  if (!q) return DB.clients.slice();
+  var ph = normPhone(q);
+  return DB.clients.filter(function (c) {
+    return c.name.toLowerCase().indexOf(q) >= 0 || c.id.indexOf(q) >= 0 ||
+      (ph.length >= 3 && normPhone(c.phone).indexOf(ph) >= 0) ||
+      (c.email || "").toLowerCase().indexOf(q) >= 0 || (c.code || "").toLowerCase().indexOf(q) >= 0;
+  });
+}
+function lastVisit(c) {
+  var b = c.hist.filter(function (h) { return h.k === "buy"; });
+  return b.length ? b[0].t : "";
+}
+function logIt(m) { DB.log.unshift({ t: today(), m: m }); DB.log = DB.log.slice(0, 120); }
+function push(c, h) { c.hist.unshift(h); c.hist.sort(function (a, b) { return a.t < b.t ? 1 : a.t > b.t ? -1 : 0; }); }
+function bdayThisMonth(c) { return c.bday && Number(c.bday.slice(5, 7)) === new Date().getMonth() + 1; }
+function bdayToday(c) { return c.bday && c.bday.slice(5) === today().slice(5); }
+function gotBdayGift(c) {
+  var y = today().slice(0, 4);
+  return c.hist.some(function (h) { return h.k === "gift" && h.t.slice(0, 4) === y; });
+}
+
+/* ══════════════════════════ 3. Chrome ══════════════════════════ */
+
+function toast(msg, kind) {
+  var old = document.querySelector(".toast"); if (old) old.remove();
+  var el = document.createElement("div");
+  el.className = "toast " + (kind || "");
+  el.setAttribute("role", "status");
+  el.textContent = msg;
+  document.body.appendChild(el);
+  setTimeout(function () { el.remove(); }, 3800);
+}
+
+function modal(title, body, opts) {
+  closeModal();
+  opts = opts || {};
+  var s = document.createElement("div");
+  s.className = "scrim"; s.dataset.act = "scrim";
+  s.innerHTML = '<div class="modal" role="dialog" aria-modal="true" aria-label="' + esc(title) + '">' +
+    '<div class="modal-head"><h3>' + esc(title) + '</h3>' +
+    '<button class="btn btn-sm btn-ghost" data-act="close" aria-label="Fermer">Fermer</button></div>' +
+    '<div class="modal-body">' + body + '</div></div>';
+  document.body.appendChild(s);
+  var f = s.querySelector("input, select, textarea, button:not([data-act=close])");
+  if (f && !opts.nofocus) f.focus();
+}
+function closeModal() { var m = document.querySelector(".scrim"); if (m) m.remove(); }
+
+function topbar() {
+  var sh = DB.shop;
+  var right = S.view === "admin"
+    ? '<button class="btn btn-sm btn-ghost" data-act="leave-admin">Quitter l\'espace boucher</button>'
+    : '<button class="btn btn-sm btn-ghost" data-act="go-admin">Espace boucher</button>';
+  return '<header class="topbar"><div class="topbar-in">' +
+    '<a class="mark" href="#" data-act="home">' +
+    '<span class="mark-glyph" aria-hidden="true">B</span>' +
+    '<span class="mark-txt"><span class="mark-name">' + esc(sh.name) + '</span>' +
+    '<span class="mark-sub">Carte de fidélité</span></span></a>' +
+    '<span class="topbar-sp"></span>' + right +
+    '</div></header>';
+}
+
+function footer() {
+  var m = Store.mode === "cloud"
+    ? "Base partagée : chaque enregistrement est visible immédiatement sur tous les appareils."
+    : "Mode local : les données restent sur cet appareil (navigateur).";
+  return '<p class="foot"><b>' + esc(DB.shop.name) + '</b> — ' + esc(DB.shop.city) + '<br>' + m + '</p>';
+}
+
+/* ══════════════════════════ 4. Côté client ══════════════════════════ */
+
+function vHome() {
+  var sh = DB.shop, r = rewards();
+  var steps = [
+    ["1", "Vous créez votre carte", "Nom, téléphone, date de naissance. Trente secondes, une seule fois."],
+    ["2", "Vous donnez votre numéro en caisse", "Le boucher saisit votre achat, vos points tombent aussitôt."],
+    ["3", "Vous profitez", "Récompenses, cadeau d'anniversaire et points de parrainage."]
+  ].map(function (s) {
+    return '<li class="rw-row"><span class="rw-seal">' + s[0] + '</span>' +
+      '<span class="rw-txt"><b>' + s[1] + '</b><span>' + s[2] + '</span></span></li>';
+  }).join("");
+
+  var ladder = r.map(function (x) {
+    return '<li class="rw-row"><span class="rw-seal">' + x.p + '</span>' +
+      '<span class="rw-txt"><b>' + esc(x.label) + '</b><span>' + x.p + ' points</span></span></li>';
+  }).join("");
+
+  return '<main class="client-wrap">' +
+    '<section class="hero">' +
+    '<p class="eyebrow">' + esc(sh.city) + '</p>' +
+    '<h1>La carte du boucher</h1>' +
+    '<p>' + esc(sh.tagline) + '. Chaque euro dépensé vous rapporte ' +
+      nb(sh.ppe) + ' point' + (sh.ppe > 1 ? "s" : "") + '. Les points, eux, se transforment en viande.</p>' +
+    '<div class="hero-rule"></div></section>' +
+
+    '<div class="stack-sm">' +
+    '<button class="btn btn-primary btn-full" data-act="go-signup">Créer ma carte — ' + nb(sh.welcome) + ' points offerts</button>' +
+    '<button class="btn btn-full" data-act="go-find">J\'ai déjà une carte</button>' +
+    '</div>' +
+
+    '<section class="panel panel-pad">' +
+    '<div class="sect-head"><h2>Comment ça marche</h2></div>' +
+    '<ul class="rw">' + steps + '</ul></section>' +
+
+    '<section class="panel panel-pad">' +
+    '<div class="sect-head"><h2>Ce que vous débloquez</h2></div>' +
+    '<ul class="rw">' + ladder + '</ul>' +
+    '<p class="small muted" style="margin-top:14px">Cadeau d\'anniversaire : ' + nb(sh.birthday) +
+      ' points offerts. Parrainage : ' + nb(sh.godfather) + ' points pour vous, ' + nb(sh.godchild) + ' pour votre filleul.</p>' +
+    '</section>' + footer() + '</main>';
+}
+
+function vFind() {
+  return '<main class="client-wrap">' +
+    '<section class="hero"><h1>Ma carte</h1>' +
+    '<p>Entrez votre numéro de carte ou votre téléphone.</p><div class="hero-rule"></div></section>' +
+    '<form class="panel panel-pad stack" data-act="find">' +
+    '<div class="field"><label for="q">Numéro de carte ou téléphone</label>' +
+    '<input id="q" name="q" type="text" inputmode="numeric" autocomplete="off" placeholder="1001 ou 06 12 48 03 77" required>' +
+    '<span class="hint">Votre numéro figure en bas de votre carte.</span></div>' +
+    '<div id="find-err"></div>' +
+    '<button class="btn btn-primary btn-full" type="submit">Afficher ma carte</button>' +
+    '<button class="btn btn-ghost btn-full" type="button" data-act="go-signup">Je n\'ai pas encore de carte</button>' +
+    '</form>' + footer() + '</main>';
+}
+
+function vSignup() {
+  var sh = DB.shop;
+  return '<main class="client-wrap">' +
+    '<section class="hero"><h1>Créer ma carte</h1>' +
+    '<p>' + nb(sh.welcome) + ' points offerts à l\'inscription, sans engagement.</p><div class="hero-rule"></div></section>' +
+    '<form class="panel panel-pad stack" data-act="signup" novalidate>' +
+    '<div class="field"><label for="f-name">Nom et prénom *</label>' +
+    '<input id="f-name" name="name" type="text" autocomplete="name" placeholder="Marie Lefevre" required></div>' +
+    '<div class="field"><label for="f-phone">Téléphone *</label>' +
+    '<input id="f-phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="06 12 34 56 78" required>' +
+    '<span class="hint">Sert à retrouver votre carte si vous perdez votre numéro.</span></div>' +
+    '<div class="field"><label for="f-bday">Date de naissance *</label>' +
+    '<input id="f-bday" name="bday" type="date" max="' + today() + '" required>' +
+    '<span class="hint">Pour votre cadeau d\'anniversaire : ' + nb(sh.birthday) + ' points offerts chaque année.</span></div>' +
+    '<div class="field"><label for="f-email">E-mail <span class="muted">(facultatif)</span></label>' +
+    '<input id="f-email" name="email" type="email" autocomplete="email" placeholder="marie@exemple.fr"></div>' +
+    '<div class="field"><label for="f-code">Code parrain <span class="muted">(facultatif)</span></label>' +
+    '<input id="f-code" name="ref" type="text" autocomplete="off" placeholder="MAR-1006">' +
+    '<span class="hint">Vous recevez ' + nb(sh.godchild) + ' points, votre parrain ' + nb(sh.godfather) + '.</span></div>' +
+    '<label class="check"><input type="checkbox" name="ok" value="1">' +
+    '<span>J\'accepte que ' + esc(sh.name) + ' conserve ces informations pour la gestion de ma carte de fidélité. ' +
+    'Je peux demander leur suppression à tout moment en boutique.</span></label>' +
+    '<div id="signup-err"></div>' +
+    '<button class="btn btn-primary btn-full" type="submit">Créer ma carte</button>' +
+    '</form>' + footer() + '</main>';
+}
+
+function cardHTML(c) {
+  var sh = DB.shop;
+  return '<div class="loyalty">' +
+    '<div class="loyalty-top"><div>' +
+    '<div class="loyalty-shop">' + esc(sh.name) + '</div>' +
+    '<div class="loyalty-city">' + esc(sh.city) + '</div></div>' +
+    '<span class="tier">' + esc(tierOf(c.lifetime)) + '</span></div>' +
+    '<div class="loyalty-pts"><b>' + nb(c.points) + '</b><span>points</span></div>' +
+    '<div class="loyalty-name">' + esc(c.name) + '</div>' +
+    '<div class="loyalty-foot"><span class="loyalty-no">' + esc(c.id) + '</span>' +
+    '<span class="loyalty-since">Client depuis<br>' + dShort(c.created) + ' ' + c.created.slice(0, 4) + '</span></div></div>';
+}
+
+function vCard() {
+  var c = byId(S.cid);
+  if (!c) { S.view = "find"; return vFind(); }
+  var sh = DB.shop, r = rewards(), nx = nextReward(c.points), un = unlocked(c.points);
+  var prev = 0;
+  for (var i = 0; i < r.length; i++) if (r[i].p <= c.points) prev = r[i].p;
+  var pct = nx ? Math.max(4, Math.round((c.points - prev) / (nx.p - prev) * 100)) : 100;
+
+  var rail = '<section class="panel panel-pad">' +
+    '<div class="rail-head"><strong>' + (nx ? "Prochaine récompense" : "Toutes les récompenses sont débloquées") + '</strong>' +
+    (nx ? '<span class="num small muted">' + nb(c.points) + ' / ' + nb(nx.p) + '</span>' : '') + '</div>' +
+    '<div class="rail"><div class="rail-fill" style="width:' + pct + '%"></div></div>' +
+    '<p class="rail-foot">' + (nx
+      ? 'Encore <b>' + nb(nx.p - c.points) + ' points</b> (' + eur0((nx.p - c.points) / sh.ppe) + ' d\'achats) pour ' + esc(nx.label) + '.'
+      : 'Présentez votre carte en caisse pour en profiter.') + '</p></section>';
+
+  var rw = r.map(function (x) {
+    var on = x.p <= c.points;
+    return '<li class="rw-row' + (on ? " on" : "") + '">' +
+      '<span class="rw-seal">' + (on ? "✓" : x.p) + '</span>' +
+      '<span class="rw-txt"><b>' + esc(x.label) + '</b>' +
+      '<span>' + (on ? "Disponible — à demander en caisse" : nb(x.p - c.points) + " points restants") + '</span></span></li>';
+  }).join("");
+
+  var hist = c.hist.length ? c.hist.slice(0, 25).map(function (h) {
+    var sign = h.p > 0 ? "+" : "";
+    return '<li><span class="d">' + dShort(h.t) + '</span>' +
+      '<span class="a">' + (h.k === "buy" ? eur(h.a) : "—") + '</span>' +
+      '<span class="w">' + esc(h.w) + '</span>' +
+      '<span class="p' + (h.p < 0 ? " neg" : "") + '">' + sign + nb(h.p) + ' pts</span></li>';
+  }).join("") : '<li class="empty">Aucun achat enregistré pour l\'instant.</li>';
+
+  var bd = "";
+  if (bdayThisMonth(c)) {
+    bd = '<div class="bday"><span aria-hidden="true">🎂</span><span>Votre anniversaire est le <b>' +
+      dShort(c.bday) + '</b>' + (gotBdayGift(c) ? ' — cadeau déjà offert cette année.' :
+      ' : ' + nb(sh.birthday) + ' points vous seront offerts en caisse.') + '</span></div>';
+  }
+
+  var parrain = c.by ? byId(c.by) : null;
+  var filleuls = DB.clients.filter(function (x) { return x.by === c.id; });
+
+  return '<main class="client-wrap">' +
+    cardHTML(c) +
+    (un.length ? '<div class="banner" style="background:var(--brass-soft);border-color:var(--brass-fill);color:var(--brass)">' +
+      '<span aria-hidden="true">★</span><span><b>' + un.length + ' récompense' + (un.length > 1 ? "s" : "") +
+      ' disponible' + (un.length > 1 ? "s" : "") + '.</b> Demandez-la en caisse, le boucher la valide sur votre carte.</span></div>' : "") +
+    bd + rail +
+    '<div class="stat-row">' +
+    '<div><b>' + nb(c.visits) + '</b><span>passages</span></div>' +
+    '<div><b>' + eur0(c.spent) + '</b><span>d\'achats</span></div>' +
+    '<div><b>' + nb(c.lifetime) + '</b><span>points cumulés</span></div></div>' +
+
+    '<section class="panel panel-pad">' +
+    '<div class="sect-head"><h2>Vos récompenses</h2></div><ul class="rw">' + rw + '</ul></section>' +
+
+    '<section class="panel panel-pad">' +
+    '<div class="sect-head"><h2>Parrainage</h2></div>' +
+    '<div class="codebox"><span><span class="eyebrow" style="display:block">Votre code</span>' +
+    '<span class="c">' + esc(c.code) + '</span></span>' +
+    '<button class="btn btn-sm" data-act="copy" data-val="' + esc(c.code) + '">Copier</button></div>' +
+    '<p class="small muted" style="margin-top:12px">Donnez ce code à un proche : il gagne ' + nb(sh.godchild) +
+    ' points à l\'inscription, vous en gagnez ' + nb(sh.godfather) + '.</p>' +
+    (filleuls.length ? '<p class="small" style="margin-top:8px"><b>' + filleuls.length + ' filleul' +
+      (filleuls.length > 1 ? "s" : "") + '</b> : ' + esc(filleuls.map(function (f) { return f.name.split(" ")[0]; }).join(", ")) + '.</p>' : "") +
+    (parrain ? '<p class="small muted" style="margin-top:8px">Parrainé par ' + esc(parrain.name) + '.</p>' : "") +
+    '</section>' +
+
+    '<section class="panel panel-pad">' +
+    '<div class="sect-head"><h2>Mes achats</h2><span class="sp"></span>' +
+    '<span class="small muted">' + c.hist.length + ' mouvement' + (c.hist.length > 1 ? "s" : "") + '</span></div>' +
+    '<ul class="receipt">' + hist + '</ul></section>' +
+
+    '<div class="banner"><span aria-hidden="true">i</span><span>Vos coordonnées : ' +
+    esc(prettyPhone(c.phone)) + (c.email ? ' · ' + esc(c.email) : "") +
+    '. Une erreur ? Signalez-le en boutique.</span></div>' +
+    '<button class="btn btn-ghost btn-full" data-act="logout-client">Ce n\'est pas ma carte</button>' +
+    footer() + '</main>';
+}
+
+function doSignup(f) {
+  var name = f.name.value.trim(), phone = normPhone(f.phone.value), bday = f.bday.value,
+      email = f.email.value.trim(), ref = f.ref.value.trim(), ok = f.ok.checked;
+  var box = document.getElementById("signup-err");
+  function bad(m) { box.innerHTML = '<p class="err">' + esc(m) + '</p>'; }
+  if (name.length < 3 || name.indexOf(" ") < 0) return bad("Indiquez votre nom et votre prénom.");
+  if (phone.length < 9) return bad("Numéro de téléphone incomplet.");
+  if (email && email.indexOf("@") < 1) return bad("Adresse e-mail invalide.");
+  if (!bday) return bad("Indiquez votre date de naissance.");
+  if (Number(bday.slice(0, 4)) < 1900 || bday > today()) return bad("Date de naissance invalide.");
+  if (!ok) return bad("Merci de cocher la case d'accord pour créer la carte.");
+  if (DB.clients.some(function (c) { return normPhone(c.phone) === phone; }))
+    return bad("Ce téléphone est déjà rattaché à une carte. Utilisez « J'ai déjà une carte ».");
+
+  var parrain = null;
+  if (ref) {
+    parrain = DB.clients.filter(function (c) { return (c.code || "").toLowerCase() === ref.toLowerCase() || c.id === ref; })[0];
+    if (!parrain) return bad("Code parrain inconnu. Laissez le champ vide si vous n'en avez pas.");
+  }
+
+  var sh = DB.shop;
+  DB.seq = (DB.seq || 1000) + 1;
+  var id = String(DB.seq);
+  var c = {
+    id: id, name: name, phone: phone, email: email, bday: bday,
+    created: today(), points: sh.welcome, lifetime: sh.welcome, spent: 0, visits: 0,
+    code: slug(name) + "-" + id, by: parrain ? parrain.id : "", hist: [
+      { t: today(), a: 0, p: sh.welcome, w: "Bienvenue — carte créée", k: "welcome" }
+    ]
+  };
+  if (parrain) {
+    c.points += sh.godchild; c.lifetime += sh.godchild;
+    push(c, { t: today(), a: 0, p: sh.godchild, w: "Parrainé par " + parrain.name, k: "ref" });
+    parrain.points += sh.godfather; parrain.lifetime += sh.godfather;
+    push(parrain, { t: today(), a: 0, p: sh.godfather, w: "Parrainage de " + name, k: "ref" });
+  }
+  DB.clients.unshift(c);
+  logIt("Carte n° " + id + " créée — " + name + (parrain ? " (parrain " + parrain.name + ")" : ""));
+  S.cid = id; S.view = "card";
+  lsSet(LS_ME, id);
+  persist("Bienvenue " + name.split(" ")[0] + " ! Votre carte n° " + id + " est prête.");
+}
+
+/* ══════════════════════════ 5. Espace boucher — statistiques ══════════════════════════ */
+
+function allBuys() {
+  var out = [];
+  DB.clients.forEach(function (c) {
+    c.hist.forEach(function (h) { if (h.k === "buy") out.push({ t: h.t, a: h.a, p: h.p, c: c }); });
+  });
+  return out.sort(function (x, y) { return x.t < y.t ? 1 : -1; });
+}
+function monthKey(d) { return d.slice(0, 7); }
+
+function vAdminLogin() {
+  return '<main class="client-wrap">' +
+    '<section class="hero"><p class="eyebrow">Accès réservé</p><h1>Espace boucher</h1>' +
+    '<p>Tableau de bord, encaissement et fichier clients.</p><div class="hero-rule"></div></section>' +
+    '<form class="panel panel-pad stack" data-act="login">' +
+    '<div class="field"><label for="pin">Code d\'accès</label>' +
+    '<input id="pin" name="pin" type="password" inputmode="numeric" autocomplete="off" placeholder="••••" required></div>' +
+    '<div id="login-err"></div>' +
+    '<button class="btn btn-primary btn-full" type="submit">Entrer</button>' +
+    '<button class="btn btn-ghost btn-full" type="button" data-act="home">Retour</button>' +
+    '</form>' + footer() + '</main>';
+}
+
+function chart14() {
+  var days = [], i, k, map = {};
+  allBuys().forEach(function (b) { map[b.t] = (map[b.t] || 0) + b.a; });
+  for (i = 13; i >= 0; i--) {
+    var d = new Date(new Date(today()).getTime() - i * 864e5).toISOString().slice(0, 10);
+    days.push({ d: d, v: map[d] || 0 });
+  }
+  var max = Math.max.apply(null, days.map(function (x) { return x.v; }).concat([1]));
+  var peakIdx = 0; days.forEach(function (x, j) { if (x.v > days[peakIdx].v) peakIdx = j; });
+  var bars = days.map(function (x, j) {
+    var h = Math.round(x.v / max * 100);
+    return '<div class="bar' + (x.v ? "" : " zero") + '" tabindex="0" role="img" aria-label="' +
+      dShort(x.d) + ' : ' + eur(x.v) + '">' +
+      '<span class="tip">' + dShort(x.d) + " · " + eur(x.v) + '</span>' +
+      '<i style="height:' + (x.v ? Math.max(h, 3) : 2) + '%"></i></div>';
+  }).join("");
+  var labels = days.map(function (x, j) {
+    return '<span>' + (j % 3 === 0 || j === 13 ? x.d.slice(8) : "") + '</span>';
+  }).join("");
+  var rows = days.map(function (x) { return '<tr><td>' + dFull(x.d) + '</td><td>' + eur(x.v) + '</td></tr>'; }).join("");
+  return '<section class="panel panel-pad">' +
+    '<div class="sect-head"><h2>Encaissé sur 14 jours</h2><span class="sp"></span>' +
+    '<span class="small muted num">pic ' + eur(days[peakIdx].v) + '</span></div>' +
+    '<div class="chart"><div class="chart-grid"><i style="top:0"></i><i style="top:50%"></i><i style="bottom:0"></i></div>' +
+    bars + '</div><div class="chart-x">' + labels + '</div>' +
+    '<table class="sr"><caption>Chiffre encaissé par jour</caption><tbody>' + rows + '</tbody></table>' +
+    '</section>';
+}
+
+function vDash() {
+  var buys = allBuys(), mk = monthKey(today());
+  var mBuys = buys.filter(function (b) { return monthKey(b.t) === mk; });
+  var ca = buys.reduce(function (a, b) { return a + b.a; }, 0);
+  var caM = mBuys.reduce(function (a, b) { return a + b.a; }, 0);
+  var newM = DB.clients.filter(function (c) { return monthKey(c.created) === mk; }).length;
+  var pts = DB.clients.reduce(function (a, c) { return a + c.points; }, 0);
+  var used = 0; DB.clients.forEach(function (c) { c.hist.forEach(function (h) { if (h.k === "reward") used++; }); });
+  var bd = DB.clients.filter(bdayThisMonth).length;
+  var aReclamer = DB.clients.filter(function (c) { return unlocked(c.points).length; }).length;
+  var dormants = DB.clients.filter(function (c) { return c.visits > 0 && daysAgo(lastVisit(c)) > 90; });
+
+  var tiles = [
+    ["Clients", nb(DB.clients.length), newM ? '<span class="s up">+' + newM + " ce mois-ci</span>" : '<span class="s">aucun ce mois-ci</span>'],
+    ["Passages", nb(buys.length), '<span class="s">' + nb(mBuys.length) + " ce mois-ci</span>"],
+    ["Encaissé", eur0(ca), '<span class="s">' + eur0(caM) + " ce mois-ci</span>"],
+    ["Panier moyen", buys.length ? eur(ca / buys.length) : "—", '<span class="s">sur ' + nb(buys.length) + " achats</span>"],
+    ["Points en circulation", nb(pts), '<span class="s">' + nb(aReclamer) + " client" + (aReclamer > 1 ? "s" : "") + " ont une récompense à réclamer</span>"],
+    ["Récompenses utilisées", nb(used), '<span class="s">' + nb(bd) + " anniversaire" + (bd > 1 ? "s" : "") + " ce mois</span>"]
+  ].map(function (t) {
+    return '<div class="tile"><span class="k">' + t[0] + '</span><span class="v">' + t[1] + '</span>' + t[2] + '</div>';
+  }).join("");
+
+  var top = DB.clients.slice().sort(function (a, b) { return b.lifetime - a.lifetime; }).slice(0, 6);
+  var maxL = top.length ? top[0].lifetime : 1;
+  var rank = top.map(function (c) {
+    return '<div class="rank-row" data-act="open-client" data-id="' + c.id + '" style="cursor:pointer">' +
+      '<span class="n">' + esc(c.name) + '</span>' +
+      '<span class="v">' + nb(c.lifetime) + ' pts · ' + eur0(c.spent) + '</span>' +
+      '<span class="b"><i style="width:' + Math.max(3, Math.round(c.lifetime / maxL * 100)) + '%"></i></span></div>';
+  }).join("");
+
+  var jrn = DB.log.slice(0, 8).map(function (l) {
+    return '<li style="display:flex;gap:12px;padding:9px 0;border-bottom:1px dashed var(--line)">' +
+      '<span class="num small muted" style="flex:none;width:58px">' + dShort(l.t) + '</span>' +
+      '<span class="small">' + esc(l.m) + '</span></li>';
+  }).join("") || '<li class="empty">Rien pour l\'instant.</li>';
+
+  return '<div class="stack">' +
+    '<div class="tiles">' + tiles + '</div>' +
+    (dormants.length ? '<div class="banner warn"><span aria-hidden="true">!</span><span><b>' + dormants.length +
+      ' client' + (dormants.length > 1 ? "s" : "") + ' sans passage depuis plus de 3 mois.</b> ' +
+      esc(dormants.slice(0, 4).map(function (c) { return c.name + " (n° " + c.id + ")"; }).join(", ")) +
+      (dormants.length > 4 ? "…" : "") + ' — une relance et un petit geste les font revenir.</span></div>' : "") +
+    chart14() +
+    '<div class="cols">' +
+    '<section class="panel panel-pad"><div class="sect-head"><h2>Meilleurs clients</h2>' +
+    '<span class="sp"></span><span class="small muted">points cumulés</span></div>' +
+    '<div class="rank">' + rank + '</div></section>' +
+    '<section class="panel panel-pad"><div class="sect-head"><h2>Journal</h2></div>' +
+    '<ul>' + jrn + '</ul></section>' +
+    '</div></div>';
+}
+
+/* ══════════════════════════ 6. Encaisser ══════════════════════════ */
+
+function vTill() {
+  var c = S.till && S.till.cid ? byId(S.till.cid) : null;
+  var sh = DB.shop;
+  var head = '<section class="panel panel-pad stack">' +
+    '<div class="sect-head"><h2>Encaisser un achat</h2><span class="sp"></span>' +
+    '<span class="small muted">Saisissez le numéro de carte du client</span></div>' +
+    '<form data-act="till-find" style="display:flex;gap:10px;flex-wrap:wrap">' +
+    '<input name="q" type="text" inputmode="numeric" autocomplete="off" style="flex:1;min-width:190px" ' +
+    'placeholder="N° de carte, téléphone ou nom" value="">' +
+    '<button class="btn btn-primary" type="submit">Rechercher</button>' +
+    (c ? '<button class="btn btn-ghost" type="button" data-act="till-clear">Changer</button>' : "") +
+    '</form>';
+
+  if (!c) {
+    var recent = DB.clients.slice().sort(function (a, b) {
+      return (lastVisit(b) || "").localeCompare(lastVisit(a) || "");
+    }).slice(0, 6).map(function (x) {
+      return '<button class="chip" data-act="till-pick" data-id="' + x.id + '">' +
+        '<span class="num">' + x.id + '</span> · ' + esc(x.name) + '</button>';
+    }).join("");
+    return head + '<p class="small muted">Derniers passages</p><div class="chips">' + recent + '</div></section>';
+  }
+
+  var un = unlocked(c.points), nx = nextReward(c.points);
+  var baskets = ["Bœuf", "Agneau", "Volaille", "Porc", "Merguez", "Brochettes", "Charcuterie", "Plat préparé"]
+    .map(function (b) { return '<button class="chip" type="button" data-act="add-w" data-w="' + b + '">' + b + '</button>'; }).join("");
+  var quick = [10, 15, 20, 30, 50, 80]
+    .map(function (v) { return '<button class="chip" type="button" data-act="set-amt" data-v="' + v + '">' + v + ' €</button>'; }).join("");
+
+  return head +
+    '<div class="till-found"><span class="av">' + esc(initials(c.name)) + '</span>' +
+    '<span style="flex:1;min-width:0"><b>' + esc(c.name) + '</b><br>' +
+    '<span class="small muted num">n° ' + c.id + ' · ' + esc(prettyPhone(c.phone)) + ' · ' +
+    nb(c.points) + ' points · ' + nb(c.visits) + ' passages</span></span>' +
+    '<span class="pill brass">' + esc(tierOf(c.lifetime)) + '</span></div>' +
+
+    (bdayToday(c) ? '<div class="bday"><span aria-hidden="true">🎂</span><span style="flex:1">' +
+      '<b>C\'est son anniversaire aujourd\'hui.</b>' + (gotBdayGift(c) ? " Cadeau déjà offert cette année." : "") + '</span>' +
+      (gotBdayGift(c) ? "" : '<button class="btn btn-sm btn-brass" data-act="gift-bday" data-id="' + c.id + '">Offrir ' + nb(sh.birthday) + ' pts</button>') +
+      '</span></div>' : "") +
+
+    (un.length ? '<div class="banner" style="background:var(--brass-soft);border-color:var(--brass-fill);color:var(--brass)">' +
+      '<span aria-hidden="true">★</span><span style="flex:1"><b>Récompense disponible :</b> ' +
+      esc(un[un.length - 1].label) + '</span>' +
+      '<button class="btn btn-sm btn-brass" data-act="use-reward" data-id="' + c.id + '">Utiliser</button></div>' : "") +
+
+    '<form data-act="till-save" class="stack">' +
+    '<div class="field"><label for="amt">Montant de l\'achat</label>' +
+    '<input id="amt" name="amt" type="text" inputmode="decimal" placeholder="0,00" autocomplete="off" required></div>' +
+    '<div class="chips">' + quick + '</div>' +
+    '<div class="field"><label for="w">Détail de l\'achat <span class="muted">(facultatif)</span></label>' +
+    '<input id="w" name="w" type="text" autocomplete="off" placeholder="Bavette, merguez…"></div>' +
+    '<div class="chips">' + baskets + '</div>' +
+    '<button class="btn btn-primary btn-full" type="submit">Valider l\'achat et créditer les points</button>' +
+    '<p class="small muted" style="text-align:center">' + nb(sh.ppe) + ' point' + (sh.ppe > 1 ? "s" : "") +
+    ' par euro' + (nx ? ' · encore ' + nb(nx.p - c.points) + ' pts pour « ' + esc(nx.label) + ' »' : "") + '</p>' +
+    '</form></section>';
+}
+
+function tillSave(f) {
+  var c = byId(S.till.cid); if (!c) return;
+  var raw = String(f.amt.value).replace(/\s/g, "").replace(",", ".");
+  var a = parseFloat(raw);
+  if (!(a > 0)) { toast("Montant invalide.", "bad"); return; }
+  a = Math.round(a * 100) / 100;
+  var w = f.w.value.trim() || "Achat en boutique";
+  var p = Math.round(a * DB.shop.ppe);
+  c.points += p; c.lifetime += p; c.spent = Math.round((c.spent + a) * 100) / 100; c.visits++;
+  push(c, { t: today(), a: a, p: p, w: w, k: "buy" });
+  logIt("Encaissement " + eur(a) + " — n° " + c.id + " (" + c.name + ")");
+  var nx = nextReward(c.points);
+  persist("+" + p + " points pour " + c.name.split(" ")[0] + " · solde " + nb(c.points) +
+    (nx ? " · encore " + nb(nx.p - c.points) + " pts" : " · récompense max atteinte"));
+}
+
+/* ══════════════════════════ 7. Fichier clients ══════════════════════════ */
+
+function vClients() {
+  var q = S.q || "", sort = S.sort || "recent";
+  var list = search(q);
+  var sorters = {
+    recent: function (a, b) { return (lastVisit(b) || "0").localeCompare(lastVisit(a) || "0"); },
+    points: function (a, b) { return b.points - a.points; },
+    spent: function (a, b) { return b.spent - a.spent; },
+    visits: function (a, b) { return b.visits - a.visits; },
+    name: function (a, b) { return a.name.localeCompare(b.name, "fr"); },
+    news: function (a, b) { return b.created.localeCompare(a.created); }
+  };
+  list = list.sort(sorters[sort] || sorters.recent);
+
+  var rows = list.map(function (c) {
+    var lv = lastVisit(c), d = daysAgo(lv);
+    var st = !c.visits ? '<span class="pill">jamais venu</span>'
+      : d <= 30 ? '<span class="pill good"><i></i>actif</span>'
+      : d <= 90 ? '<span class="pill warn"><i></i>' + d + ' j</span>'
+      : '<span class="pill crit"><i></i>' + d + ' j</span>';
+    return '<tr data-act="open-client" data-id="' + c.id + '" tabindex="0">' +
+      '<td class="no">' + c.id + '</td>' +
+      '<td><b>' + esc(c.name) + '</b><br><span class="small muted num">' + esc(prettyPhone(c.phone)) + '</span></td>' +
+      '<td class="r num"><b>' + nb(c.points) + '</b></td>' +
+      '<td class="r num">' + nb(c.visits) + '</td>' +
+      '<td class="r num">' + eur(c.spent) + '</td>' +
+      '<td class="num small">' + (lv ? dShort(lv) : "—") + '</td>' +
+      '<td>' + st + '</td>' +
+      '<td class="num small">' + (c.bday ? dShort(c.bday) : "—") + '</td></tr>';
+  }).join("") || '<tr><td colspan="8" class="empty">Aucun client ne correspond à « ' + esc(q) + ' ».</td></tr>';
+
+  var opts = [["recent", "Dernier passage"], ["points", "Points"], ["spent", "Total dépensé"],
+    ["visits", "Passages"], ["news", "Inscription"], ["name", "Nom"]]
+    .map(function (o) { return '<option value="' + o[0] + '"' + (sort === o[0] ? " selected" : "") + '>' + o[1] + '</option>'; }).join("");
+
+  return '<div class="stack">' +
+    '<section class="panel panel-pad stack">' +
+    '<div class="sect-head"><h2>Fichier clients</h2><span class="sp"></span>' +
+    '<span class="small muted">' + nb(list.length) + " / " + nb(DB.clients.length) + ' fiches</span></div>' +
+    '<div style="display:flex;gap:10px;flex-wrap:wrap">' +
+    '<input id="cq" type="search" placeholder="Nom, n° de carte, téléphone…" value="' + esc(q) + '" style="flex:1;min-width:200px" data-act="search-live">' +
+    '<select id="csort" data-act="sort" style="width:auto">' + opts + '</select>' +
+    '<button class="btn" data-act="new-client">Nouvelle carte</button></div>' +
+    '<div class="tbl-wrap"><table class="tbl"><thead><tr>' +
+    '<th>N°</th><th>Client</th><th class="r">Points</th><th class="r">Passages</th>' +
+    '<th class="r">Dépensé</th><th>Dernier</th><th>Statut</th><th>Anniv.</th>' +
+    '</tr></thead><tbody>' + rows + '</tbody></table></div>' +
+    '<p class="small muted">Touchez une ligne pour ouvrir la fiche.</p>' +
+    '</section></div>';
+}
+
+function clientModal(id) {
+  var c = byId(id); if (!c) return;
+  var un = unlocked(c.points), sh = DB.shop;
+  var parrain = c.by ? byId(c.by) : null;
+  var filleuls = DB.clients.filter(function (x) { return x.by === c.id; });
+  var hist = c.hist.slice(0, 40).map(function (h) {
+    return '<li><span class="d">' + dShort(h.t) + '</span>' +
+      '<span class="a">' + (h.k === "buy" ? eur(h.a) : "—") + '</span>' +
+      '<span class="w">' + esc(h.w) + '</span>' +
+      '<span class="p' + (h.p < 0 ? " neg" : "") + '">' + (h.p > 0 ? "+" : "") + nb(h.p) + ' pts</span></li>';
+  }).join("") || '<li class="empty">Aucun mouvement.</li>';
+
+  var body =
+    '<div class="stat-row"><div><b>' + nb(c.points) + '</b><span>points</span></div>' +
+    '<div><b>' + nb(c.visits) + '</b><span>passages</span></div>' +
+    '<div><b>' + eur0(c.spent) + '</b><span>dépensé</span></div></div>' +
+    '<div class="small muted num">n° ' + c.id + ' · ' + esc(prettyPhone(c.phone)) +
+    (c.email ? ' · ' + esc(c.email) : "") + '<br>Né(e) le ' + dFull(c.bday) + ' · client depuis le ' + dFull(c.created) +
+    ' · code parrain ' + esc(c.code) + '<br>' + nb(c.lifetime) + ' points cumulés · statut ' + esc(tierOf(c.lifetime)) +
+    (parrain ? '<br>Parrainé par ' + esc(parrain.name) : "") +
+    (filleuls.length ? '<br>' + filleuls.length + ' filleul' + (filleuls.length > 1 ? "s" : "") + ' : ' +
+      esc(filleuls.map(function (f) { return f.name; }).join(", ")) : "") + '</div>' +
+    '<div class="btn-row">' +
+    '<button class="btn btn-primary btn-sm" data-act="till-pick" data-id="' + c.id + '">Encaisser un achat</button>' +
+    (un.length ? '<button class="btn btn-brass btn-sm" data-act="use-reward" data-id="' + c.id + '">Utiliser une récompense</button>' : "") +
+    (bdayThisMonth(c) && !gotBdayGift(c) ? '<button class="btn btn-sm" data-act="gift-bday" data-id="' + c.id + '">Cadeau anniversaire</button>' : "") +
+    '<button class="btn btn-sm" data-act="adjust" data-id="' + c.id + '">Ajouter / retirer des points</button>' +
+    '<button class="btn btn-sm" data-act="edit-client" data-id="' + c.id + '">Modifier la fiche</button>' +
+    '<button class="btn btn-sm btn-danger" data-act="del-client" data-id="' + c.id + '">Supprimer</button>' +
+    '</div>' +
+    '<hr class="divide"><div class="sect-head" style="margin:0"><h2 style="font-size:16px">Historique</h2></div>' +
+    '<ul class="receipt">' + hist + '</ul>';
+  modal(c.name, body, { nofocus: true });
+}
+
+function editModal(id) {
+  var c = byId(id);
+  modal("Modifier la fiche", '<form data-act="save-client" data-id="' + c.id + '" class="stack">' +
+    '<div class="field"><label for="e-name">Nom et prénom</label><input id="e-name" name="name" value="' + esc(c.name) + '" required></div>' +
+    '<div class="grid-2">' +
+    '<div class="field"><label for="e-phone">Téléphone</label><input id="e-phone" name="phone" value="' + esc(c.phone) + '" required></div>' +
+    '<div class="field"><label for="e-bday">Naissance</label><input id="e-bday" name="bday" type="date" value="' + esc(c.bday) + '"></div></div>' +
+    '<div class="field"><label for="e-mail">E-mail</label><input id="e-mail" name="email" type="email" value="' + esc(c.email || "") + '"></div>' +
+    '<button class="btn btn-primary btn-full" type="submit">Enregistrer</button></form>');
+}
+
+function adjustModal(id) {
+  var c = byId(id);
+  modal("Ajuster les points", '<form data-act="save-adjust" data-id="' + c.id + '" class="stack">' +
+    '<p class="small muted">Solde actuel : <b class="num">' + nb(c.points) + ' points</b>. ' +
+    'Un nombre négatif retire des points.</p>' +
+    '<div class="field"><label for="a-p">Points</label><input id="a-p" name="p" type="number" step="1" value="50" required></div>' +
+    '<div class="field"><label for="a-w">Motif</label><input id="a-w" name="w" value="Geste commercial" required></div>' +
+    '<button class="btn btn-primary btn-full" type="submit">Appliquer</button></form>');
+}
+
+function newClientModal() {
+  modal("Nouvelle carte", '<form data-act="admin-new" class="stack">' +
+    '<div class="field"><label for="n-name">Nom et prénom *</label><input id="n-name" name="name" required></div>' +
+    '<div class="grid-2">' +
+    '<div class="field"><label for="n-phone">Téléphone *</label><input id="n-phone" name="phone" type="tel" required></div>' +
+    '<div class="field"><label for="n-bday">Naissance</label><input id="n-bday" name="bday" type="date"></div></div>' +
+    '<div class="field"><label for="n-mail">E-mail</label><input id="n-mail" name="email" type="email"></div>' +
+    '<div class="field"><label for="n-ref">Code parrain</label><input id="n-ref" name="ref"></div>' +
+    '<div id="an-err"></div>' +
+    '<button class="btn btn-primary btn-full" type="submit">Créer la carte</button></form>');
+}
+
+/* ══════════════════════════ 8. Anniversaires & parrainage ══════════════════════════ */
+
+function vBday() {
+  var m = new Date().getMonth() + 1, sh = DB.shop;
+  var list = DB.clients.filter(bdayThisMonth).sort(function (a, b) { return a.bday.slice(8) - b.bday.slice(8); });
+  var rows = list.map(function (c) {
+    var isToday = bdayToday(c), done = gotBdayGift(c);
+    return '<div class="rw-row' + (isToday ? " on" : "") + '">' +
+      '<span class="rw-seal">' + Number(c.bday.slice(8)) + '</span>' +
+      '<span class="rw-txt"><b>' + esc(c.name) + '</b>' +
+      '<span class="num">n° ' + c.id + ' · ' + esc(prettyPhone(c.phone)) + (c.email ? ' · ' + esc(c.email) : "") + '</span></span>' +
+      (done ? '<span class="pill good"><i></i>offert</span>'
+        : '<button class="btn btn-sm btn-brass" data-act="gift-bday" data-id="' + c.id + '">Offrir ' + nb(sh.birthday) + ' pts</button>') +
+      '</div>';
+  }).join("") || '<p class="empty">Aucun anniversaire en ' + MOIS_L[m - 1] + '.</p>';
+
+  var next = DB.clients.filter(function (c) { return c.bday && Number(c.bday.slice(5, 7)) === (m % 12) + 1; })
+    .sort(function (a, b) { return a.bday.slice(8) - b.bday.slice(8); })
+    .map(function (c) { return '<li class="small" style="padding:6px 0;border-bottom:1px dashed var(--line)"><span class="num">' +
+      dShort(c.bday) + '</span> — ' + esc(c.name) + ' <span class="muted num">n° ' + c.id + '</span></li>'; }).join("")
+    || '<li class="empty">Personne.</li>';
+
+  return '<div class="stack"><div class="cols">' +
+    '<section class="panel panel-pad"><div class="sect-head"><h2>Anniversaires — ' + MOIS_L[m - 1] + '</h2>' +
+    '<span class="sp"></span><span class="small muted">' + list.length + ' client' + (list.length > 1 ? "s" : "") + '</span></div>' +
+    '<div class="rw">' + rows + '</div>' +
+    '<p class="small muted" style="margin-top:14px">Le cadeau crédite ' + nb(sh.birthday) +
+    ' points sur la carte, une fois par an. Le client le voit immédiatement.</p></section>' +
+    '<section class="panel panel-pad"><div class="sect-head"><h2>Le mois prochain</h2></div><ul>' + next + '</ul></section>' +
+    '</div></div>';
+}
+
+function vRef() {
+  var sh = DB.shop;
+  var parrains = DB.clients.filter(function (p) { return DB.clients.some(function (c) { return c.by === p.id; }); })
+    .map(function (p) {
+      var f = DB.clients.filter(function (c) { return c.by === p.id; });
+      return { p: p, f: f, ca: f.reduce(function (a, c) { return a + c.spent; }, 0) };
+    }).sort(function (a, b) { return b.f.length - a.f.length; });
+  var total = parrains.reduce(function (a, x) { return a + x.f.length; }, 0);
+  var caF = parrains.reduce(function (a, x) { return a + x.ca; }, 0);
+
+  var rows = parrains.map(function (x) {
+    return '<tr data-act="open-client" data-id="' + x.p.id + '" tabindex="0">' +
+      '<td class="no">' + x.p.id + '</td><td><b>' + esc(x.p.name) + '</b><br>' +
+      '<span class="small muted num">' + esc(x.p.code) + '</span></td>' +
+      '<td class="r num"><b>' + x.f.length + '</b></td>' +
+      '<td class="small">' + esc(x.f.map(function (c) { return c.name; }).join(", ")) + '</td>' +
+      '<td class="r num">' + eur0(x.ca) + '</td>' +
+      '<td class="r num">' + nb(x.f.length * sh.godfather) + '</td></tr>';
+  }).join("") || '<tr><td colspan="6" class="empty">Aucun parrainage pour l\'instant.</td></tr>';
+
+  return '<div class="stack">' +
+    '<div class="tiles">' +
+    '<div class="tile"><span class="k">Parrainages</span><span class="v">' + nb(total) + '</span><span class="s">' +
+    nb(parrains.length) + ' parrain' + (parrains.length > 1 ? "s" : "") + ' actif' + (parrains.length > 1 ? "s" : "") + '</span></div>' +
+    '<div class="tile"><span class="k">Encaissé via filleuls</span><span class="v">' + eur0(caF) + '</span>' +
+    '<span class="s">clients amenés par le bouche-à-oreille</span></div>' +
+    '<div class="tile"><span class="k">Points distribués</span><span class="v">' + nb(total * (sh.godfather + sh.godchild)) + '</span>' +
+    '<span class="s">' + nb(sh.godfather) + ' au parrain, ' + nb(sh.godchild) + ' au filleul</span></div>' +
+    '</div>' +
+    '<section class="panel panel-pad"><div class="sect-head"><h2>Qui a parrainé qui</h2></div>' +
+    '<div class="tbl-wrap"><table class="tbl"><thead><tr><th>N°</th><th>Parrain</th><th class="r">Filleuls</th>' +
+    '<th>Détail</th><th class="r">Encaissé</th><th class="r">Pts gagnés</th></tr></thead><tbody>' + rows + '</tbody></table></div>' +
+    '<p class="small muted" style="margin-top:12px">Chaque client a un code personnel (visible sur sa carte). ' +
+    'Le filleul le saisit à l\'inscription : les deux sont crédités automatiquement.</p></section></div>';
+}
+
+/* ══════════════════════════ 9. Réglages & données ══════════════════════════ */
+
+function vSet() {
+  var sh = DB.shop;
+  var rw = rewards().map(function (r, i) {
+    return '<div style="display:flex;gap:10px;align-items:center">' +
+      '<input name="p" type="number" step="10" min="1" value="' + r.p + '" style="width:110px" aria-label="Points">' +
+      '<input name="l" value="' + esc(r.label) + '" style="flex:1" aria-label="Récompense">' +
+      '<button class="btn btn-sm btn-danger" type="button" data-act="del-reward" data-i="' + i + '" aria-label="Supprimer">✕</button></div>';
+  }).join("");
+
+  var demo = DB.clients.filter(function (c) { return c.demo; }).length;
+
+  return '<div class="stack"><div class="cols">' +
+    '<div class="stack">' +
+    '<form class="panel panel-pad stack" data-act="save-shop">' +
+    '<div class="sect-head"><h2>La boutique</h2></div>' +
+    '<div class="field"><label for="s-name">Nom</label><input id="s-name" name="name" value="' + esc(sh.name) + '" required></div>' +
+    '<div class="grid-2">' +
+    '<div class="field"><label for="s-city">Ville</label><input id="s-city" name="city" value="' + esc(sh.city) + '"></div>' +
+    '<div class="field"><label for="s-tag">Accroche</label><input id="s-tag" name="tagline" value="' + esc(sh.tagline) + '"></div></div>' +
+    '<hr class="divide"><div class="sect-head" style="margin:0"><h2 style="font-size:16px">Barème</h2></div>' +
+    '<div class="grid-2">' +
+    '<div class="field"><label for="s-ppe">Points par euro dépensé</label><input id="s-ppe" name="ppe" type="number" step="0.5" min="0.5" value="' + sh.ppe + '"></div>' +
+    '<div class="field"><label for="s-wel">Points de bienvenue</label><input id="s-wel" name="welcome" type="number" step="5" min="0" value="' + sh.welcome + '"></div>' +
+    '<div class="field"><label for="s-bd">Cadeau anniversaire</label><input id="s-bd" name="birthday" type="number" step="5" min="0" value="' + sh.birthday + '"></div>' +
+    '<div class="field"><label for="s-gf">Parrain</label><input id="s-gf" name="godfather" type="number" step="5" min="0" value="' + sh.godfather + '"></div>' +
+    '<div class="field"><label for="s-gc">Filleul</label><input id="s-gc" name="godchild" type="number" step="5" min="0" value="' + sh.godchild + '"></div></div>' +
+    '<button class="btn btn-primary btn-full" type="submit">Enregistrer</button></form>' +
+
+    '<form class="panel panel-pad stack" data-act="save-rewards">' +
+    '<div class="sect-head"><h2>Récompenses</h2><span class="sp"></span>' +
+    '<button class="btn btn-sm" type="button" data-act="add-reward">Ajouter</button></div>' +
+    '<div class="stack-sm" id="rw-list">' + rw + '</div>' +
+    '<button class="btn btn-primary btn-full" type="submit">Enregistrer le barème</button>' +
+    '<p class="small muted">Les paliers s\'appliquent immédiatement sur toutes les cartes.</p></form>' +
+    '</div>' +
+
+    '<div class="stack">' +
+    '<form class="panel panel-pad stack" data-act="save-pin">' +
+    '<div class="sect-head"><h2>Code d\'accès</h2></div>' +
+    '<div class="field"><label for="p-old">Code actuel</label><input id="p-old" name="old" type="password" required></div>' +
+    '<div class="field"><label for="p-new">Nouveau code</label><input id="p-new" name="neo" type="password" inputmode="numeric" required>' +
+    '<span class="hint">4 chiffres minimum. Notez-le : il n\'y a pas de récupération.</span></div>' +
+    '<div id="pin-err"></div>' +
+    '<button class="btn btn-primary btn-full" type="submit">Changer le code</button></form>' +
+
+    '<section class="panel panel-pad stack">' +
+    '<div class="sect-head"><h2>Données</h2></div>' +
+    '<p class="small muted">' + nb(DB.clients.length) + ' fiches · ' + nb(allBuys().length) + ' achats enregistrés' +
+    (DB.updated ? ' · dernière écriture le ' + dFull(DB.updated) : "") + '.</p>' +
+    '<div class="btn-row">' +
+    '<button class="btn btn-sm" data-act="export-clients">Export clients (CSV)</button>' +
+    '<button class="btn btn-sm" data-act="export-buys">Export achats (CSV)</button>' +
+    '<button class="btn btn-sm" data-act="backup">Sauvegarde (JSON)</button>' +
+    '<button class="btn btn-sm" data-act="restore">Restaurer</button></div>' +
+    '<hr class="divide">' +
+    '<div class="btn-row">' +
+    (demo ? '<button class="btn btn-sm btn-danger" data-act="wipe-demo">Effacer les ' + demo + ' fiches de démonstration</button>' : "") +
+    '<button class="btn btn-sm btn-danger" data-act="wipe-all">Tout effacer</button></div>' +
+    '<div class="banner"><span aria-hidden="true">i</span><span>' +
+    (Store.mode === "cloud"
+      ? "Base partagée : chaque validation publie une nouvelle version de la page. Tous les appareils ouverts se mettent à jour."
+      : "Mode local : les données vivent dans le navigateur de cet appareil. Faites une sauvegarde JSON régulièrement.") +
+    '</span></div></section></div></div></div>';
+}
+
+function csv(rows) {
+  return rows.map(function (r) {
+    return r.map(function (v) {
+      v = String(v == null ? "" : v);
+      return /[";\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v;
+    }).join(";");
+  }).join("\r\n");
+}
+function csvClients() {
+  var rows = [["Numero", "Nom", "Telephone", "Email", "Naissance", "Inscription", "Points", "Points cumules",
+    "Total depense", "Passages", "Dernier passage", "Statut", "Code parrain", "Parraine par"]];
+  DB.clients.forEach(function (c) {
+    var p = c.by ? byId(c.by) : null;
+    rows.push([c.id, c.name, c.phone, c.email, c.bday, c.created, c.points, c.lifetime,
+      String(c.spent).replace(".", ","), c.visits, lastVisit(c), tierOf(c.lifetime), c.code, p ? p.name : ""]);
+  });
+  return "﻿" + csv(rows);
+}
+function csvBuys() {
+  var rows = [["Date", "Numero", "Client", "Type", "Montant", "Points", "Detail"]];
+  var kinds = { buy: "Achat", reward: "Recompense", gift: "Cadeau", ref: "Parrainage", welcome: "Bienvenue", adj: "Ajustement" };
+  DB.clients.forEach(function (c) {
+    c.hist.forEach(function (h) {
+      rows.push([h.t, c.id, c.name, kinds[h.k] || h.k, String(h.a || 0).replace(".", ","), h.p, h.w]);
+    });
+  });
+  rows.sort(function (a, b) { return a[0] === "Date" ? -1 : b[0] === "Date" ? 1 : b[0].localeCompare(a[0]); });
+  return "﻿" + csv(rows);
+}
+
+function offerFile(name, data) {
+  function fallback() {
+    modal("Copier le fichier", '<p class="small muted">Le téléchargement direct n\'est pas disponible ici. ' +
+      'Sélectionnez tout le texte ci-dessous et collez-le dans un fichier <b>' + esc(name) + '</b>.</p>' +
+      '<textarea rows="12" style="font-family:var(--mono);font-size:12px">' + esc(data) + '</textarea>' +
+      '<button class="btn btn-primary btn-full" data-act="copy" data-val="' + esc(data).slice(0, 200000) + '">Copier dans le presse-papier</button>');
+  }
+  var api = window.claude && window.claude.use ? window.claude.use("downloads") : null;
+  if (!api) return fallback();
+  api.then(function (d) {
+    if (!d) return fallback();
+    d.save({ filename: name, data: data }).then(function () { toast("Fichier enregistré.", "ok"); })
+    ["catch"](function (e) {
+      var c = (e && e.code) || "";
+      if (c === "declined") return;
+      if (c === "extension_not_enabled" || c === "rejected_extension") {
+        d.save({ filename: name.replace(/\.[a-z]+$/, "") + ".txt", data: data })
+          .then(function () { toast("Fichier enregistré.", "ok"); })["catch"](fallback);
+        return;
+      }
+      fallback();
+    });
+  })["catch"](fallback);
+}
+
+function restoreModal() {
+  modal("Restaurer une sauvegarde", '<form data-act="do-restore" class="stack">' +
+    '<div class="banner warn"><span aria-hidden="true">!</span><span>La restauration remplace toutes les données actuelles.</span></div>' +
+    '<div class="field"><label for="r-file">Fichier de sauvegarde</label><input id="r-file" type="file" accept=".json,application/json" data-act="pick-file"></div>' +
+    '<div class="field"><label for="r-txt">…ou collez le contenu JSON</label>' +
+    '<textarea id="r-txt" name="json" rows="7" style="font-family:var(--mono);font-size:12px"></textarea></div>' +
+    '<div id="r-err"></div>' +
+    '<button class="btn btn-primary btn-full" type="submit">Restaurer</button></form>');
+}
+
+/* ══════════════════════════ 10. Assemblage ══════════════════════════ */
+
+var TABS = [["dash", "Tableau de bord"], ["till", "Encaisser"], ["clients", "Clients"],
+  ["bday", "Anniversaires"], ["ref", "Parrainage"], ["set", "Réglages"]];
+
+function vAdmin() {
+  var body = S.tab === "till" ? vTill() : S.tab === "clients" ? vClients() :
+    S.tab === "bday" ? vBday() : S.tab === "ref" ? vRef() : S.tab === "set" ? vSet() : vDash();
+  var tabs = TABS.map(function (t) {
+    return '<button class="tab" role="tab" aria-selected="' + (S.tab === t[0]) + '" data-act="tab" data-t="' + t[0] + '">' + t[1] + '</button>';
+  }).join("");
+  return '<main class="admin-wrap">' +
+    '<div class="tabs" role="tablist">' + tabs + '</div>' + body +
+    '<p class="foot"><b>' + esc(DB.shop.name) + '</b> — espace boucher' +
+    (Store.readonly ? ' · <b>lecture seule</b> sur cet appareil' : "") + '</p></main>';
+}
+
+function render() {
+  var v = S.view;
+  var html = v === "signup" ? vSignup() : v === "find" ? vFind() : v === "card" ? vCard() :
+    v === "admin" ? (S.admin ? vAdmin() : vAdminLogin()) : vHome();
+  document.getElementById("app").innerHTML = topbar() + html;
+  saveSession();
+  if (S.focusId) {
+    var el = document.getElementById(S.focusId);
+    if (el) { el.focus(); try { el.setSelectionRange(el.value.length, el.value.length); } catch (e) {} }
+    S.focusId = "";
+  }
+  window.scrollTo({ top: S.scroll || 0, behavior: "instant" });
+  S.scroll = 0;
+}
+
+function go(view, tab) {
+  S.view = view; if (tab) S.tab = tab;
+  closeModal(); render();
+}
+
+/* ── actions ── */
+var ACTS = {
+  "home": function () { go("home"); },
+  "go-signup": function () { go("signup"); },
+  "go-find": function () { go("find"); },
+  "go-admin": function () { go("admin"); },
+  "leave-admin": function () { S.admin = false; go("home"); },
+  "logout-client": function () { lsDel(LS_ME); S.cid = ""; go("find"); },
+  "close": closeModal,
+  "scrim": function (el, ev) { if (ev.target.classList.contains("scrim")) closeModal(); },
+  "tab": function (el) { S.tab = el.dataset.t; S.q = ""; closeModal(); render(); },
+  "copy": function (el) {
+    var v = el.dataset.val;
+    try {
+      navigator.clipboard.writeText(v).then(function () { toast("Copié.", "ok"); },
+        function () { toast("Copie impossible — sélectionnez le texte à la main.", "bad"); });
+    } catch (e) { toast("Copie impossible — sélectionnez le texte à la main.", "bad"); }
+  },
+  "open-client": function (el) { clientModal(el.dataset.id); },
+  "edit-client": function (el) { editModal(el.dataset.id); },
+  "adjust": function (el) { adjustModal(el.dataset.id); },
+  "new-client": function () { newClientModal(); },
+  "till-pick": function (el) { S.till = { cid: el.dataset.id }; S.focusId = "amt"; go("admin", "till"); },
+  "till-clear": function () { S.till = {}; render(); },
+  "add-w": function (el) {
+    var i = document.getElementById("w"); if (!i) return;
+    i.value = i.value ? i.value + ", " + el.dataset.w : el.dataset.w;
+  },
+  "set-amt": function (el) { var i = document.getElementById("amt"); if (i) { i.value = el.dataset.v; i.focus(); } },
+  "sort": function (el) { S.sort = el.value; render(); },
+  "gift-bday": function (el) {
+    var c = byId(el.dataset.id); if (!c || gotBdayGift(c)) return;
+    var p = DB.shop.birthday;
+    c.points += p; c.lifetime += p;
+    push(c, { t: today(), a: 0, p: p, w: "Cadeau d'anniversaire", k: "gift" });
+    logIt("Cadeau anniversaire — n° " + c.id + " (" + c.name + ")");
+    closeModal(); persist("Joyeux anniversaire ! " + p + " points offerts à " + c.name.split(" ")[0] + ".");
+  },
+  "use-reward": function (el) {
+    var c = byId(el.dataset.id); if (!c) return;
+    var un = unlocked(c.points);
+    if (!un.length) return toast("Aucune récompense disponible.", "bad");
+    var opts = un.map(function (r, i) {
+      return '<button class="btn btn-full" style="justify-content:space-between" data-act="do-reward" data-id="' + c.id +
+        '" data-p="' + r.p + '" data-l="' + esc(r.label) + '"><span>' + esc(r.label) + '</span>' +
+        '<span class="num">−' + r.p + ' pts</span></button>';
+    }).join("");
+    modal("Utiliser une récompense", '<p class="small muted">Solde : <b class="num">' + nb(c.points) +
+      ' points</b>. Les points sont retirés à la validation.</p><div class="stack-sm">' + opts + '</div>');
+  },
+  "do-reward": function (el) {
+    var c = byId(el.dataset.id), p = Number(el.dataset.p), l = el.dataset.l;
+    if (!c || c.points < p) return toast("Solde insuffisant.", "bad");
+    c.points -= p;
+    push(c, { t: today(), a: 0, p: -p, w: l, k: "reward" });
+    logIt("Récompense « " + l + " » — n° " + c.id);
+    closeModal(); persist("Récompense validée : " + l + " · nouveau solde " + nb(c.points) + " pts");
+  },
+  "del-client": function (el) {
+    var c = byId(el.dataset.id);
+    modal("Supprimer la fiche", '<p>Supprimer définitivement <b>' + esc(c.name) + '</b> (n° ' + c.id + ') ' +
+      'et ses ' + c.hist.length + ' mouvements ? Cette action est irréversible.</p>' +
+      '<div class="btn-row"><button class="btn btn-danger" data-act="do-del" data-id="' + c.id + '">Supprimer</button>' +
+      '<button class="btn" data-act="close">Annuler</button></div>');
+  },
+  "do-del": function (el) {
+    var c = byId(el.dataset.id);
+    DB.clients = DB.clients.filter(function (x) { return x.id !== c.id; });
+    DB.clients.forEach(function (x) { if (x.by === c.id) x.by = ""; });
+    logIt("Fiche n° " + c.id + " supprimée");
+    closeModal(); persist("Fiche supprimée.");
+  },
+  "add-reward": function () {
+    var l = document.getElementById("rw-list");
+    var d = document.createElement("div");
+    d.style.cssText = "display:flex;gap:10px;align-items:center";
+    d.innerHTML = '<input name="p" type="number" step="10" min="1" value="100" style="width:110px" aria-label="Points">' +
+      '<input name="l" value="" placeholder="Ce que le client gagne" style="flex:1" aria-label="Récompense">' +
+      '<button class="btn btn-sm btn-danger" type="button" data-act="drop-row" aria-label="Supprimer">✕</button>';
+    l.appendChild(d); d.querySelector('input[name=l]').focus();
+  },
+  "del-reward": function (el) { el.parentNode.remove(); },
+  "drop-row": function (el) { el.parentNode.remove(); },
+  "export-clients": function () { offerFile("clients-fidelite.csv", csvClients()); },
+  "export-buys": function () { offerFile("achats-fidelite.csv", csvBuys()); },
+  "backup": function () { offerFile("sauvegarde-fidelite.json", JSON.stringify(DB, null, 1)); },
+  "restore": function () { restoreModal(); },
+  "wipe-demo": function () {
+    DB.clients = DB.clients.filter(function (c) { return !c.demo; });
+    logIt("Fiches de démonstration effacées");
+    persist("Fiches de démonstration effacées.");
+  },
+  "wipe-all": function () {
+    modal("Tout effacer", '<p>Supprimer <b>' + DB.clients.length + ' fiches</b> et tout l\'historique ? ' +
+      'Faites d\'abord une sauvegarde.</p><div class="btn-row">' +
+      '<button class="btn btn-danger" data-act="do-wipe">Oui, tout effacer</button>' +
+      '<button class="btn" data-act="close">Annuler</button></div>');
+  },
+  "do-wipe": function () {
+    DB.clients = []; DB.log = []; DB.seq = 1000;
+    closeModal(); persist("Base vidée.");
+  },
+  "pick-file": function (el) {
+    var f = el.files && el.files[0]; if (!f) return;
+    var r = new FileReader();
+    r.onload = function () { var t = document.getElementById("r-txt"); if (t) t.value = r.result; };
+    r.readAsText(f);
+  }
+};
+
+/* ── formulaires ── */
+var FORMS = {
+  "find": function (f) {
+    var c = findClient(f.q.value) || search(f.q.value)[0];
+    var box = document.getElementById("find-err");
+    if (!c) { box.innerHTML = '<p class="err">Aucune carte trouvée. Vérifiez le numéro ou créez votre carte.</p>'; return; }
+    S.cid = c.id; lsSet(LS_ME, c.id); go("card");
+  },
+  "signup": doSignup,
+  "login": function (f) {
+    if (String(f.pin.value) === String(DB.admin.pin)) { S.admin = true; S.tab = "dash"; render(); }
+    else document.getElementById("login-err").innerHTML = '<p class="err">Code incorrect.</p>';
+  },
+  "till-find": function (f) {
+    var q = f.q.value, c = findClient(q) || search(q)[0];
+    if (!c) { toast("Aucun client pour « " + q + " ».", "bad"); return; }
+    S.till = { cid: c.id }; S.focusId = "amt"; render();
+  },
+  "till-save": tillSave,
+  "save-client": function (f, el) {
+    var c = byId(el.dataset.id);
+    c.name = f.name.value.trim(); c.phone = normPhone(f.phone.value);
+    c.email = f.email.value.trim(); c.bday = f.bday.value;
+    logIt("Fiche n° " + c.id + " modifiée");
+    closeModal(); persist("Fiche mise à jour.");
+  },
+  "save-adjust": function (f, el) {
+    var c = byId(el.dataset.id), p = Math.round(Number(f.p.value)), w = f.w.value.trim() || "Ajustement";
+    if (!p) return toast("Indiquez un nombre de points.", "bad");
+    c.points += p; if (p > 0) c.lifetime += p;
+    push(c, { t: today(), a: 0, p: p, w: w, k: "adj" });
+    logIt((p > 0 ? "+" : "") + p + " points — n° " + c.id + " (" + w + ")");
+    closeModal(); persist((p > 0 ? "+" : "") + p + " points pour " + c.name.split(" ")[0] + ".");
+  },
+  "admin-new": function (f) {
+    var name = f.name.value.trim(), phone = normPhone(f.phone.value);
+    var box = document.getElementById("an-err");
+    if (name.length < 3) { box.innerHTML = '<p class="err">Nom trop court.</p>'; return; }
+    if (phone.length < 9) { box.innerHTML = '<p class="err">Téléphone incomplet.</p>'; return; }
+    if (DB.clients.some(function (c) { return normPhone(c.phone) === phone; })) {
+      box.innerHTML = '<p class="err">Ce téléphone a déjà une carte.</p>'; return;
+    }
+    var parrain = f.ref.value.trim() ? DB.clients.filter(function (c) {
+      return (c.code || "").toLowerCase() === f.ref.value.trim().toLowerCase() || c.id === f.ref.value.trim();
+    })[0] : null;
+    var sh = DB.shop;
+    DB.seq = (DB.seq || 1000) + 1;
+    var id = String(DB.seq);
+    var c = { id: id, name: name, phone: phone, email: f.email.value.trim(), bday: f.bday.value,
+      created: today(), points: sh.welcome, lifetime: sh.welcome, spent: 0, visits: 0,
+      code: slug(name) + "-" + id, by: parrain ? parrain.id : "",
+      hist: [{ t: today(), a: 0, p: sh.welcome, w: "Bienvenue — carte créée", k: "welcome" }] };
+    if (parrain) {
+      c.points += sh.godchild; c.lifetime += sh.godchild;
+      push(c, { t: today(), a: 0, p: sh.godchild, w: "Parrainé par " + parrain.name, k: "ref" });
+      parrain.points += sh.godfather; parrain.lifetime += sh.godfather;
+      push(parrain, { t: today(), a: 0, p: sh.godfather, w: "Parrainage de " + name, k: "ref" });
+    }
+    DB.clients.unshift(c);
+    logIt("Carte n° " + id + " créée — " + name);
+    S.till = { cid: id }; S.tab = "till";
+    closeModal(); persist("Carte n° " + id + " créée pour " + name + ".");
+  },
+  "save-shop": function (f) {
+    var sh = DB.shop;
+    sh.name = f.name.value.trim() || sh.name;
+    sh.city = f.city.value.trim(); sh.tagline = f.tagline.value.trim();
+    sh.ppe = Math.max(0.5, Number(f.ppe.value) || 1);
+    sh.welcome = Math.max(0, Math.round(Number(f.welcome.value) || 0));
+    sh.birthday = Math.max(0, Math.round(Number(f.birthday.value) || 0));
+    sh.godfather = Math.max(0, Math.round(Number(f.godfather.value) || 0));
+    sh.godchild = Math.max(0, Math.round(Number(f.godchild.value) || 0));
+    logIt("Réglages de la boutique modifiés");
+    persist("Réglages enregistrés.");
+  },
+  "save-rewards": function (f) {
+    var ps = f.querySelectorAll('input[name=p]'), ls = f.querySelectorAll('input[name=l]'), out = [];
+    for (var i = 0; i < ps.length; i++) {
+      var p = Math.round(Number(ps[i].value)), l = ls[i].value.trim();
+      if (p > 0 && l) out.push({ p: p, label: l });
+    }
+    if (!out.length) return toast("Gardez au moins une récompense.", "bad");
+    DB.shop.rewards = out.sort(function (a, b) { return a.p - b.p; });
+    logIt("Barème de récompenses modifié");
+    persist("Barème enregistré.");
+  },
+  "save-pin": function (f) {
+    var box = document.getElementById("pin-err");
+    if (String(f.old.value) !== String(DB.admin.pin)) { box.innerHTML = '<p class="err">Code actuel incorrect.</p>'; return; }
+    var n = String(f.neo.value).trim();
+    if (n.length < 4) { box.innerHTML = '<p class="err">4 caractères minimum.</p>'; return; }
+    DB.admin.pin = n; logIt("Code d'accès modifié");
+    persist("Code d'accès changé.");
+  },
+  "do-restore": function (f) {
+    var box = document.getElementById("r-err");
+    try {
+      var d = migrate(JSON.parse(f.json.value));
+      if (!d || !d.clients) throw 0;
+      DB = d; logIt("Sauvegarde restaurée");
+      closeModal(); persist("Sauvegarde restaurée : " + d.clients.length + " fiches.");
+    } catch (e) { box.innerHTML = '<p class="err">Fichier illisible. Collez le contenu complet du fichier JSON.</p>'; }
+  }
+};
+
+/* ── écouteurs ── */
+document.addEventListener("click", function (ev) {
+  var el = ev.target.closest("[data-act]");
+  if (!el) return;
+  var a = el.dataset.act;
+  if (el.tagName === "FORM" || el.tagName === "INPUT" || el.tagName === "SELECT") return;
+  if (ACTS[a]) { ev.preventDefault(); S.scroll = window.scrollY; ACTS[a](el, ev); }
+});
+document.addEventListener("submit", function (ev) {
+  var f = ev.target.closest("form[data-act]");
+  if (!f) return;
+  ev.preventDefault();
+  var h = FORMS[f.dataset.act];
+  if (h) { S.scroll = window.scrollY; h(f, f); }
+});
+document.addEventListener("change", function (ev) {
+  var el = ev.target.closest("[data-act]");
+  if (!el) return;
+  if (el.dataset.act === "sort") { S.scroll = window.scrollY; ACTS.sort(el); }
+  if (el.dataset.act === "pick-file") ACTS["pick-file"](el);
+});
+var qt = null;
+document.addEventListener("input", function (ev) {
+  var el = ev.target;
+  if (el.dataset && el.dataset.act === "search-live") {
+    clearTimeout(qt);
+    qt = setTimeout(function () { S.q = el.value; S.focusId = "cq"; S.scroll = window.scrollY; render(); }, 220);
+  }
+});
+document.addEventListener("keydown", function (ev) {
+  if (ev.key === "Escape") closeModal();
+  if (ev.key === "Enter" && ev.target.tagName === "TR" && ev.target.dataset.act) {
+    ACTS[ev.target.dataset.act](ev.target, ev);
+  }
+});
+
+/* ── démarrage ── */
+function boot() {
+  DB = migrate(embedded()) || { v: 1, shop: {}, admin: { pin: "4726" }, seq: 1000, clients: [], log: [] };
+  S = loadSession();
+  var api = window.claude && window.claude.use ? window.claude.use("artifact") : null;
+  var done = function () {
+    if (Store.mode !== "cloud") {
+      var l = lsGet(LS_DB);
+      if (l) { try { var d = migrate(JSON.parse(l)); if (d) DB = d; } catch (e) {} }
+    }
+    if (!S.cid) { var me = lsGet(LS_ME); if (me && byId(me)) S.cid = me; }
+    if (S.view === "card" && !byId(S.cid)) S.view = "home";
+    render();
+    if (S.flash) { toast(S.flash, "ok"); S.flash = ""; saveSession(); }
+  };
+  if (api && api.then) {
+    api.then(function (a) { if (a) { Store.api = a; Store.mode = "cloud"; } done(); })["catch"](done);
+  } else { done(); }
+}
+if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot);
+else boot();
+
+})();
+</script>
