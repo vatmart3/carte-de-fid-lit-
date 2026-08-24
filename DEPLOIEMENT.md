@@ -3,8 +3,12 @@
 Objectif : une adresse web unique, le boucher encaisse depuis sa tablette,
 chaque client consulte sa carte depuis son propre téléphone.
 
+> **Le code d'accès du boucher.** En base en ligne, il n'y a plus de code à
+> quatre chiffres : c'est l'e-mail et le mot de passe créés à l'étape 1.3.
+> Le code `4726` ne vaut que pour la démonstration hors base.
+
 Compter **une heure** la première fois. Coût : 0 € par mois (offres gratuites
-Supabase + Netlify), 10 à 15 € par an si vous voulez un nom de domaine à vous.
+Supabase + Vercel), 10 à 15 € par an si vous voulez un nom de domaine à vous.
 
 ---
 
@@ -61,23 +65,47 @@ Réglages → **Base en ligne**, coller les deux valeurs. Attention, cet
 enregistrement ne vaut que pour l'appareil utilisé — pour les clients, les
 valeurs doivent être **dans le fichier**.
 
-## 3. Publier le site — Netlify
+## 3. Publier le site — Vercel
 
-1. Sur https://app.netlify.com → **Add new site** → **Deploy manually**.
-2. Glisser le fichier `index.html` (seul) dans la zone de dépôt.
-3. Le site est en ligne sur une adresse du type
-   `https://nom-invente-123.netlify.app`. La renommer dans
-   **Site configuration → Change site name**.
+Le dépôt est prêt pour Vercel : `vercel.json` et `scripts/build-site.mjs`
+publient **uniquement** `index.html`. Le schéma, les scripts, la démo et la
+documentation restent dans le dépôt, hors de l'hébergement public.
 
-Alternatives équivalentes : Vercel, Cloudflare Pages, GitHub Pages, ou
-l'hébergement mutualisé d'un hébergeur français — c'est un fichier statique,
-n'importe quel hébergement fait l'affaire.
+1. Aller sur https://vercel.com/new
+2. **Import Git Repository** → connecter GitHub → choisir `carte-de-fid-lit-`
+3. Ne rien changer : la configuration est lue dans `vercel.json`
+   (aucune dépendance, aucun framework, dossier publié `public/`)
+4. **Deploy**. L'adresse arrive en une minute, du type
+   `carte-de-fid-lit.vercel.app` — modifiable dans **Settings → Domains**.
+
+Chaque `git push` redéploie ensuite le site automatiquement.
+
+Sans passer par GitHub, depuis le dossier du projet :
+
+```sh
+npx vercel --prod
+```
+
+### En-têtes de sécurité
+
+`vercel.json` installe aussi une politique de contenu (CSP) qui n'autorise la
+page à contacter que **ce projet Supabase** et les polices Google, et interdit
+tout le reste. Elle a été testée avec l'application complète avant livraison.
+En cas de changement de projet Supabase, mettre à jour l'adresse dans
+`connect-src`, sinon la page ne pourra plus joindre la base.
 
 ### Nom de domaine (facultatif)
 
 Acheter `fidelite-boucherie-xxx.fr` (OVH, Gandi, Infomaniak : ~12 €/an), puis
-Netlify → **Domain management → Add a domain**. Le certificat HTTPS est
-automatique.
+Vercel → **Settings → Domains → Add**. Le certificat HTTPS est automatique.
+
+### Autres hébergeurs
+
+C'est un fichier statique : Netlify (glisser `index.html` sur
+https://app.netlify.com/drop), Cloudflare Pages, GitHub Pages ou un
+hébergement mutualisé classique conviennent aussi. Seul Vercel lit
+`vercel.json` ; ailleurs, les en-têtes de sécurité sont à reporter dans la
+configuration de l'hébergeur.
 
 ## 4. Reprendre les données existantes
 

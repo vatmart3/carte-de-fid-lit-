@@ -128,6 +128,9 @@ démo publiée le fait automatiquement.
 - `DEPLOIEMENT.md` — mise en ligne pas à pas.
 - `dist/artifact.html` — la même application sans l'enveloppe `<html>/<head>/<body>`, format attendu par l'hébergement en ligne. Généré, ne pas modifier à la main.
 - `scripts/seed.mjs` — générateur du jeu de démonstration.
+- `vercel.json` + `scripts/build-site.mjs` — publication : seul `index.html` est
+  mis en ligne, avec les en-têtes de sécurité (CSP restreinte au projet Supabase
+  et aux polices Google, testée avec l'application complète).
 
 Hébergement statique possible tel quel (GitHub Pages, Netlify, OVH…) : déposer
 `index.html`, l'application tourne alors en mode local.
