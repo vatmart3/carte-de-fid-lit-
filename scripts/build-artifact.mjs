@@ -23,7 +23,8 @@ const keep = head
   .trim();
 // La vitrine, elle, est peuplée : le fichier de production part vide, mais une
 // démonstration sur une boutique sans clients ne montre rien.
-const withDemo = b => b.replace(
+// DEMO=0 produit une vitrine vide, comme une boutique le jour de l'installation.
+const withDemo = b => process.env.DEMO === "0" ? b : b.replace(
   /(<script id="db" type="application\/json">)[\s\S]*?(<\/script>)/,
   (m, a, z) => a + fs.readFileSync("demo/demo.json", "utf8").trim() + z);
 

@@ -824,7 +824,9 @@ function closeModal() { var m = document.querySelector(".scrim"); if (m) m.remov
 
 function topbar() {
   var sh = DB.shop;
-  var right = S.view !== "admin"
+  var right = S.view === "card"
+    ? '<button class="btn btn-sm btn-ghost" data-act="logout-client">Ce n\'est pas ma carte</button>'
+    : S.view !== "admin"
     ? '<button class="btn btn-sm btn-ghost" data-act="go-admin">Espace boucher</button>'
     : S.admin
     ? '<button class="btn btn-sm btn-ghost" data-act="lock">Verrouiller</button>' +
@@ -1071,7 +1073,6 @@ function vCard() {
     '<p class="small muted" style="margin-top:12px">Ces boutons agissent immédiatement, sans passer par la boutique. ' +
     'Détail dans la <button class="linklike" data-act="go-privacy">politique de confidentialité</button>.</p>' +
     '</section>' +
-    '<button class="btn btn-ghost btn-full" data-act="logout-client">Ce n\'est pas ma carte</button>' +
     footer() + '</main>';
 }
 
@@ -1968,6 +1969,7 @@ var ACTS = {
   "go-find": function () { go("find"); },
   "go-admin": function () { go("admin"); },
   "lock": function () { lockNow("Espace boucher verrouillé."); },
+  "go-home-admin": function () { S.cid = ""; go("admin"); },
   "leave-admin": function () {
     S.admin = false; S.view = "home"; S.tab = "dash"; S.q = ""; S.till = {};
     saveSession();
