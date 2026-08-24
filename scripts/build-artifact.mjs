@@ -21,6 +21,12 @@ const keep = head
   .filter(l => !/^\s*<meta /.test(l))   // charset / viewport / color-scheme : fournis par l'hôte
   .join("\n")
   .trim();
+// La vitrine, elle, est peuplée : le fichier de production part vide, mais une
+// démonstration sur une boutique sans clients ne montre rien.
+const withDemo = b => b.replace(
+  /(<script id="db" type="application\/json">)[\s\S]*?(<\/script>)/,
+  (m, a, z) => a + fs.readFileSync("demo/demo.json", "utf8").trim() + z);
+
 fs.mkdirSync("dist", { recursive: true });
-fs.writeFileSync("dist/artifact.html", keep + "\n" + noCfg(body.trim()) + "\n");
+fs.writeFileSync("dist/artifact.html", keep + "\n" + withDemo(noCfg(body.trim())) + "\n");
 console.log("dist/artifact.html —", (fs.statSync("dist/artifact.html").size / 1024).toFixed(1), "Ko");

@@ -25,6 +25,11 @@ page autonome — aucun serveur à installer.
 Le client retrouve sa carte avec son numéro **ou** son téléphone. Son appareil
 la mémorise ensuite.
 
+L'espace boucher est toujours derrière le mot de passe : aucun passage direct
+depuis la carte d'un client, et la session se verrouille seule après un délai
+d'inactivité réglable (quinze minutes par défaut). Le verrouillage efface la
+session côté navigateur — ce n'est pas qu'un rideau devant l'écran.
+
 ## Côté boucher
 
 | Onglet | Contenu |
@@ -34,7 +39,7 @@ la mémorise ensuite.
 | **Clients** | Fichier complet, recherche instantanée, tris, statut d'activité. Fiche détaillée : historique, encaissement, utilisation d'une récompense, ajout/retrait manuel de points avec motif, modification, suppression. Création de carte au comptoir. |
 | **Anniversaires** | Ceux du mois (avec repérage du jour même) et ceux du mois suivant, pour anticiper. Cadeau limité à une fois par an et par client. |
 | **Parrainage** | Qui a parrainé qui, chiffre d'affaires apporté par les filleuls, points distribués. |
-| **Réglages** | Nom / ville / accroche de la boutique, barème (points par euro, bienvenue, anniversaire, parrain, filleul), éditeur de récompenses, compte d'accès, export CSV clients et achats, sauvegarde et restauration JSON. |
+| **Réglages** | Nom / ville / accroche de la boutique, barème (points par euro, bienvenue, anniversaire, parrain, filleul), verrouillage automatique, éditeur de récompenses, compte d'accès, export CSV clients et achats, sauvegarde et restauration JSON. |
 | **Données personnelles** | Identité légale de la boutique (alimente les mentions légales et la politique de confidentialité), durée de conservation, signalement et purge des fiches trop anciennes, contrôle de l'installation. |
 
 ## Barème par défaut
@@ -126,7 +131,8 @@ essayer l'application sans base, vider ce bloc (`{"url":"","key":""}`) sur une
 copie : elle repasse en mode local avec le jeu de démonstration. Le build de la
 démo publiée le fait automatiquement.
 
-- `index.html` — l'application complète (source de vérité : structure, style, logique, base de démonstration).
+- `index.html` — l'application complète, **base vide** : c'est le fichier de production, aucune fiche fictive.
+- `demo/demo.json` — le jeu de démonstration, injecté uniquement dans la vitrine publiée.
 - `supabase/schema.sql` — tables, règles d'accès et fonctions de la base en ligne.
 - `DEPLOIEMENT.md` — mise en ligne pas à pas.
 - `dist/artifact.html` — la même application sans l'enveloppe `<html>/<head>/<body>`, format attendu par l'hébergement en ligne. Généré, ne pas modifier à la main.
