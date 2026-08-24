@@ -507,7 +507,11 @@ function sbConfig() {
 function sbFetch(path, opts, asUser) {
   opts = opts || {};
   var h = { apikey: SB.key, "Content-Type": "application/json" };
-  h.Authorization = "Bearer " + (asUser && SB.token ? SB.token : SB.key);
+  // Session du boucher si on en a une. Sinon on n'envoie « Authorization » que
+  // pour les anciennes clés JWT : les clés « sb_publishable_… » passent par le
+  // seul en-tête apikey, et un Bearer non-JWT ferait échouer la passerelle.
+  if (asUser && SB.token) h.Authorization = "Bearer " + SB.token;
+  else if (SB.key.slice(0, 3) === "eyJ") h.Authorization = "Bearer " + SB.key;
   if (opts.prefer) h.Prefer = opts.prefer;
   return fetch(SB.url.replace(/\/+$/, "") + path, {
     method: opts.method || "GET", headers: h,
