@@ -8,8 +8,8 @@ const TODAY = new Date('2026-08-24T12:00:00Z');
 const dayStr = d => new Date(TODAY.getTime() - d * 864e5).toISOString().slice(0, 10);
 
 const SHOP = {
-  name: "Boucherie Sept-la-Ville",
-  city: "Sept-la-Ville",
+  name: "Boucherie Vatuone",
+  city: "Sète",
   tagline: "Artisan boucher — viandes de pays",
   ppe: 1,          // points par euro
   welcome: 20,

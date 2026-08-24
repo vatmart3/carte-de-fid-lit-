@@ -6,6 +6,7 @@ page autonome — aucun serveur à installer.
 
 **Démo en ligne :** https://claude.ai/code/artifact/5dfed855-fac8-4e64-895c-2cf7f198fd90
 **Code d'accès boucher :** `4726` (modifiable dans Réglages → Code d'accès)
+**Mise en production :** [DEPLOIEMENT.md](DEPLOIEMENT.md) — Supabase + hébergement statique, une heure.
 
 ---
 
@@ -51,40 +52,45 @@ paramétrée sur « Boucherie Sept-la-Ville »).
 
 ## Où sont stockées les données
 
-L'application détecte son environnement :
-
-- **Base partagée** (version publiée en ligne) — chaque validation republie la
-  page avec les nouvelles données. Tous les appareils ouverts se mettent à jour :
-  le boucher encaisse sur sa tablette, le client voit ses points changer sur son
-  téléphone.
-- **Mode local** (fichier ouvert directement, hébergement statique, ou visiteur
-  en lecture seule) — les données restent dans le navigateur de l'appareil
-  (`localStorage`). Faire une sauvegarde JSON régulièrement.
-
+L'application détecte son environnement et choisit seule l'un des trois modes.
 Le mode actif est indiqué en bas de chaque page et dans Réglages → Données.
 
-## Limites de cette version — à lire avant de la vendre
+**1. Base en ligne (Supabase) — le mode de production.** C'est celui à utiliser
+en boutique : voir [DEPLOIEMENT.md](DEPLOIEMENT.md). Le boucher se connecte avec
+un compte e-mail, chaque client reçoit un lien personnel (`…/?c=xxxx`) et
+consulte sa carte depuis son propre téléphone. Les points sont calculés par la
+base, jamais par le navigateur, et le fichier clients n'est lisible que par les
+comptes inscrits dans la table `staff`.
 
-Cette version est une **maquette fonctionnelle**, pas encore un produit de
-production :
+**2. Base partagée (page publiée en ligne).** Chaque validation republie la page
+avec les nouvelles données ; tous les appareils ouverts se mettent à jour. Bon
+pour une démonstration, pas pour de vrais clients : ils sont en lecture seule et
+les données sont lisibles dans le source de la page.
 
-- Les données (dont les téléphones et le code d'accès) sont contenues dans la
-  page. Toute personne ayant le lien peut, en lisant le source, les consulter.
-  Le code d'accès protège l'interface, pas les données.
-- Les écritures concurrentes sont gérées par « le dernier qui publie gagne » :
-  deux encaissements simultanés depuis deux appareils, et le second est rejeté
-  (la page se recharge sur la version gagnante). Sans conséquence pour une
-  caisse unique.
-- Pas d'envoi de SMS ni d'e-mail automatique pour les anniversaires : la liste
-  est fournie, le geste reste manuel.
+**3. Mode local.** Fichier ouvert directement ou hébergement statique sans base :
+les données restent dans le navigateur de l'appareil (`localStorage`). Prévoir
+une sauvegarde JSON régulière.
 
-Pour une mise en production : un serveur avec une vraie base (PostgreSQL,
-Supabase, Firebase…), une authentification côté serveur, un lien client
-personnel par carte, et un journal des opérations. Le modèle de données ci-dessous
-est déjà structuré pour cette migration — seule la couche `Store` (fonctions
-`persist` / `boot` dans `index.html`) est à remplacer par des appels réseau.
+## Limites connues
+
+**En mode base en ligne** (production) :
+
+- Pas d'envoi automatique de SMS ni d'e-mail pour les anniversaires : la liste
+  du mois est fournie, le geste reste manuel.
+- Pas de lecture de QR code : le numéro de carte se saisit au clavier.
+- Le fichier client est chargé en une fois à la connexion du boucher : parfait
+  jusqu'à quelques milliers de fiches, à paginer au-delà.
+
+**Sans base en ligne** (modes 2 et 3), à ne pas mettre entre les mains de vrais
+clients : les données, téléphones et code d'accès compris, sont contenues dans
+la page et lisibles par quiconque en ouvre le source. Le code d'accès protège
+l'interface, pas les données.
 
 ## Modèle de données
+
+En mode base en ligne, ce même modèle est réparti sur les tables `shop`,
+`clients`, `moves`, `log` et `staff` (voir [`supabase/schema.sql`](supabase/schema.sql)).
+Hors ligne, il tient dans un seul objet :
 
 ```jsonc
 {
@@ -112,6 +118,8 @@ node scripts/build-artifact.mjs   # produit dist/artifact.html pour la mise en l
 ```
 
 - `index.html` — l'application complète (source de vérité : structure, style, logique, base de démonstration).
+- `supabase/schema.sql` — tables, règles d'accès et fonctions de la base en ligne.
+- `DEPLOIEMENT.md` — mise en ligne pas à pas.
 - `dist/artifact.html` — la même application sans l'enveloppe `<html>/<head>/<body>`, format attendu par l'hébergement en ligne. Généré, ne pas modifier à la main.
 - `scripts/seed.mjs` — générateur du jeu de démonstration.
 
