@@ -150,9 +150,10 @@ du code**, ce qui marche partout. Et le numéro de carte reste saisissable au
 clavier : le scanner fait gagner du temps, il n'est jamais un passage obligé.
 
 Sur la démonstration hébergée chez Claude, la page tourne dans un cadre isolé
-qui ne donne pas accès à l'appareil photo : le scanner n'y fonctionne que sur
-les navigateurs équipés d'un lecteur natif. C'est une limite de la vitrine, pas
-de l'application déployée.
+qui ne donne pas accès à l'appareil photo. Le bouton **Prendre une photo du
+code** y prend le relais : la vitrine embarque son propre lecteur, elle
+fonctionne donc aussi sur Safari et sur iPhone. C'est une limite de la vitrine,
+pas de l'application déployée, où la caméra s'ouvre directement.
 
 ## 5. Se mettre en règle (RGPD)
 

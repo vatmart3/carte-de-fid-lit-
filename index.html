@@ -418,9 +418,13 @@ function renderDoc(state) {
   var json = JSON.stringify(state).replace(/</g, "\\u003c");
   var cfg = "";
   try { cfg = document.getElementById("sbcfg").textContent; } catch (e) { cfg = '{"url":"","key":""}'; }
+  // Le lecteur de codes, quand il est embarqué (vitrine), doit survivre aux
+  // republications : sans lui, plus de scan sur les navigateurs sans lecteur natif.
+  var dec = document.getElementById("qrdec");
+  var decTag = dec ? '<script id="qrdec">' + dec.textContent + '<\/script>\n' : "";
   return "<!doctype html>\n<html lang=\"fr\">\n<head>\n" + HEAD + "<style id=\"appstyle\">" + css + "</style>\n</head>\n<body>\n" +
     "<div id=\"app\"></div>\n" +
-    "<script id=\"sbcfg\" type=\"application/json\">" + cfg + "<\/script>\n" +
+    "<script id=\"sbcfg\" type=\"application/json\">" + cfg + "<\/script>\n" + decTag +
     "<script id=\"db\" type=\"application/json\">" + json + "<\/script>\n" +
     "<script id=\"appjs\">" + js + "<\/script>\n</body>\n</html>";
 }
@@ -1189,30 +1193,53 @@ function scanFound(text) {
   return true;
 }
 
+function photoOnly(msg) {
+  scanMsg(msg);
+  var box = document.querySelector(".scan-box");
+  if (box) box.style.display = "none";
+  // On ne touche pas au contenu du libellé : il abrite le champ photo lui-même.
+  var b = document.getElementById("scan-photo-btn");
+  if (b) b.className = "btn btn-primary btn-full";
+  var t = document.getElementById("scan-photo-txt");
+  if (t) t.textContent = "Ouvrir l'appareil photo";
+}
+
 function openScanner() {
   modal("Scanner la carte",
-    '<div class="scan-box"><video id="scan-video" playsinline muted autoplay></video>' +
+    '<div class="scan-box"><video id="scan-video" playsinline webkit-playsinline muted autoplay></video>' +
     '<div class="scan-frame"></div></div>' +
+    '<p id="scan-msg" class="small muted">Ouverture de l\'appareil photo…</p>' +
     '<canvas id="scan-canvas" hidden></canvas>' +
-    '<p id="scan-msg" class="small muted">Préparation de l\'appareil photo…</p>' +
     '<div class="btn-row">' +
-    '<label class="btn btn-sm" style="cursor:pointer">Prendre une photo du code' +
+    '<label id="scan-photo-btn" class="btn btn-sm" style="cursor:pointer">' +
+    '<span id="scan-photo-txt">Prendre une photo du code</span>' +
     '<input id="scan-file" type="file" accept="image/*" capture="environment" hidden data-act="scan-file"></label>' +
     '<button class="btn btn-sm" data-act="close">Annuler</button></div>',
     { nofocus: true });
 
-  makeDecoder().then(function (read) {
-    var video = document.getElementById("scan-video");
-    var canvas = document.getElementById("scan-canvas");
-    if (!video || !canvas) return;
-    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-      scanMsg("L\'appareil photo n\'est pas accessible ici. Utilisez « Prendre une photo du code ».");
-      return;
-    }
-    navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: "environment" } } })
-      .then(function (st) {
-        scanStream = st; video.srcObject = st;
-        scanMsg("Placez le code du client dans le cadre.");
+  // Le décodeur peut demander un aller-retour réseau. Safari, lui, exige que
+  // l'appareil photo soit réclamé dans la foulée du geste de l'utilisateur :
+  // on lance donc la caméra d'abord, et le décodeur en parallèle.
+  var decoder = makeDecoder();
+  decoder["catch"](function () {});
+
+  var video = document.getElementById("scan-video");
+  var canvas = document.getElementById("scan-canvas");
+  if (!video || !canvas) return;
+
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    photoOnly("Cette page n\'a pas accès à l\'appareil photo. Prenez une photo du code, ça marche partout.");
+    return;
+  }
+
+  navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: "environment" } } })
+    .then(function (st) {
+      scanStream = st;
+      video.srcObject = st;
+      var pl = video.play();                       // iOS ne démarre pas le flux tout seul
+      if (pl && pl["catch"]) pl["catch"](function () {});
+      scanMsg("Placez le code du client dans le cadre.");
+      return decoder.then(function (read) {
         var tick = function () {
           if (!scanStream || !document.getElementById("scan-video")) return;
           if (video.readyState >= 2 && video.videoWidth) {
@@ -1227,17 +1254,17 @@ function openScanner() {
           scanTimer = setTimeout(tick, 160);
         };
         tick();
-      })["catch"](function (e) {
-        var n = (e && e.name) || "";
-        scanMsg(n === "NotAllowedError"
-          ? "Accès à l\'appareil photo refusé. Autorisez-le dans le navigateur, ou prenez une photo du code."
-          : n === "NotFoundError"
-          ? "Aucun appareil photo trouvé. Prenez une photo du code, ou saisissez le numéro."
-          : "Appareil photo indisponible. Prenez une photo du code, ou saisissez le numéro.");
+      })["catch"](function () {
+        scanMsg("Le lecteur de codes n\'a pas pu être chargé. Saisissez le numéro de carte.");
       });
-  })["catch"](function () {
-    scanMsg("Le lecteur de codes n\'est pas disponible sur cette version. Saisissez le numéro de carte.");
-  });
+    })["catch"](function (e) {
+      var n = (e && e.name) || "";
+      photoOnly(n === "NotAllowedError"
+        ? "Accès à l\'appareil photo refusé. Autorisez-le dans les réglages du navigateur, ou prenez simplement une photo du code."
+        : n === "NotFoundError"
+        ? "Aucun appareil photo trouvé sur cet appareil. Prenez une photo du code."
+        : "L\'appareil photo n\'est pas disponible ici. Prenez une photo du code, ça marche partout.");
+    });
 }
 
 function scanPhoto(file) {

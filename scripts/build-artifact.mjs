@@ -28,6 +28,13 @@ const withDemo = b => process.env.DEMO === "0" ? b : b.replace(
   /(<script id="db" type="application\/json">)[\s\S]*?(<\/script>)/,
   (m, a, z) => a + fs.readFileSync("demo/demo.json", "utf8").trim() + z);
 
+// La vitrine est un fichier unique : elle ne peut pas aller chercher le lecteur
+// de codes à côté d'elle. On l'embarque donc ici — et seulement ici, pour que
+// le site déployé continue de ne le servir qu'au boucher qui en a besoin.
+const withDecoder = b => b.replace(
+  '<script id="appjs">',
+  '<script id="qrdec">' + fs.readFileSync("vendor/jsqr.min.js", "utf8") + '<\/script>\n<script id="appjs">');
+
 fs.mkdirSync("dist", { recursive: true });
-fs.writeFileSync("dist/artifact.html", keep + "\n" + withDemo(noCfg(body.trim())) + "\n");
+fs.writeFileSync("dist/artifact.html", keep + "\n" + withDecoder(withDemo(noCfg(body.trim()))) + "\n");
 console.log("dist/artifact.html —", (fs.statSync("dist/artifact.html").size / 1024).toFixed(1), "Ko");
