@@ -18,20 +18,20 @@ Supabase + Netlify), 10 à 15 € par an si vous voulez un nom de domaine à vou
    Le message attendu est « Success. No rows returned ».
 3. Ouvrir **Authentication → Users → Add user**, créer le compte du boucher
    (e-mail + mot de passe), et cocher **Auto Confirm User**.
-4. Toujours dans **Authentication → Users**, copier l'**UID** de ce compte.
-   Retourner dans **SQL Editor** et exécuter, en remplaçant l'identifiant :
-
-   ```sql
-   insert into public.staff (user_id, name)
-   values ('COLLER-L-UID-ICI', 'Le boucher');
-   ```
-
-   Sans cette ligne, le compte se connecte mais ne voit rien : c'est voulu.
-5. Dans **Authentication → Providers → Email**, désactiver
+   Ce tout premier compte est **automatiquement** reconnu comme personnel :
+   rien à recopier. Les comptes créés ensuite ne le sont pas.
+4. Dans **Authentication → Providers → Email**, désactiver
    **Enable sign-ups**. Personne ne peut plus créer de compte de son côté.
 
+Pour ajouter un second employé plus tard, créer son compte puis exécuter :
+
+```sql
+insert into public.staff (user_id, name)
+select id, 'Prénom' from auth.users where email = 'son@adresse.fr';
+```
+
 > **Déjà fait pour ce dépôt.** `index.html` est configuré sur le projet
-> `edgivtkpqyziucjyzffs`. Il reste les étapes 1, 3 et 5. Une fois le schéma
+> `edgivtkpqyziucjyzffs`. Il reste les étapes 1, 3 et 4. Une fois le schéma
 > installé, ouvrir Espace boucher → Réglages → Base en ligne →
 > **Vérifier l'installation** : les quatre contrôles doivent être verts.
 

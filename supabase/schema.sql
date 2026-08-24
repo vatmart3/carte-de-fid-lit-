@@ -108,6 +108,26 @@ end $$;
 -- quatre fonctions ci-dessous, et rien d'autre.
 revoke all on public.shop, public.clients, public.moves, public.log, public.staff from anon;
 
+-- Le tout premier compte créé devient automatiquement le personnel : plus besoin
+-- de recopier son identifiant à la main. Les suivants ne le sont pas.
+create or replace function public.enroll_first_staff() returns trigger
+  language plpgsql security definer set search_path = public, pg_temp as $$
+begin
+  if not exists (select 1 from public.staff) then
+    insert into public.staff (user_id, name) values (new.id, coalesce(new.email, 'Compte principal'));
+  end if;
+  return new;
+end $$;
+
+do $$
+begin
+  execute 'drop trigger if exists enroll_first_staff on auth.users';
+  execute 'create trigger enroll_first_staff after insert on auth.users
+             for each row execute function public.enroll_first_staff()';
+exception when others then
+  raise notice 'Inscription automatique du personnel indisponible sur ce projet. Ajoutez le compte à la main : insert into public.staff (user_id, name) select id, ''Le boucher'' from auth.users where email = ''...'';';
+end $$;
+
 -- ── 4. Ce que le public peut faire ─────────────────────────────────────
 
 -- Retire les accents sans dépendre de l'extension unaccent.
