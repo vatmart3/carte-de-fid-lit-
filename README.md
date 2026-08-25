@@ -138,6 +138,10 @@ démo publiée le fait automatiquement.
 - `DEPLOIEMENT.md` — mise en ligne pas à pas.
 - `dist/artifact.html` — la même application sans l'enveloppe `<html>/<head>/<body>`, format attendu par l'hébergement en ligne. Généré, ne pas modifier à la main.
 - `scripts/seed.mjs` — générateur du jeu de démonstration.
+- `scripts/build-essai.mjs` — produit `dist/carte-essai.html` : l'application
+  entière dans un fichier unique, lecteur de QR compris, sans base branchée.
+  Sert à essayer la caméra sur un vrai téléphone avant la mise en ligne — la
+  vitrine publiée tourne dans un cadre qui n'a pas accès à l'appareil photo.
 - `vercel.json` + `scripts/build-site.mjs` — publication : `index.html`,
   `scanner.js` et le dossier `police/`, avec les en-têtes de sécurité (CSP
   restreinte au seul projet Supabase, testée avec l'application complète).

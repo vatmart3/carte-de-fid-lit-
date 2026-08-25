@@ -183,17 +183,84 @@ input:-webkit-autofill,input:-webkit-autofill:focus{
 .hero p{color:var(--ink-2);margin-top:18px;font-size:17px;max-width:40ch;margin-inline:auto;line-height:1.6}
 .hero-rule{display:none}
 /* ─────────── la carte ─────────── */
+/* ─────────── la carte ───────────
+   Six habillages de boutique : le rouge de la maison, le papier du boucher,
+   l'ardoise du menu du jour, le billot, le marbre du comptoir, l'émail vert
+   des anciennes devantures. Tout en dégradés : pas une image à télécharger,
+   et net sur n'importe quel écran. */
+[data-style]{
+  --ca:#E24444; --cb:#B02525;              /* le fond */
+  --cfg:#FFFFFF;                            /* l'encre */
+  --cdim:rgba(255,255,255,.82);             /* l'encre discrète */
+  --cveil:rgba(255,255,255,.16);            /* le voile de lumière */
+  --cchip:rgba(255,255,255,.18);            /* la pastille de statut */
+  --cchip-line:rgba(255,255,255,.24);
+  --cmark:rgba(255,255,255,.13);            /* le fer du boucher, en filigrane */
+  --cglow:rgba(190,43,43,.50);
+  --ctex:none;
+}
 .loyalty{
-  position:relative;border-radius:22px;overflow:hidden;color:var(--card-ink);
-  background:var(--card-bg);
-  background-image:linear-gradient(157deg, var(--card-top) 0%, var(--card-bot) 100%);
-  padding:26px;box-shadow:0 14px 40px -18px rgba(190,43,43,.55);
+  position:relative;border-radius:22px;overflow:hidden;color:var(--cfg);
+  background:var(--cb);
+  background-image:linear-gradient(157deg, var(--ca) 0%, var(--cb) 100%);
+  padding:26px;box-shadow:0 14px 40px -18px var(--cglow);
   animation:pose .45s ease both;
 }
+/* le grain de la matière */
+.loyalty::before{content:"";position:absolute;inset:0;background-image:var(--ctex);
+  pointer-events:none;opacity:.9}
 /* un voile très doux en haut à droite : la carte prend du relief sans bruit */
 .loyalty::after{content:"";position:absolute;top:-45%;right:-25%;width:75%;height:150%;
-  background:radial-gradient(closest-side, rgba(255,255,255,.16), transparent 70%);pointer-events:none}
+  background:radial-gradient(closest-side, var(--cveil), transparent 70%);pointer-events:none}
 .loyalty > *{position:relative;z-index:1}
+/* le couperet, posé en grand et presque invisible dans l'angle */
+/* Le couperet traverse le flanc droit : la lame dans la carte, le manche qui
+   sort du cadre. Placé à mi-hauteur, là où le texte ne va jamais. */
+.loyalty-mark{position:absolute;right:-42px;top:50%;width:190px;height:94px;
+  color:var(--cmark);pointer-events:none;z-index:0;transform:translateY(-54%) rotate(-7deg)}
+.loyalty-mark svg{width:100%;height:100%;display:block}
+/* Papier du boucher — kraft rosé, encre brune */
+[data-style="papier"]{
+  --ca:#F6E3D4; --cb:#E9C9B2; --cfg:#4A2A1C; --cdim:rgba(74,42,28,.72);
+  --cveil:rgba(255,255,255,.45); --cchip:rgba(74,42,28,.10); --cchip-line:rgba(74,42,28,.18);
+  --cmark:rgba(74,42,28,.13); --cglow:rgba(120,74,50,.32);
+  --ctex:repeating-linear-gradient(46deg, rgba(120,74,50,.05) 0 2px, transparent 2px 7px);
+}
+/* Ardoise — le tableau du menu du jour */
+[data-style="ardoise"]{
+  --ca:#3A3E42; --cb:#1E2124; --cfg:#F4F2EC; --cdim:rgba(244,242,236,.72);
+  --cveil:rgba(255,255,255,.10); --cchip:rgba(255,255,255,.13); --cchip-line:rgba(255,255,255,.20);
+  --cmark:rgba(255,255,255,.15); --cglow:rgba(10,12,14,.55);
+  --ctex:radial-gradient(circle at 18% 28%, rgba(255,255,255,.05), transparent 42%),
+         radial-gradient(circle at 76% 72%, rgba(255,255,255,.04), transparent 38%);
+}
+/* Billot — le bois du plan de travail */
+[data-style="billot"]{
+  --ca:#B98450; --cb:#8A5A32; --cfg:#FFF6EA; --cdim:rgba(255,246,234,.80);
+  --cveil:rgba(255,255,255,.22); --cchip:rgba(255,255,255,.18); --cchip-line:rgba(255,255,255,.26);
+  --cmark:rgba(255,255,255,.15); --cglow:rgba(110,70,40,.45);
+  --ctex:repeating-linear-gradient(90deg, rgba(60,32,12,.055) 0 4px, transparent 4px 17px),
+         repeating-linear-gradient(90deg, rgba(255,235,205,.05) 0 2px, transparent 2px 39px);
+}
+/* Marbre — le comptoir */
+[data-style="marbre"]{
+  --ca:#FBFBFC; --cb:#E4E5E9; --cfg:#232327; --cdim:rgba(35,35,39,.66);
+  --cveil:rgba(255,255,255,.75); --cchip:rgba(35,35,39,.08); --cchip-line:rgba(35,35,39,.15);
+  --cmark:rgba(35,35,39,.10); --cglow:rgba(60,60,70,.30);
+  --ctex:linear-gradient(112deg, transparent 34%, rgba(120,124,136,.20) 35%, transparent 36%),
+         linear-gradient(104deg, transparent 58%, rgba(120,124,136,.14) 59%, transparent 61%),
+         linear-gradient(126deg, transparent 74%, rgba(120,124,136,.11) 75%, transparent 76%);
+}
+/* Émail vert — les devantures d'autrefois */
+[data-style="laurier"]{
+  --ca:#2E6B4F; --cb:#1B4632; --cfg:#F6EFD9; --cdim:rgba(246,239,217,.78);
+  --cveil:rgba(255,255,255,.14); --cchip:rgba(246,239,217,.16); --cchip-line:rgba(246,239,217,.30);
+  --cmark:rgba(246,239,217,.13); --cglow:rgba(20,60,42,.48);
+  --ctex:none;
+}
+.loyalty[data-style="laurier"]::before{
+  inset:9px;border:1px solid rgba(246,239,217,.28);border-radius:14px;opacity:1;
+}
 /* La carte se pose en fondu, sans glisser : un texte qui se déplace après
    coup, c'est exactement ce qu'on cherche à supprimer. Et elle ne se pose
    qu'une fois — pas à chaque encaissement. */
@@ -201,18 +268,30 @@ input:-webkit-autofill,input:-webkit-autofill:focus{
 .loyalty.posed{animation:none}
 .loyalty-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
 .loyalty-shop{font-family:var(--titre);font-weight:700;font-size:19px;line-height:1.25}
-.loyalty-city{font-size:13px;opacity:.85;margin-top:3px;font-weight:500}
+.loyalty-city{font-size:13px;color:var(--cdim);margin-top:3px;font-weight:500}
 .tier{font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;
-  padding:7px 13px;border-radius:99px;background:rgba(255,255,255,.18);color:#fff;white-space:nowrap;
-  border:1px solid rgba(255,255,255,.22)}
+  padding:7px 13px;border-radius:99px;background:var(--cchip);color:var(--cfg);white-space:nowrap;
+  border:1px solid var(--cchip-line)}
 .loyalty-pts{display:flex;align-items:baseline;gap:10px;margin-top:34px}
 .loyalty-pts b{font-family:var(--titre);font-weight:700;font-size:62px;line-height:1;
   font-variant-numeric:tabular-nums;letter-spacing:-.03em}
-.loyalty-pts span{font-size:14px;text-transform:uppercase;letter-spacing:.06em;opacity:.85;font-weight:700}
+.loyalty-pts span{font-size:14px;text-transform:uppercase;letter-spacing:.06em;color:var(--cdim);font-weight:700}
 .loyalty-name{margin-top:24px;font-size:18px;font-weight:700}
 .loyalty-foot{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;margin-top:2px}
-.loyalty-no{font-size:25px;font-weight:700;letter-spacing:.12em;font-variant-numeric:tabular-nums;opacity:.95}
-.loyalty-since{font-size:12px;opacity:.8;text-align:right;line-height:1.5;font-weight:500}
+.loyalty-no{font-size:25px;font-weight:700;letter-spacing:.12em;font-variant-numeric:tabular-nums}
+.loyalty-since{font-size:12px;color:var(--cdim);text-align:right;line-height:1.5;font-weight:500}
+/* le choix de l'habillage, sur la carte du client */
+.styles{display:grid;grid-template-columns:repeat(auto-fit,minmax(96px,1fr));gap:10px}
+.style-pick{position:relative;border-radius:12px;overflow:hidden;padding:0;border:1px solid var(--hair-2);
+  background:none;cursor:pointer;transition:border-color .15s, transform .08s}
+.style-pick:hover{border-color:var(--muted)}
+.style-pick:active{transform:scale(.985)}
+.style-pick[aria-pressed="true"]{border-color:var(--ink);box-shadow:0 0 0 2px var(--ink)}
+.style-pick .swatch{display:block;height:58px;background:var(--cb);
+  background-image:var(--ctex),linear-gradient(157deg, var(--ca), var(--cb))}
+.style-pick .nm{display:flex;align-items:center;justify-content:center;min-height:44px;
+  padding:7px 6px;font-size:12.5px;font-weight:700;
+  color:var(--ink);background:var(--surface-1);text-align:center;line-height:1.25}
 /* ─────────── jauge ─────────── */
 .rail-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:10px}
 .rail-head strong{font-size:15px;font-weight:700}
@@ -417,6 +496,33 @@ input:-webkit-autofill,input:-webkit-autofill:focus{
 .scan-frame{position:absolute;inset:14%;border:3px solid rgba(255,255,255,.9);border-radius:12px;
   box-shadow:0 0 0 100vmax rgba(0,0,0,.35);pointer-events:none}
 #scan-canvas{display:none}
+/* ─────────── la signature ───────────
+   Une vraie case blanche, quel que soit le thème : on signe sur du papier,
+   pas sur un écran noir. */
+.sign{
+  position:relative;background:#FFFFFF;border:1px solid var(--hair-2);
+  border-radius:var(--r-sm);aspect-ratio:1000/320;overflow:hidden;
+  touch-action:none;-webkit-user-select:none;user-select:none;
+}
+.sign-pad{position:absolute;inset:0;width:100%;height:100%;display:block;cursor:crosshair}
+.sign-line{position:absolute;left:7%;right:7%;bottom:24%;height:1px;background:#DCDCE1;pointer-events:none}
+.sign-ghost{
+  position:absolute;left:0;right:0;bottom:11%;text-align:center;pointer-events:none;
+  font-size:14px;color:#9A9AA2;font-weight:500;transition:opacity .15s;
+}
+.sign.has-ink .sign-ghost,.sign.has-ink .sign-line{opacity:0}
+.sign-clear{
+  position:absolute;top:8px;right:8px;padding:7px 12px;border-radius:99px;
+  font-size:13px;font-weight:700;color:#63636B;background:#F2F2F4;border:1px solid #E4E4E8;
+  opacity:0;pointer-events:none;transition:opacity .15s;
+}
+.sign.has-ink .sign-clear{opacity:1;pointer-events:auto}
+.sign-clear:hover{background:#E8E8EC;color:#1B1B1F}
+/* la signature au repos, telle qu'elle reste sur la fiche */
+.sign-shown{background:#FFFFFF;border:1px solid var(--hair-2);border-radius:var(--r-sm);
+  padding:10px 14px;display:flex;align-items:center;justify-content:center;min-height:96px}
+.sign-ink{color:#1B1B1F;width:100%;height:76px}
+.sign-foot{margin-top:9px;font-size:13.5px;color:var(--muted);text-align:center}
 /* ═══════════════════════ sur téléphone ═══════════════════════
    Trois règles : rien ne saute pendant le chargement, rien ne déborde sur
    le côté, et tout ce qui est à l'écran se lit sans faire glisser la page.
@@ -664,6 +770,8 @@ function migrate(d) {
       migrated = true;
     }
     if (c.marketing === undefined) c.marketing = false;
+    if (c.sign === undefined) c.sign = "";
+    if (c.style === undefined) c.style = "";
   });
   return d;
 }
@@ -905,6 +1013,7 @@ function sbLoadAll() {
           id: c.id, token: c.token, name: c.name, phone: c.phone, email: c.email || "",
           bday_day: c.bday_day, bday_month: c.bday_month,
           marketing: !!c.marketing, consent_at: c.consent_at || "",
+          sign: c.signature || "", signed_at: c.signed_at || "", style: c.card_style || "",
           created: d10(c.created), code: c.code,
           points: c.points, lifetime: c.lifetime, spent: Number(c.spent), visits: c.visits,
           last_visit: d10(c.last_visit), by: c.referred_by || "",
@@ -942,6 +1051,7 @@ function cardToClient(card, tok) {
     id: card.id, token: tok, name: card.name, phone: card.phone, email: card.email || "",
     bday_day: card.bday_day, bday_month: card.bday_month,
     marketing: !!card.marketing, consent_at: card.consent_at || "",
+    sign: card.sign || "", signed_at: card.signed_at || "", style: card.card_style || "",
     created: d10(card.created), code: card.code,
     points: card.points, lifetime: card.lifetime, spent: Number(card.spent), visits: card.visits,
     last_visit: d10(card.last_visit), by: "", parrain: card.parrain || "",
@@ -1245,6 +1355,165 @@ function idFromScan(t) {
   return "";
 }
 
+/* ══════════════════════════ 1 quater. La signature ══════════════════════════ */
+/* Le client signe du doigt dans une case blanche. On ne garde pas une image :
+   un tracé pèse cent fois moins et reste net à toutes les tailles. Les points
+   sont ramenés dans un repère fixe de 1000 × 320, arrondis à l'entier, et les
+   points trop rapprochés sont jetés — l'œil n'y voit rien, le fichier oui. */
+
+var SIGN_W = 1000, SIGN_H = 320;
+var signCache = {};   // les traits en cours de saisie, à l'abri d'un réaffichage
+
+function signEncode(strokes) {
+  return strokes.map(function (st) {
+    return st.map(function (p) { return p[0] + "," + p[1]; }).join(" ");
+  }).join("|");
+}
+
+function signDecode(str) {
+  if (!str) return [];
+  return String(str).split("|").map(function (st) {
+    return st.split(" ").filter(Boolean).map(function (p) {
+      var xy = p.split(",");
+      return [Number(xy[0]) || 0, Number(xy[1]) || 0];
+    });
+  }).filter(function (st) { return st.length; });
+}
+
+/* Assez de matière pour être une signature, et pas un point posé par erreur. */
+function signSubstantial(str) {
+  var st = signDecode(str), n = 0, i, j, d = 0;
+  for (i = 0; i < st.length; i++) {
+    n += st[i].length;
+    for (j = 1; j < st[i].length; j++) {
+      d += Math.abs(st[i][j][0] - st[i][j - 1][0]) + Math.abs(st[i][j][1] - st[i][j - 1][1]);
+    }
+  }
+  return n >= 8 && d >= 300;
+}
+
+function signSVG(str, h) {
+  var st = signDecode(str);
+  if (!st.length) return "";
+  var paths = st.map(function (s) {
+    return '<polyline points="' + s.map(function (p) { return p[0] + "," + p[1]; }).join(" ") + '"/>';
+  }).join("");
+  return '<svg class="sign-ink" viewBox="0 0 ' + SIGN_W + ' ' + SIGN_H + '" ' +
+    (h ? 'style="height:' + h + 'px" ' : "") +
+    'preserveAspectRatio="xMidYMid meet" aria-label="Signature" role="img" ' +
+    'fill="none" stroke="currentColor" stroke-width="7" ' +
+    'stroke-linecap="round" stroke-linejoin="round">' + paths + '</svg>';
+}
+
+/* Installe les cases à signer présentes à l'écran. Appelée après chaque
+   réaffichage : le document est reconstruit, les écouteurs avec. */
+function mountSigns() {
+  var boxes = document.querySelectorAll("[data-sign]");
+  for (var i = 0; i < boxes.length; i++) mountSign(boxes[i]);
+}
+
+function mountSign(box) {
+  if (box.__mounted) return;
+  box.__mounted = true;
+  var key = box.getAttribute("data-sign");
+  var cv = box.querySelector("canvas");
+  var out = box.querySelector("input[type=hidden]");
+  var strokes = signCache[key] ? signCache[key].slice() : signDecode(out ? out.value : "");
+  var cur = null, drawing = false;
+
+  function size() {
+    var r = box.getBoundingClientRect();
+    var dpr = Math.min(window.devicePixelRatio || 1, 3);
+    if (!r.width) return;
+    cv.width = Math.round(r.width * dpr);
+    cv.height = Math.round(r.height * dpr);
+    cv.style.width = r.width + "px";
+    cv.style.height = r.height + "px";
+    redraw();
+  }
+
+  function ink() {
+    // La case est toujours blanche : l'encre doit être sombre dans les deux thèmes.
+    return "#1B1B1F";
+  }
+
+  function redraw() {
+    var g = cv.getContext("2d");
+    if (!g) return;
+    g.setTransform(1, 0, 0, 1, 0, 0);
+    g.clearRect(0, 0, cv.width, cv.height);
+    var sx = cv.width / SIGN_W, sy = cv.height / SIGN_H;
+    g.lineWidth = Math.max(2, 7 * Math.min(sx, sy));
+    g.lineCap = "round"; g.lineJoin = "round"; g.strokeStyle = ink();
+    strokes.forEach(function (st) {
+      if (st.length < 2) {
+        if (!st.length) return;
+        g.beginPath(); g.arc(st[0][0] * sx, st[0][1] * sy, g.lineWidth / 2, 0, 6.284); 
+        g.fillStyle = ink(); g.fill(); return;
+      }
+      g.beginPath();
+      g.moveTo(st[0][0] * sx, st[0][1] * sy);
+      for (var i = 1; i < st.length; i++) g.lineTo(st[i][0] * sx, st[i][1] * sy);
+      g.stroke();
+    });
+    box.classList.toggle("has-ink", strokes.length > 0);
+    if (out) out.value = signEncode(strokes);
+    signCache[key] = strokes.slice();
+  }
+
+  function at(ev) {
+    var r = cv.getBoundingClientRect();
+    var x = Math.round((ev.clientX - r.left) / r.width * SIGN_W);
+    var y = Math.round((ev.clientY - r.top) / r.height * SIGN_H);
+    return [Math.max(0, Math.min(SIGN_W, x)), Math.max(0, Math.min(SIGN_H, y))];
+  }
+
+  function down(ev) {
+    if (ev.button !== undefined && ev.button !== 0) return;
+    drawing = true; cur = [at(ev)]; strokes.push(cur);
+    try { cv.setPointerCapture(ev.pointerId); } catch (e) {}
+    ev.preventDefault(); redraw();
+  }
+  function move(ev) {
+    if (!drawing) return;
+    var p = at(ev), last = cur[cur.length - 1];
+    if (Math.abs(p[0] - last[0]) + Math.abs(p[1] - last[1]) < 5) return;
+    cur.push(p); ev.preventDefault(); redraw();
+  }
+  function up() { drawing = false; cur = null; redraw(); }
+
+  cv.addEventListener("pointerdown", down);
+  cv.addEventListener("pointermove", move);
+  cv.addEventListener("pointerup", up);
+  cv.addEventListener("pointercancel", up);
+  cv.addEventListener("pointerleave", up);
+
+  var clear = box.querySelector("[data-sign-clear]");
+  if (clear) clear.addEventListener("click", function (ev) {
+    ev.preventDefault(); strokes = []; redraw();
+  });
+
+  size();
+  if (window.ResizeObserver) {
+    try { new ResizeObserver(size).observe(box); } catch (e) {}
+  } else {
+    window.addEventListener("resize", size);
+  }
+}
+
+/* La case à signer, prête à poser dans un formulaire. */
+function signField(key, label, hint) {
+  return '<div class="field">' +
+    '<label for="' + key + '-pad">' + label + '</label>' +
+    '<div class="sign" data-sign="' + key + '">' +
+    '<canvas id="' + key + '-pad" class="sign-pad" aria-label="Case de signature"></canvas>' +
+    '<span class="sign-line" aria-hidden="true"></span>' +
+    '<span class="sign-ghost">Signez ici avec le doigt</span>' +
+    '<button type="button" class="sign-clear" data-sign-clear>Effacer</button>' +
+    '<input type="hidden" name="sign" value=""></div>' +
+    (hint ? '<span class="hint">' + hint + '</span>' : "") + '</div>';
+}
+
 /* ══════════════════════════ 2. Utilitaires ══════════════════════════ */
 
 function esc(s) {
@@ -1263,7 +1532,14 @@ function nb(n) { return esp(Number(n || 0).toLocaleString("fr-FR")); }
 var MOIS = ["janv.", "févr.", "mars", "avril", "mai", "juin", "juil.", "août", "sept.", "oct.", "nov.", "déc."];
 var MOIS_L = ["janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août", "septembre", "octobre", "novembre", "décembre"];
 function dShort(iso) { if (!iso) return "—"; var p = iso.split("-"); return Number(p[2]) + " " + MOIS[Number(p[1]) - 1]; }
-function dFull(iso) { if (!iso) return "—"; var p = iso.split("-"); return Number(p[2]) + " " + MOIS_L[Number(p[1]) - 1] + " " + p[0]; }
+/* Accepte aussi bien « 2026-08-25 » qu'un horodatage complet : le jour tenait
+   la fin de la chaîne et sortait en « NaN août ». */
+function dFull(iso) {
+  if (!iso) return "—";
+  var p = d10(iso).split("-");
+  if (p.length < 3) return "—";
+  return Number(p[2]) + " " + MOIS_L[Number(p[1]) - 1] + " " + p[0];
+}
 function daysAgo(iso) { if (!iso) return 9999; return Math.round((new Date(today()) - new Date(iso)) / 864e5); }
 function initials(n) { return n.trim().split(/\s+/).map(function (w) { return w[0]; }).join("").slice(0, 2).toUpperCase(); }
 function normPhone(p) { return String(p || "").replace(/[^0-9+]/g, ""); }
@@ -1356,6 +1632,7 @@ function modal(title, body, opts) {
     '<button class="btn btn-sm btn-ghost" data-act="close" aria-label="Fermer">Fermer</button></div>' +
     '<div class="modal-body">' + body + '</div></div>';
   document.body.appendChild(s);
+  mountSigns();
   var f = s.querySelector("input, select, textarea, button:not([data-act=close])");
   if (f && !opts.nofocus) f.focus();
 }
@@ -1581,7 +1858,8 @@ function scanPhoto(file) {
 /* Une carte de présentation, pour que l'accueil montre l'objet plutôt que d'en parler. */
 function specimenHTML() {
   var sh = DB.shop;
-  return '<div class="loyalty specimen" aria-hidden="true">' +
+  return '<div class="loyalty specimen" aria-hidden="true" data-style="' + styleOf(null) + '">' +
+    '<span class="loyalty-mark">' + cleaverSVG() + '</span>' +
     '<div class="loyalty-top"><div>' +
     '<div class="loyalty-shop">' + esc(sh.name) + '</div>' +
     '<div class="loyalty-city">' + esc(sh.city) + '</div></div>' +
@@ -1679,6 +1957,9 @@ function vSignup() {
     '<div class="field"><label for="f-code">Code parrain <span class="muted">(facultatif)</span></label>' +
     '<input id="f-code" name="ref" type="text" autocomplete="off" placeholder="MAR-1006">' +
     '<span class="hint">Vous recevez ' + nb(sh.godchild) + ' points, votre parrain ' + nb(sh.godfather) + '.</span></div>' +
+    signField("f-sign", "Votre signature *",
+      "Elle vaut accord et reste visible sur votre carte. Vous pouvez la retirer " +
+      "en même temps que vos données, à tout moment.") +
     '<label class="check"><input type="checkbox" name="ok" value="1">' +
     '<span>J\'accepte que ' + esc(sh.name) + ' conserve ces informations pour gérer ma carte de fidélité, ' +
     'et j\'ai lu la <button type="button" class="linklike" data-act="go-privacy">politique de confidentialité</button>. *</span></label>' +
@@ -1702,9 +1983,28 @@ function monthOpts(sel) {
   }).join("");
 }
 
+/* Les habillages proposés. La clé voyage dans data-style, rien de plus. */
+var CARD_STYLES = [
+  ["rouge", "Rouge maison"], ["papier", "Papier kraft"], ["ardoise", "Ardoise"],
+  ["billot", "Billot"], ["marbre", "Marbre"], ["laurier", "Émail vert"]
+];
+function styleOf(c) {
+  var k = (c && c.style) || (DB.shop && DB.shop.card_style) || "rouge";
+  return CARD_STYLES.some(function (x) { return x[0] === k; }) ? k : "rouge";
+}
+/* Le fer du boucher : un couperet, tracé une fois pour toutes. Le coin avant
+   coupé et le manche fin suffisent à le rendre lisible en filigrane. */
+function cleaverSVG() {
+  return '<svg viewBox="0 0 150 74" fill="currentColor" aria-hidden="true">' +
+    '<path d="M9 5h65l18 19v38a6 6 0 0 1-6 6H9a5 5 0 0 1-5-5V10a5 5 0 0 1 5-5z"/>' +
+    '<path d="M92 31h48a8 8 0 0 1 0 16H92z"/>' +
+    '<circle cx="17" cy="15" r="4" fill="#000" fill-opacity=".26"/></svg>';
+}
+
 function cardHTML(c) {
   var sh = DB.shop;
-  return '<div class="loyalty' + (posed ? " posed" : "") + '">' +
+  return '<div class="loyalty' + (posed ? " posed" : "") + '" data-style="' + styleOf(c) + '">' +
+    '<span class="loyalty-mark" aria-hidden="true">' + cleaverSVG() + '</span>' +
     '<div class="loyalty-top"><div>' +
     '<div class="loyalty-shop">' + esc(sh.name) + '</div>' +
     '<div class="loyalty-city">' + esc(sh.city) + '</div></div>' +
@@ -1805,6 +2105,26 @@ function vCard() {
     '<ul class="receipt">' + hist + '</ul></section>' +
 
     '<section class="panel panel-pad">' +
+    '<div class="sect-head"><h2>Ma carte</h2><span class="sp"></span>' +
+    '<span class="small muted">choisissez son allure</span></div>' +
+    '<div class="styles">' + CARD_STYLES.map(function (st) {
+      return '<button type="button" class="style-pick" data-style="' + st[0] + '" ' +
+        'aria-pressed="' + (styleOf(c) === st[0]) + '" data-act="pick-style" data-k="' + st[0] + '">' +
+        '<span class="swatch"></span><span class="nm">' + st[1] + '</span></button>';
+    }).join("") + '</div></section>' +
+
+    '<section class="panel panel-pad">' +
+    '<div class="sect-head"><h2>Ma signature</h2></div>' +
+    (c.sign
+      ? '<div class="sign-shown">' + signSVG(c.sign) + '</div>' +
+        '<p class="sign-foot">Signée le ' + dFull(c.signed_at || c.consent_at || c.created) +
+        ' — elle vaut votre accord pour la carte de fidélité.</p>'
+      : '<p class="small muted">Votre carte n\'a pas encore été signée.</p>' +
+        '<div class="btn-row" style="margin-top:14px">' +
+        '<button class="btn btn-sm btn-ink" data-act="my-sign">Signer ma carte</button></div>') +
+    '</section>' +
+
+    '<section class="panel panel-pad">' +
     '<div class="sect-head"><h2>Mes données</h2></div>' +
     '<p class="small muted">' + esc(prettyPhone(c.phone)) + (c.email ? ' · ' + esc(c.email) : "") +
     ' · anniversaire le ' + bdayLabel(c) + '</p>' +
@@ -1827,13 +2147,15 @@ function doSignup(f) {
   var name = f.name.value.trim(), phone = normPhone(f.phone.value),
       bd = Number(f.bd.value), bm = Number(f.bm.value),
       email = f.email.value.trim(), ref = f.ref.value.trim(),
-      ok = f.ok.checked, pub = f.pub.checked;
+      ok = f.ok.checked, pub = f.pub.checked,
+      sign = f.sign ? f.sign.value : "";
   var box = document.getElementById("signup-err");
   function bad(m) { box.innerHTML = '<p class="err">' + esc(m) + '</p>'; }
   if (name.length < 3 || name.indexOf(" ") < 0) return bad("Indiquez votre nom et votre prénom.");
   if (phone.length < 9) return bad("Numéro de téléphone incomplet.");
   if (email && email.indexOf("@") < 1) return bad("Adresse e-mail invalide.");
   if (!bd || !bm) return bad("Indiquez le jour et le mois de votre anniversaire.");
+  if (!signSubstantial(sign)) return bad("Merci de signer dans la case blanche.");
   if (!ok) return bad("Merci de cocher la case d'accord pour créer la carte.");
   if (Store.mode !== "supabase" && DB.clients.some(function (c) { return normPhone(c.phone) === phone; }))
     return bad("Ce téléphone est déjà rattaché à une carte. Utilisez « J'ai déjà une carte ».");
@@ -1848,8 +2170,8 @@ function doSignup(f) {
     box.innerHTML = '<p class="small muted">Création en cours…</p>';
     rpc("create_card", { p_name: name, p_phone: phone, p_day: bd, p_month: bm,
                          p_email: email || null, p_ref: ref || null,
-                         p_marketing: pub, p_notice: NOTICE_VERSION })
-      .then(function (r) { location.replace(cardLink(r.token)); })
+                         p_marketing: pub, p_notice: NOTICE_VERSION, p_sign: sign })
+      .then(function (r) { delete signCache["f-sign"]; location.replace(cardLink(r.token)); })
       ["catch"](function (e) { bad(errMsg(e)); });
     return;
   }
@@ -1859,6 +2181,7 @@ function doSignup(f) {
   var id = String(DB.seq);
   var c = {
     id: id, name: name, phone: phone, email: email, bday_day: bd, bday_month: bm,
+    sign: sign, signed_at: new Date().toISOString(),
     consent_at: new Date().toISOString(), notice: NOTICE_VERSION,
     marketing: pub, marketing_at: pub ? new Date().toISOString() : null,
     created: today(), points: sh.welcome, lifetime: sh.welcome, spent: 0, visits: 0,
@@ -1874,6 +2197,7 @@ function doSignup(f) {
   }
   DB.clients.unshift(c);
   logIt("Carte n° " + id + " créée" + (parrain ? " (parrainée)" : ""), id);
+  delete signCache["f-sign"];
   S.cid = id; S.view = "card";
   lsSet(LS_ME, id);
   persist("Bienvenue " + name.split(" ")[0] + " ! Votre carte n° " + id + " est prête.");
@@ -1916,7 +2240,9 @@ function vPrivacy() {
        ["Votre e-mail", "facultatif — seulement si vous le donnez"],
        ["Le jour et le mois de votre anniversaire", "pour le cadeau annuel. L\'année n\'est ni demandée ni conservée"],
        ["Vos achats : date, montant, nature", "pour calculer vos points et votre historique"],
-       ["Votre parrain et vos filleuls", "pour créditer les points de parrainage"]]
+       ["Votre parrain et vos filleuls", "pour créditer les points de parrainage"],
+       ["Votre signature", "le tracé que vous avez dessiné à l\'inscription : il prouve votre " +
+        "accord, et rien d\'autre. Il n\'est ni analysé, ni comparé, ni transmis"]]
       .map(function (r) {
         return '<li class="rw-row"><span class="rw-txt"><b>' + r[0] + '</b><span>' + r[1] + '</span></span></li>';
       }).join("") + '</ul>' +
@@ -1926,6 +2252,9 @@ function vPrivacy() {
     sec("Pourquoi, et à quel titre", '<p class="small">' +
       '<b>Gérer votre carte</b> — points, récompenses, historique, parrainage. Base légale : l\'exécution du programme ' +
       'de fidélité auquel vous avez adhéré.<br><br>' +
+      '<b>Conserver la preuve de votre accord</b> — la case cochée, l\'heure exacte et votre signature. ' +
+      'Base légale : l\'obligation faite au responsable de démontrer votre consentement (RGPD, article 7.1). ' +
+      'La signature disparaît en même temps que le reste si vous supprimez votre carte.<br><br>' +
       '<b>Vous envoyer des offres</b> — uniquement si vous avez coché la case prévue à l\'inscription. ' +
       'Base légale : votre consentement, que vous pouvez retirer à tout moment depuis votre carte, sans perdre vos points.</p>') +
 
@@ -2278,8 +2607,19 @@ function clientModal(id) {
       ["Code parrain", '<span class="num">' + esc(c.code) + '</span>'],
       parrain ? ["Parrainé par", esc(parrain.name)] : null,
       filleuls.length ? ["Filleul" + (filleuls.length > 1 ? "s" : ""),
-        esc(filleuls.map(function (f) { return f.name; }).join(", "))] : null
+        esc(filleuls.map(function (f) { return f.name; }).join(", "))] : null,
+      ["Accord", c.consent_at
+        ? 'Recueilli le ' + dFull(c.consent_at)
+        : '<span class="pill crit"><i></i>manquant</span>']
     ]) +
+    (c.sign
+      ? '<div><span class="eyebrow" style="display:block;margin-bottom:8px">Signature</span>' +
+        '<div class="sign-shown">' + signSVG(c.sign) + '</div>' +
+        '<p class="sign-foot">Signée le ' + dFull(c.signed_at || c.consent_at || c.created) + '</p></div>'
+      : '<div class="banner warn"><span class="ico" aria-hidden="true">!</span>' +
+        '<span class="grow">Cette fiche n\'a pas de signature. Faites signer le client à son ' +
+        'prochain passage : c\'est la preuve de son accord.</span>' +
+        '<button class="btn btn-sm btn-brass-o" data-act="sign-client" data-id="' + c.id + '">Faire signer</button></div>') +
     '<div class="btn-row">' +
     '<button class="btn btn-primary btn-sm" data-act="till-pick" data-id="' + c.id + '">Encaisser un achat</button>' +
     (un.length ? '<button class="btn btn-brass btn-sm" data-act="use-reward" data-id="' + c.id + '">Utiliser une récompense</button>' : "") +
@@ -2326,6 +2666,14 @@ function newClientModal() {
     '<select name="bm"><option value="">Mois</option>' + monthOpts() + '</select></div></div></div>' +
     '<div class="field"><label for="n-mail">E-mail</label><input id="n-mail" name="email" type="email"></div>' +
     '<div class="field"><label for="n-ref">Code parrain</label><input id="n-ref" name="ref"></div>' +
+    signField("n-sign", "Signature du client *",
+      "Faites signer le client sur cet écran. Sans son accord, la carte ne peut pas être créée.") +
+    '<label class="check"><input type="checkbox" name="ok" value="1">' +
+    '<span>Le client accepte que ' + esc(DB.shop.name) + ' conserve ces informations pour gérer ' +
+    'sa carte de fidélité, et a été informé de la politique de confidentialité. *</span></label>' +
+    '<label class="check"><input type="checkbox" name="pub" value="1">' +
+    '<span>Le client accepte de recevoir les offres de la boutique. ' +
+    '<span class="muted">Facultatif.</span></span></label>' +
     '<div id="an-err"></div>' +
     '<button class="btn btn-primary btn-full" type="submit">Créer la carte</button></form>');
 }
@@ -2421,6 +2769,14 @@ function vSet() {
     '<div class="grid-2">' +
     '<div class="field"><label for="s-city">Ville</label><input id="s-city" name="city" value="' + esc(sh.city) + '"></div>' +
     '<div class="field"><label for="s-tag">Accroche</label><input id="s-tag" name="tagline" value="' + esc(sh.tagline) + '"></div></div>' +
+    '<div class="field"><label>Allure de la carte</label>' +
+    '<div class="styles">' + CARD_STYLES.map(function (st) {
+      return '<button type="button" class="style-pick" data-style="' + st[0] + '" ' +
+        'aria-pressed="' + (styleOf(null) === st[0]) + '" data-act="shop-style" data-k="' + st[0] + '">' +
+        '<span class="swatch"></span><span class="nm">' + st[1] + '</span></button>';
+    }).join("") + '</div>' +
+    '<span class="hint">L\'allure par défaut des nouvelles cartes. Chaque client peut ' +
+    'ensuite choisir la sienne depuis son compte.</span></div>' +
     '<hr class="divide"><div class="sect-head" style="margin:0"><h2 style="font-size:16px">Barème</h2></div>' +
     '<div class="grid-2">' +
     '<div class="field"><label for="s-ppe">Points par euro dépensé</label><input id="s-ppe" name="ppe" type="number" step="0.5" min="0.5" value="' + sh.ppe + '"></div>' +
@@ -2495,6 +2851,7 @@ function rgpdPanel() {
       (ph ? ' placeholder="' + esc(ph) + '"' : "") + '></div>';
   };
   var sansConsentement = DB.clients.filter(function (c) { return !c.consent_at; }).length;
+  var sansSignature = DB.clients.filter(function (c) { return !c.sign; }).length;
 
   return '<form class="panel panel-pad stack" data-act="save-legal">' +
     '<div class="sect-head"><h2>Données personnelles</h2></div>' +
@@ -2525,9 +2882,12 @@ function rgpdPanel() {
       : "Aucune fiche ne dépasse la durée de conservation.") + '</span></div>' +
     (stale.length ? '<button class="btn btn-danger btn-full" type="button" data-act="purge-stale">' +
       'Supprimer ces ' + stale.length + ' fiche' + (stale.length > 1 ? "s" : "") + '</button>' : "") +
-    (sansConsentement ? '<div class="banner warn"><span aria-hidden="true">!</span><span>' +
+    (sansConsentement ? '<div class="banner warn"><span class="ico" aria-hidden="true">!</span><span class="grow">' +
       sansConsentement + ' fiche(s) sans preuve de consentement — probablement reprises d\'un ancien fichier. ' +
       'Recueillez leur accord au prochain passage.</span></div>' : "") +
+    (sansSignature ? '<div class="banner"><span class="ico" aria-hidden="true">i</span><span class="grow">' +
+      sansSignature + ' fiche(s) sans signature. Ouvrez la fiche du client à son prochain passage : ' +
+      'le bouton « Faire signer » ajoute sa signature sans rien changer d\'autre.</span></div>' : "") +
     '</form>';
 }
 
@@ -2609,12 +2969,12 @@ function csv(rows) {
 function csvClients() {
   var rows = [["Numero", "Nom", "Telephone", "Email", "Anniversaire", "Inscription", "Points", "Points cumules",
     "Total depense", "Passages", "Dernier passage", "Statut", "Code parrain", "Parraine par",
-    "Offres acceptees", "Consentement"]];
+    "Offres acceptees", "Consentement", "Signee le"]];
   DB.clients.forEach(function (c) {
     var p = c.by ? byId(c.by) : null;
     rows.push([c.id, c.name, c.phone, c.email, bdayLabel(c), c.created, c.points, c.lifetime,
       String(c.spent).replace(".", ","), c.visits, lastVisit(c), tierOf(c.lifetime), c.code, p ? p.name : "",
-      c.marketing ? "oui" : "non", d10(c.consent_at)]);
+      c.marketing ? "oui" : "non", d10(c.consent_at), d10(c.signed_at)]);
   });
   return "﻿" + csv(rows);
 }
@@ -2720,6 +3080,7 @@ function render() {
   window.scrollTo({ top: S.scroll || 0, behavior: "instant" });
   S.scroll = 0;
   posed = true;
+  mountSigns();
 }
 
 /* Changer d'écran remet la page en haut ; rester sur le même écran conserve
@@ -2815,6 +3176,41 @@ var ACTS = {
       '<div id="my-err"></div>' +
       '<button class="btn btn-ink btn-full" type="submit">Enregistrer</button></form>');
   },
+  "shop-style": function (el) {
+    DB.shop.card_style = el.dataset.k;
+    if (Store.mode === "supabase")
+      return remote(sbFetch("/rest/v1/shop?id=eq.1", {
+        method: "PATCH", prefer: "return=minimal", body: { data: DB.shop }
+      }, true), "Allure de la carte enregistrée.");
+    persist("Allure de la carte enregistrée.");
+  },
+  "pick-style": function (el) {
+    var c = byId(S.cid); if (!c) return;
+    var k = el.dataset.k;
+    c.style = k;
+    if (Store.mode === "supabase")
+      return remote(rpc("set_card_style", { p_token: c.token, p_style: k }), "Carte mise à jour.");
+    persist("Carte mise à jour.");
+  },
+  "my-sign": function () {
+    var c = byId(S.cid); if (!c) return;
+    modal("Signer ma carte", '<form data-act="my-sign-save" class="stack">' +
+      '<p class="small">Votre signature vaut accord pour que la boutique conserve vos ' +
+      'informations et gère votre carte. Elle reste visible sur votre compte, et disparaît ' +
+      'avec vos données si vous supprimez votre carte.</p>' +
+      signField("my-sign", "Votre signature") +
+      '<div id="ms-err"></div>' +
+      '<button class="btn btn-ink btn-full" type="submit">Enregistrer ma signature</button></form>');
+  },
+  "sign-client": function (el) {
+    var c = byId(el.dataset.id); if (!c) return;
+    modal("Signature de " + c.name, '<form data-act="sign-client-save" class="stack" data-id="' + c.id + '">' +
+      '<p class="small">Faites signer le client sur cet écran. La signature reste attachée à sa ' +
+      'fiche et vaut preuve de son accord.</p>' +
+      signField("c-sign", "Signature du client") +
+      '<div id="cs-err"></div>' +
+      '<button class="btn btn-ink btn-full" type="submit">Enregistrer la signature</button></form>');
+  },
   "my-export": function () {
     var c = byId(S.cid); if (!c) return;
     var data = {
@@ -2823,7 +3219,8 @@ var ACTS = {
       carte: { numero: c.id, nom: c.name, telephone: c.phone, email: c.email || null,
         anniversaire: bdayLabel(c), inscription: c.created, code_parrain: c.code,
         points: c.points, points_cumules: c.lifetime, total_depense: c.spent,
-        passages: c.visits, offres_acceptees: !!c.marketing, consentement: c.consent_at || null },
+        passages: c.visits, offres_acceptees: !!c.marketing, consentement: c.consent_at || null,
+        signature: c.sign || null, signee_le: c.signed_at || null },
       historique: (c.hist || []).map(function (h) {
         return { date: h.t, montant: h.a, points: h.p, detail: h.w, type: h.k };
       })
@@ -3059,6 +3456,36 @@ var FORMS = {
     c.name = name; c.phone = phone; c.email = email; c.bday_day = bd; c.bday_month = bm;
     closeModal(); persist("Informations mises à jour.");
   },
+  "my-sign-save": function (f) {
+    var c = byId(S.cid); if (!c) return;
+    var box = document.getElementById("ms-err");
+    var sign = f.sign ? f.sign.value : "";
+    if (!signSubstantial(sign)) { box.innerHTML = '<p class="err">Merci de signer dans la case blanche.</p>'; return; }
+    delete signCache["my-sign"];
+    if (Store.mode === "supabase")
+      return remote(rpc("sign_card", { p_token: c.token, p_sign: sign }).then(function () {
+        c.sign = sign; c.signed_at = new Date().toISOString(); return true;
+      }), "Signature enregistrée.");
+    c.sign = sign; c.signed_at = new Date().toISOString();
+    closeModal(); persist("Signature enregistrée.");
+  },
+  "sign-client-save": function (f, el) {
+    var c = byId(el.dataset.id); if (!c) return;
+    var box = document.getElementById("cs-err");
+    var sign = f.sign ? f.sign.value : "";
+    if (!signSubstantial(sign)) { box.innerHTML = '<p class="err">La case est vide : faites signer le client.</p>'; return; }
+    delete signCache["c-sign"];
+    if (Store.mode === "supabase")
+      return remote(sbFetch("/rest/v1/clients?id=eq." + encodeURIComponent(c.id), {
+        method: "PATCH", prefer: "return=minimal",
+        body: { signature: sign, signed_at: new Date().toISOString() }
+      }, true).then(function () {
+        c.sign = sign; c.signed_at = new Date().toISOString(); return true;
+      }), "Signature enregistrée.");
+    c.sign = sign; c.signed_at = new Date().toISOString();
+    logIt("Signature recueillie pour la fiche n° " + c.id, c.id);
+    closeModal(); persist("Signature enregistrée.");
+  },
   "save-client": function (f, el) {
     var c = byId(el.dataset.id);
     if (Store.mode === "supabase")
@@ -3088,19 +3515,26 @@ var FORMS = {
   },
   "admin-new": function (f) {
     var name = f.name.value.trim(), phone = normPhone(f.phone.value);
+    var sign = f.sign ? f.sign.value : "", pub = f.pub ? f.pub.checked : false;
     var box = document.getElementById("an-err");
     if (name.length < 3) { box.innerHTML = '<p class="err">Nom trop court.</p>'; return; }
     if (phone.length < 9) { box.innerHTML = '<p class="err">Téléphone incomplet.</p>'; return; }
     if (DB.clients.some(function (c) { return normPhone(c.phone) === phone; })) {
       box.innerHTML = '<p class="err">Ce téléphone a déjà une carte.</p>'; return;
     }
+    if (!signSubstantial(sign)) {
+      box.innerHTML = '<p class="err">Faites signer le client dans la case blanche.</p>'; return;
+    }
+    if (!f.ok.checked) {
+      box.innerHTML = '<p class="err">Le client doit donner son accord pour que la carte soit créée.</p>'; return;
+    }
     if (Store.mode === "supabase") {
       box.innerHTML = '<p class="small muted">Création…</p>';
       return remote(rpc("create_card", {
         p_name: name, p_phone: phone, p_day: Number(f.bd.value) || null, p_month: Number(f.bm.value) || null,
         p_email: f.email.value.trim() || null, p_ref: f.ref.value.trim() || null,
-        p_marketing: false, p_notice: NOTICE_VERSION
-      }, true).then(function (r) { S.till = { cid: r.id }; S.tab = "till"; return r; }),
+        p_marketing: pub, p_notice: NOTICE_VERSION, p_sign: sign
+      }, true).then(function (r) { delete signCache["n-sign"]; S.till = { cid: r.id }; S.tab = "till"; return r; }),
         function (r) { return "Carte n° " + r.id + " créée pour " + name + "."; });
     }
     var parrain = f.ref.value.trim() ? DB.clients.filter(function (c) {
@@ -3111,7 +3545,9 @@ var FORMS = {
     var id = String(DB.seq);
     var c = { id: id, name: name, phone: phone, email: f.email.value.trim(),
       bday_day: Number(f.bd.value) || null, bday_month: Number(f.bm.value) || null,
-      consent_at: new Date().toISOString(), notice: NOTICE_VERSION, marketing: false,
+      sign: sign, signed_at: new Date().toISOString(),
+      consent_at: new Date().toISOString(), notice: NOTICE_VERSION,
+      marketing: pub, marketing_at: pub ? new Date().toISOString() : null,
       created: today(), points: sh.welcome, lifetime: sh.welcome, spent: 0, visits: 0,
       code: slug(name) + "-" + id, by: parrain ? parrain.id : "",
       hist: [{ t: today(), a: 0, p: sh.welcome, w: "Bienvenue — carte créée", k: "welcome" }] };
@@ -3123,6 +3559,7 @@ var FORMS = {
     }
     DB.clients.unshift(c);
     logIt("Carte n° " + id + " créée", id);
+    delete signCache["n-sign"];
     S.till = { cid: id }; S.tab = "till";
     closeModal(); persist("Carte n° " + id + " créée pour " + name + ".");
   },

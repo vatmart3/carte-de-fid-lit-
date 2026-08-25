@@ -150,11 +150,46 @@ Si l'appareil photo est indisponible, le scanner propose de **prendre une photo
 du code**, ce qui marche partout. Et le numéro de carte reste saisissable au
 clavier : le scanner fait gagner du temps, il n'est jamais un passage obligé.
 
-Sur la démonstration hébergée chez Claude, la page tourne dans un cadre isolé
-qui ne donne pas accès à l'appareil photo. Le bouton **Prendre une photo du
-code** y prend le relais : la vitrine embarque son propre lecteur, elle
-fonctionne donc aussi sur Safari et sur iPhone. C'est une limite de la vitrine,
-pas de l'application déployée, où la caméra s'ouvre directement.
+### Pourquoi le scan ne marche pas sur la démonstration
+
+Sur la démonstration hébergée chez Claude, la page tourne **dans un cadre isolé
+(iframe) qui ne reçoit pas l'autorisation caméra**. Aucun réglage, aucune
+correction de code ne peut y changer quoi que ce soit : le navigateur refuse
+l'accès avant même que l'application demande. Le bouton **Prendre une photo du
+code** y prend le relais, et le numéro reste saisissable au clavier.
+
+Pour essayer la caméra **avant** la mise en ligne définitive :
+
+```bash
+node scripts/build-essai.mjs
+```
+
+produit `dist/carte-essai.html` — l'application entière dans un fichier unique,
+lecteur de codes compris, sans aucune base branchée. Déposez ce fichier sur
+[app.netlify.com/drop](https://app.netlify.com/drop) (glisser-déposer, pas de
+compte à créer) : vous obtenez une adresse en HTTPS, vous l'ouvrez sur le
+téléphone, et le scan s'ouvre pour de vrai. Ce fichier ne touche à rien : il ne
+connaît pas votre base Supabase.
+
+Une fois le site publié sur Vercel (partie 3), la question ne se pose plus : la
+page est en pleine fenêtre, en HTTPS, et la caméra s'ouvre au premier appui.
+
+## 4 ter. La signature du client
+
+Depuis l'inscription, le client **signe du doigt dans une case blanche**, que la
+carte soit créée par lui-même sur son téléphone ou par le boucher au comptoir.
+Sans signature ni case d'accord cochée, la carte n'est pas créée.
+
+Ce n'est pas une image : l'application enregistre le **tracé** (quelques
+centaines d'octets), ce qui reste net à toutes les tailles et ne pèse rien dans
+la base. La signature reste affichée sur le compte du client, apparaît sur sa
+fiche côté boucher, part avec l'export de ses données, et disparaît avec elles
+s'il supprime sa carte.
+
+Les fiches créées avant cette version n'ont pas de signature. Réglages →
+Données personnelles indique combien il en reste ; ouvrez la fiche du client à
+son prochain passage et utilisez **Faire signer**. Le client peut aussi le faire
+lui-même depuis sa carte.
 
 ## 5. Se mettre en règle (RGPD)
 

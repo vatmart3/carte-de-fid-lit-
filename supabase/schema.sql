@@ -36,6 +36,11 @@ create table if not exists public.clients (
 alter table public.clients add column if not exists bday_day   smallint;
 alter table public.clients add column if not exists bday_month smallint;
 alter table public.clients add column if not exists consent_at timestamptz;
+-- La signature manuscrite : un tracé, pas une image. Quelques centaines
+-- d'octets, et la preuve de l'accord du client (RGPD art. 7.1).
+alter table public.clients add column if not exists signature text;
+alter table public.clients add column if not exists signed_at timestamptz;
+alter table public.clients add column if not exists card_style text;
 alter table public.clients add column if not exists notice     text;
 alter table public.clients add column if not exists marketing  boolean not null default false;
 alter table public.clients add column if not exists marketing_at timestamptz;
@@ -186,6 +191,7 @@ begin
     'id', c.id, 'name', c.name, 'phone', c.phone, 'email', c.email,
     'bday_day', c.bday_day, 'bday_month', c.bday_month,
     'marketing', c.marketing, 'consent_at', c.consent_at,
+    'sign', c.signature, 'signed_at', c.signed_at, 'card_style', c.card_style,
     'created', c.created, 'code', c.code,
     'points', c.points, 'lifetime', c.lifetime, 'spent', c.spent, 'visits', c.visits,
     'last_visit', c.last_visit,
@@ -212,10 +218,12 @@ $$ select jsonb_build_object('token', token) from public.clients
 -- Créer sa carte. Les points de bienvenue et de parrainage sont calculés ici,
 -- côté serveur : le navigateur ne peut pas s'en attribuer davantage.
 drop function if exists public.create_card(text, text, date, text, text);
+drop function if exists public.create_card(text, text, int, int, text, text, boolean, text);
 create or replace function public.create_card(
     p_name text, p_phone text, p_day int, p_month int,
     p_email text default null, p_ref text default null,
-    p_marketing boolean default false, p_notice text default null) returns jsonb
+    p_marketing boolean default false, p_notice text default null,
+    p_sign text default null) returns jsonb
   language plpgsql security definer set search_path = public, pg_temp as $$
 declare
   s jsonb; nid text; ncode text; ph text; par public.clients;
@@ -247,11 +255,14 @@ begin
 
   insert into public.clients (id, name, phone, email, bday_day, bday_month, code,
                               points, lifetime, referred_by,
-                              consent_at, notice, marketing, marketing_at)
+                              consent_at, notice, marketing, marketing_at,
+                              signature, signed_at)
     values (nid, btrim(p_name), ph, nullif(btrim(coalesce(p_email,'')), ''), p_day, p_month,
             ncode, total, total, par.id,
             now(), coalesce(p_notice, 'v1'), coalesce(p_marketing, false),
-            case when p_marketing then now() end);
+            case when p_marketing then now() end,
+            nullif(btrim(coalesce(p_sign,'')), ''),
+            case when nullif(btrim(coalesce(p_sign,'')), '') is not null then now() end);
   insert into public.moves (client_id, amount, points, label, kind)
     values (nid, 0, welcome, 'Bienvenue — carte créée', 'welcome');
 
@@ -298,6 +309,35 @@ begin
    where id = c.id;
   insert into public.log (m, client_id) values ('Fiche n° ' || c.id || ' modifiée par le client', c.id);
   return jsonb_build_object('ok', true);
+end $$;
+
+-- Signer sa carte après coup : les fiches créées avant la signature, et
+-- celles ouvertes au comptoir sans écran tactile.
+create or replace function public.sign_card(p_token uuid, p_sign text) returns jsonb
+  language plpgsql security definer set search_path = public, pg_temp as $$
+declare c public.clients; sg text;
+begin
+  sg := nullif(btrim(coalesce(p_sign, '')), '');
+  if sg is null or length(sg) < 20 then raise exception 'signature_vide'; end if;
+  if length(sg) > 20000 then raise exception 'signature_trop_longue'; end if;
+  select * into c from public.clients where token = p_token;
+  if not found then raise exception 'lien_inconnu'; end if;
+  update public.clients set signature = sg, signed_at = now() where id = c.id;
+  insert into public.log (m, client_id) values ('Fiche n° ' || c.id || ' : carte signée', c.id);
+  return jsonb_build_object('signed_at', now());
+end $$;
+
+-- Le client choisit l'habillage de sa carte. Aucune donnée personnelle.
+create or replace function public.set_card_style(p_token uuid, p_style text) returns jsonb
+  language plpgsql security definer set search_path = public, pg_temp as $$
+declare c public.clients; st text;
+begin
+  st := nullif(btrim(coalesce(p_style, '')), '');
+  if st is not null and st !~ '^[a-z0-9-]{1,24}$' then raise exception 'style_inconnu'; end if;
+  select * into c from public.clients where token = p_token;
+  if not found then raise exception 'lien_inconnu'; end if;
+  update public.clients set card_style = st where id = c.id;
+  return jsonb_build_object('card_style', st);
 end $$;
 
 create or replace function public.set_marketing(p_token uuid, p_on boolean) returns jsonb
@@ -519,9 +559,11 @@ revoke execute on function
 grant execute on function public.public_shop(),
                           public.get_card(uuid),
                           public.find_card(text, int, int),
-                          public.create_card(text, text, int, int, text, text, boolean, text),
+                          public.create_card(text, text, int, int, text, text, boolean, text, text),
                           public.update_card(uuid, text, text, text, int, int),
                           public.set_marketing(uuid, boolean),
+                          public.sign_card(uuid, text),
+                          public.set_card_style(uuid, text),
                           public.delete_card(uuid) to anon, authenticated;
 grant execute on function public.record_purchase(text, numeric, text),
                           public.use_reward(text, int, text),
