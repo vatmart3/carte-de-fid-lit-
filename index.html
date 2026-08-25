@@ -305,6 +305,10 @@ input:-webkit-autofill,input:-webkit-autofill:focus{
 .reward-row{display:flex;gap:10px;align-items:center}
 .reward-row input[name="p"]{width:100px;flex:none}
 .reward-row .ru{font-size:14px;color:var(--muted);font-weight:500;flex:none}
+/* la barre du fichier clients : recherche, tri, nouvelle carte */
+.filter-row{display:flex;gap:10px;flex-wrap:wrap}
+.filter-row #cq{flex:1 1 200px;min-width:0}
+.filter-row select{width:auto;min-width:0}
 .till-find{display:flex;gap:10px;flex-wrap:wrap}
 .till-find input[name="q"]{flex:1 1 220px;min-width:0}
 .till-found{display:flex;align-items:center;gap:14px;padding:16px;border-radius:var(--r-sm);background:var(--surface-2);border:1px solid var(--hair)}
@@ -425,15 +429,15 @@ p,li,td,th,label,.hint,.small,.banner,.tile .k,.foot{overflow-wrap:break-word}
   .tbl{min-width:0;display:block;font-size:15px}
   .tbl thead{display:none}
   .tbl tbody{display:block}
-  .tbl tr{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px 8px;
+  .tbl tr{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:9px 8px;
     background:var(--surface-1);border:1px solid var(--hair);border-radius:var(--r-sm);
-    padding:14px 16px;margin-bottom:10px;align-items:start}
+    padding:13px 15px;margin-bottom:9px;align-items:start;line-height:1.45}
   .tbl tr:last-child{margin-bottom:0}
   .tbl tbody tr:hover{background:var(--surface-1)}
   /* chaque valeur porte son intitulé au-dessus d'elle, en petit */
   .tbl td{display:block;padding:0;border:0;text-align:left;grid-column:span 2;min-width:0}
   .tbl td::before{content:attr(data-l);display:block;color:var(--muted);
-    font-size:12px;font-weight:500;line-height:1.4;margin-bottom:1px}
+    font-size:12px;font-weight:500;line-height:1.3}
   .tbl td:not([data-l])::before{content:none}
   .tbl td.r{text-align:left}
   /* en-tête de la fiche : numéro · nom · état de fréquentation */
@@ -451,7 +455,7 @@ p,li,td,th,label,.hint,.small,.banner,.tile .k,.foot{overflow-wrap:break-word}
   .tbl td.c-wide{grid-column:1/-1;grid-row:3}
   .tbl td.empty{grid-column:1/-1;grid-row:1;text-align:center}
   /* un trait discret sépare l'identité des chiffres */
-  .tbl td.c-a,.tbl td.c-b,.tbl td.c-c{border-top:1px solid var(--hair);padding-top:10px}
+  .tbl td.c-a,.tbl td.c-b,.tbl td.c-c{border-top:1px solid var(--hair);padding-top:9px}
 
   /* ── le bandeau du haut ──
      Le flou derrière un bandeau collant fait saccader le défilement sur les
@@ -500,10 +504,12 @@ p,li,td,th,label,.hint,.small,.banner,.tile .k,.foot{overflow-wrap:break-word}
   .till-find input[name="q"]{flex:1 1 100%}
   .till-find .btn{flex:1 1 auto}
 
-  /* ── la barre de recherche du fichier clients ── */
-  .filter-row #cq{flex:1 1 100%;min-width:0}
-  .filter-row select{flex:1 1 auto;width:auto;min-width:0}
-  .filter-row .btn{flex:0 0 auto}
+  /* ── la barre de recherche du fichier clients ──
+     La recherche prend toute la largeur ; le tri et « Nouvelle carte » se
+     partagent la ligne suivante, sans que le nom du tri soit rogné. */
+  .filter-row #cq{flex:1 1 100%}
+  .filter-row select{flex:1 1 58%}
+  .filter-row .btn{flex:1 1 0;white-space:nowrap}
 
   /* ── la fiche trouvée en caisse, et les bandeaux à bouton ──
      Le nom, le numéro et le statut se disputaient la même ligne : trois
@@ -2178,9 +2184,9 @@ function vClients() {
     '<section class="panel panel-pad stack">' +
     '<div class="sect-head"><h2>Fichier clients</h2><span class="sp"></span>' +
     '<span class="small muted">' + nb(list.length) + " / " + nb(DB.clients.length) + ' fiches</span></div>' +
-    '<div class="filter-row" style="display:flex;gap:10px;flex-wrap:wrap">' +
-    '<input id="cq" type="search" placeholder="Nom, n° de carte, téléphone…" value="' + esc(q) + '" style="flex:1;min-width:200px" data-act="search-live">' +
-    '<select id="csort" data-act="sort" style="width:auto">' + opts + '</select>' +
+    '<div class="filter-row">' +
+    '<input id="cq" type="search" placeholder="Nom, n° de carte, téléphone…" value="' + esc(q) + '" data-act="search-live">' +
+    '<select id="csort" data-act="sort">' + opts + '</select>' +
     '<button class="btn" data-act="new-client">Nouvelle carte</button></div>' +
     '<div class="tbl-wrap"><table class="tbl"><thead><tr>' +
     '<th>N°</th><th>Client</th><th class="r">Points</th><th class="r">Passages</th>' +
