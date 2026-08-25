@@ -815,8 +815,12 @@ var HEAD =
 function headFonts() {
   var out = "";
   try {
+    // Sur le site, ces éléments sont dans <head> ; dans la vitrine publiée,
+    // l'hôte reprend le document et ils atterrissent dans le corps de page.
+    // Chercher dans la seule en-tête, c'était perdre la police à chaque
+    // republication de la vitrine.
     var sel = 'link[rel="preload"][as="font"], style#fontface, link[href*="fonts.googleapis"], link[href*="fonts.gstatic"]';
-    var n = document.head.querySelectorAll(sel);
+    var n = document.querySelectorAll(sel);
     for (var i = 0; i < n.length; i++) out += n[i].outerHTML + "\n";
   } catch (e) {}
   return out;
@@ -2973,6 +2977,7 @@ try {
   window.__t_split = msgSplit;
   window.__t_final = msgFinal;
   window.__t_trace = msgTrace;
+  window.__t_headFonts = headFonts;
 } catch (e) {}
 
 /* ══════════════════════════ 8. Anniversaires & parrainage ══════════════════════════ */
