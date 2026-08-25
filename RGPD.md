@@ -71,12 +71,12 @@ Personne ne peut le faire à sa place.
 | **Nom du traitement** | Programme de fidélité clients |
 | **Responsable de traitement** | [Raison sociale], [adresse], [SIRET] — représenté par [nom du gérant] |
 | **Contact** | [e-mail] — [téléphone] |
-| **Finalités** | Gestion des cartes de fidélité : cumul de points, récompenses, cadeau d'anniversaire, parrainage, historique d'achats. Envoi d'offres commerciales pour les clients l'ayant accepté. |
+| **Finalités** | Gestion des cartes de fidélité : cumul de points, récompenses, cadeau d'anniversaire, parrainage, historique d'achats. Information des clients (commande prête, horaires). Envoi d'offres commerciales aux seuls clients l'ayant accepté. |
 | **Base légale** | Exécution du programme de fidélité souscrit par le client. Consentement pour les offres commerciales. Obligation du responsable de démontrer le consentement (art. 7.1) pour la signature et l'horodatage. |
 | **Personnes concernées** | Clients de la boutique ayant adhéré au programme |
 | **Catégories de données** | Identité : nom et prénom. Coordonnées : téléphone, e-mail (facultatif). Vie personnelle : jour et mois de naissance. Données d'achat : date, montant, nature des achats, points, récompenses. Parrainage : lien entre clients. Preuve du consentement : case cochée, horodatage, signature manuscrite. |
 | **Données sensibles** | Aucune. La signature est conservée comme simple preuve d'accord (art. 7.1) : elle n'est ni analysée, ni comparée, ni utilisée pour identifier qui que ce soit. Elle ne constitue donc pas une donnée biométrique au sens de l'article 9. |
-| **Destinataires** | Le gérant et le personnel habilité de la boutique |
+| **Destinataires** | Le gérant et le personnel habilité de la boutique. Pour les envois groupés, l'opérateur téléphonique ou le fournisseur de messagerie du gérant, qui achemine le message depuis son propre téléphone — l'application ne dispose d'aucun service d'envoi et ne transmet aucune donnée à un tiers. |
 | **Sous-traitants** | Supabase (hébergement de la base, région [région]) ; Vercel (hébergement de la page) |
 | **Transferts hors UE** | Aucun — base hébergée en Union européenne |
 | **Durée de conservation** | 3 ans à compter du dernier passage en boutique, puis suppression de la fiche et de son historique |

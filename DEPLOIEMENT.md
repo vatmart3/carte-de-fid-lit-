@@ -191,6 +191,36 @@ Données personnelles indique combien il en reste ; ouvrez la fiche du client à
 son prochain passage et utilisez **Faire signer**. Le client peut aussi le faire
 lui-même depuis sa carte.
 
+## 4 quater. Écrire à une partie des clients
+
+Dans **Clients**, un carré à cocher précède chaque nom. Cochez qui vous voulez —
+ou **Tout cocher**, qui ne prend que les fiches actuellement affichées : tapez
+d'abord une recherche pour restreindre la liste, puis cochez tout.
+
+Le bandeau noir qui apparaît propose **Écrire à ces clients**. La fenêtre
+demande d'abord la **nature** du message, et c'est le point important :
+
+- **Message de service** — commande prête, horaires, fermeture. Cela répond à
+  une demande du client : tout le monde peut le recevoir.
+- **Offre commerciale** — arrivage, promotion. La loi ne permet de l'envoyer
+  qu'aux clients qui ont coché la case « j'accepte de recevoir les offres ».
+  L'application **retire les autres d'elle-même** et affiche leurs noms, pour
+  que vous sachiez qui n'est pas parti.
+
+Ensuite : un modèle si vous voulez, votre texte, et trois sorties — **SMS**,
+**e-mail** (les adresses en copie cachée, personne ne voit celles des autres),
+ou **copier les numéros**. Dans les trois cas l'application ne fait qu'ouvrir
+votre application de messages avec tout déjà rempli : c'est vous qui relisez et
+qui appuyez sur envoyer. La carte de fidélité n'a aucun service d'envoi, et ne
+transmet donc rien à personne.
+
+Deux limites pratiques : au-delà d'environ vingt numéros, certains téléphones
+refusent d'ouvrir le SMS — envoyez en deux fois ; et au-delà de 160 caractères,
+l'opérateur facture deux SMS. Le compteur de caractères le rappelle.
+
+Chaque envoi laisse une ligne dans le journal : la nature, la voie, le nombre
+de destinataires et le nombre d'écartés. Ni les noms, ni le texte.
+
 ## 5. Se mettre en règle (RGPD)
 
 Une fois le site en ligne, ouvrir **Réglages → Données personnelles** et

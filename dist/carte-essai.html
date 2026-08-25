@@ -441,6 +441,37 @@ input:-webkit-autofill,input:-webkit-autofill:focus{
 .tbl tbody tr:hover{background:var(--surface-2)}
 .tbl .no{font-weight:700;font-variant-numeric:tabular-nums}
 .tbl .num{font-size:14.5px}
+/* ─────────── cocher des clients ───────────
+   Un vrai carré, assez grand pour un doigt, dans sa propre colonne : le reste
+   de la ligne continue d'ouvrir la fiche. */
+.tbl th.pick,.tbl td.pick{width:52px;padding-left:18px;padding-right:0;cursor:pointer}
+.tick{display:block;width:22px;height:22px;border-radius:6px;border:2px solid var(--hair-2);
+  background:var(--surface-1);position:relative;transition:background .12s,border-color .12s}
+.pick:hover .tick{border-color:var(--muted)}
+.pick[aria-checked="true"] .tick{background:var(--ink);border-color:var(--ink)}
+.pick[aria-checked="true"] .tick::after{content:"";position:absolute;left:6px;top:2px;
+  width:6px;height:11px;border:solid var(--ground);border-width:0 2.5px 2.5px 0;transform:rotate(42deg)}
+.pick:focus-visible{outline:none}
+.pick:focus-visible .tick{outline:2px solid var(--rouge-fill);outline-offset:2px}
+.tbl tbody tr.picked{background:var(--rouge-soft)}
+.tbl tbody tr.picked:hover{background:var(--rouge-soft)}
+
+.pick-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.pick-row .small{flex:1;min-width:0}
+@media (max-width:520px){.pick-row .small{flex:1 1 100%}}
+
+/* le bandeau qui apparaît dès qu'une case est cochée */
+.selbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  padding:14px 18px;border-radius:var(--r-sm);background:var(--ink);color:var(--ground)}
+.selbar .cnt{font-size:15px;font-weight:500}
+.selbar .cnt b{font-weight:700}
+.selbar .sp{flex:1}
+.selbar .btn{border-color:rgba(255,255,255,.28);background:transparent;color:var(--ground)}
+.selbar .btn:hover{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.4)}
+.selbar .btn-ink{background:var(--ground);color:var(--ink);border-color:var(--ground)}
+.selbar .btn-ink:hover{background:#fff;color:var(--ink);border-color:#fff}
+.selbar .btn-ghost{border-color:transparent;color:rgba(255,255,255,.75)}
+
 .pill{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:99px;
   font-size:12.5px;font-weight:700;white-space:nowrap;background:var(--surface-3);color:var(--ink-2)}
 .pill.brass{background:var(--ambre-soft);color:var(--ambre)}
@@ -621,7 +652,7 @@ p,li,td,th,label,.hint,.small,.banner,.tile .k,.foot{overflow-wrap:break-word}
   .tbl{min-width:0;display:block;font-size:15px}
   .tbl thead{display:none}
   .tbl tbody{display:block}
-  .tbl tr{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:9px 8px;
+  .tbl tr{display:grid;grid-template-columns:34px repeat(5,minmax(0,1fr));gap:9px 8px;
     background:var(--surface-2);border:1px solid var(--hair);border-radius:var(--r-sm);
     padding:14px 16px;margin-bottom:9px;align-items:start;line-height:1.45}
   .tbl tr:last-child{margin-bottom:0}
@@ -632,18 +663,19 @@ p,li,td,th,label,.hint,.small,.banner,.tile .k,.foot{overflow-wrap:break-word}
     font-size:12px;font-weight:500;line-height:1.3}
   .tbl td:not([data-l])::before{content:none}
   .tbl td.r{text-align:left}
-  /* en-tête de la fiche : numéro · nom · état de fréquentation */
-  .tbl td.hd-a{grid-column:1/2;grid-row:1;font-size:17px;align-self:center}
-  .tbl td.hd-b{grid-column:2/6;grid-row:1}
+  /* en-tête de la fiche : la case, le numéro, le nom, l'état */
+  .tbl td.pick{grid-column:1/2;grid-row:1;width:auto;padding:0;align-self:center}
+  .tbl td.hd-a{grid-column:2/3;grid-row:1;font-size:17px;align-self:center}
+  .tbl td.hd-b{grid-column:3/6;grid-row:1}
   .tbl td.hd-b b{font-size:17px;line-height:1.3}
   .tbl td.c-st{grid-column:6/7;grid-row:1;text-align:right;align-self:center}
   .tbl td.c-st::before{content:none}
   /* les chiffres, puis les dates */
   .tbl td.c-a{grid-column:1/3;grid-row:2}
   .tbl td.c-b{grid-column:3/5;grid-row:2}
-  .tbl td.c-c{grid-column:5/7;grid-row:2}
+  .tbl td.c-c{grid-column:5/-1;grid-row:2}
   .tbl td.c-d{grid-column:1/4;grid-row:3}
-  .tbl td.c-e{grid-column:4/7;grid-row:3}
+  .tbl td.c-e{grid-column:4/-1;grid-row:3}
   .tbl td.c-wide{grid-column:1/-1;grid-row:3}
   .tbl td.empty{grid-column:1/-1;grid-row:1;text-align:center}
   /* un trait discret sépare l'identité des chiffres */
@@ -714,6 +746,12 @@ p,li,td,th,label,.hint,.small,.banner,.tile .k,.foot{overflow-wrap:break-word}
   .banner .btn,.bday .btn{margin-left:auto}
   .banner:has(.btn),.bday:has(.btn){display:grid;grid-template-columns:auto minmax(0,1fr);gap:12px}
   .banner:has(.btn) .btn,.bday:has(.btn) .btn{grid-column:1/-1;justify-self:end;margin:0}
+
+  /* le bandeau de sélection : les boutons prennent toute la largeur */
+  .selbar{padding:14px}
+  .selbar .cnt{flex:1 1 100%}
+  .selbar .btn{flex:1 1 auto}
+  .selbar .sp{display:none}
 
   /* ── divers ── */
   .sect-head h2{font-size:19px}
@@ -912,7 +950,7 @@ setInterval(function () { if (lockExpired()) lockNow("Session verrouillée aprè
 
 function saveSession() { ssSet(SS, JSON.stringify(S)); }
 function loadSession() {
-  var d = { view: "home", tab: "dash", cid: "", admin: false, flash: "", till: {} };
+  var d = { view: "home", tab: "dash", cid: "", admin: false, flash: "", till: {}, sel: {} };
   try { var p = JSON.parse(ssGet(SS) || "null"); if (p) for (var k in p) d[k] = p[k]; } catch (e) {}
   return d;
 }
@@ -2309,8 +2347,13 @@ function vPrivacy() {
       '<b>Conserver la preuve de votre accord</b> — la case cochée, l\'heure exacte et votre signature. ' +
       'Base légale : l\'obligation faite au responsable de démontrer votre consentement (RGPD, article 7.1). ' +
       'La signature disparaît en même temps que le reste si vous supprimez votre carte.<br><br>' +
-      '<b>Vous envoyer des offres</b> — uniquement si vous avez coché la case prévue à l\'inscription. ' +
-      'Base légale : votre consentement, que vous pouvez retirer à tout moment depuis votre carte, sans perdre vos points.</p>') +
+      '<b>Vous prévenir</b> — un SMS ou un courriel quand votre commande est prête, ou pour un changement ' +
+      'd\'horaires. Base légale : l\'exécution du service que vous avez demandé.<br><br>' +
+      '<b>Vous envoyer des offres</b> — arrivages, promotions, nouveautés, par SMS ou par courriel, et ' +
+      '<b>uniquement si vous avez coché la case prévue à l\'inscription</b>. Base légale : votre consentement, ' +
+      'que vous pouvez retirer à tout moment depuis votre carte, sans perdre vos points. ' +
+      'Si vous refusez, la boutique ne peut techniquement pas vous inclure dans un envoi commercial : ' +
+      'l\'application vous en retire d\'elle-même.</p>') +
 
     sec("Combien de temps", '<p class="small">Vos données sont supprimées <b>' + y + ' ans</b> après votre dernier ' +
       'passage en boutique. La suppression emporte votre fiche et tout votre historique. ' +
@@ -2570,6 +2613,34 @@ function tillSave(f) {
 
 /* ══════════════════════════ 7. Fichier clients ══════════════════════════ */
 
+/* ── la sélection ──
+   Le boucher coche des clients pour leur écrire. L'application n'envoie rien
+   elle-même : elle prépare le message et le passe à l'application de messages
+   ou de courrier du téléphone. C'est le boucher qui appuie sur « envoyer ». */
+
+function selIds() {
+  var out = [], k;
+  for (k in (S.sel || {})) if (S.sel[k] && byId(k)) out.push(k);
+  return out;
+}
+function selClients() { return selIds().map(byId); }
+function allPicked(list) {
+  return list.length > 0 && list.every(function (c) { return S.sel && S.sel[c.id]; });
+}
+
+/* Le bandeau qui apparaît dès qu'une case est cochée. */
+function selBar(list) {
+  var n = selIds().length;
+  if (!n) return "";
+  return '<div class="selbar">' +
+    '<span class="cnt"><b>' + nb(n) + '</b> client' + (n > 1 ? "s" : "") + ' sélectionné' + (n > 1 ? "s" : "") + '</span>' +
+    '<span class="sp"></span>' +
+    '<button class="btn btn-sm btn-ink" data-act="msg-open">Écrire à ces clients</button>' +
+    '<button class="btn btn-sm" data-act="sel-export">Exporter</button>' +
+    '<button class="btn btn-sm btn-ghost" data-act="sel-none">Tout décocher</button>' +
+    '</div>';
+}
+
 function vClients() {
   var q = S.q || "", sort = S.sort || "recent";
   var list = search(q);
@@ -2589,7 +2660,12 @@ function vClients() {
       : d <= 30 ? '<span class="pill good"><i></i>actif</span>'
       : d <= 90 ? '<span class="pill warn"><i></i>' + d + ' j</span>'
       : '<span class="pill crit"><i></i>' + d + ' j</span>';
-    return '<tr data-act="open-client" data-id="' + c.id + '" tabindex="0">' +
+    var on = !!(S.sel && S.sel[c.id]);
+    return '<tr data-act="open-client" data-id="' + c.id + '" tabindex="0"' +
+      (on ? ' class="picked"' : "") + '>' +
+      '<td class="pick" data-act="pick-client" data-id="' + c.id + '" tabindex="0" ' +
+      'role="checkbox" aria-checked="' + on + '" aria-label="Sélectionner ' + esc(c.name) + '">' +
+      '<span class="tick"></span></td>' +
       '<td class="no hd-a">' + c.id + '</td>' +
       '<td class="hd-b"><b>' + esc(c.name) + '</b><br><span class="small muted num">' + esc(prettyPhone(c.phone)) + '</span></td>' +
       '<td class="r num c-a" data-l="Points"><b>' + nb(c.points) + '</b></td>' +
@@ -2598,7 +2674,7 @@ function vClients() {
       '<td class="num small c-d" data-l="Dernier">' + (lv ? dShort(lv) : "—") + '</td>' +
       '<td class="c-st" data-l="Statut">' + st + '</td>' +
       '<td class="num small c-e" data-l="Anniv.">' + bdayLabel(c) + '</td></tr>';
-  }).join("") || '<tr><td colspan="8" class="empty">Aucun client ne correspond à « ' + esc(q) + ' ».</td></tr>';
+  }).join("") || '<tr><td colspan="9" class="empty">Aucun client ne correspond à « ' + esc(q) + ' ».</td></tr>';
 
   var opts = [["recent", "Dernier passage"], ["points", "Points"], ["spent", "Total dépensé"],
     ["visits", "Passages"], ["news", "Inscription"], ["name", "Nom"]]
@@ -2612,11 +2688,21 @@ function vClients() {
     '<input id="cq" type="search" placeholder="Nom, n° de carte, téléphone…" value="' + esc(q) + '" data-act="search-live">' +
     '<select id="csort" data-act="sort">' + opts + '</select>' +
     '<button class="btn" data-act="new-client">Nouvelle carte</button></div>' +
+    '<div class="pick-row">' +
+    '<button class="btn btn-sm" data-act="pick-all">' +
+    (allPicked(list) && list.length ? "Tout décocher" : "Tout cocher") +
+    (list.length ? ' (' + nb(list.length) + ')' : "") + '</button>' +
+    '<span class="small muted">Cochez des clients pour leur écrire ou les exporter.</span>' +
+    '</div>' +
+    selBar(list) +
     '<div class="tbl-wrap"><table class="tbl"><thead><tr>' +
+    '<th class="pick" data-act="pick-all" tabindex="0" role="checkbox" ' +
+    'aria-checked="' + (allPicked(list) && list.length > 0) + '" aria-label="Tout sélectionner">' +
+    '<span class="tick"></span></th>' +
     '<th>N°</th><th>Client</th><th class="r">Points</th><th class="r">Passages</th>' +
     '<th class="r">Dépensé</th><th>Dernier</th><th>Statut</th><th>Anniv.</th>' +
     '</tr></thead><tbody>' + rows + '</tbody></table></div>' +
-    '<p class="small muted">Touchez une ligne pour ouvrir la fiche.</p>' +
+    '<p class="small muted">Touchez une ligne pour ouvrir la fiche, le carré pour la cocher.</p>' +
     '</section></div>';
 }
 
@@ -2731,6 +2817,158 @@ function newClientModal() {
     '<div id="an-err"></div>' +
     '<button class="btn btn-primary btn-full" type="submit">Créer la carte</button></form>');
 }
+
+/* ── écrire aux clients cochés ──
+   Deux natures de message, et elles n'obéissent pas aux mêmes règles.
+   • Un message de service — « votre commande est prête », « la boutique est
+     fermée jeudi » — se rapporte à ce que le client a demandé. Il part à tout
+     le monde.
+   • Une offre commerciale ne peut partir qu'aux clients qui l'ont acceptée
+     (RGPD art. 6.1.a, et l'article L.34-5 du code des postes pour la
+     prospection par SMS). L'application retire donc d'office ceux qui ont
+     refusé, et le dit.
+   Dans les deux cas c'est l'application de messages du téléphone qui envoie :
+   la carte de fidélité ne dispose d'aucun service d'envoi, et n'en veut pas. */
+
+var MSG_MODELES = [
+  ["Arrivage", "commercial", "Bonjour, arrivage {quoi} à la boutique cette semaine. À bientôt — {boutique}"],
+  ["Promotion", "commercial", "Bonjour, {offre} jusqu'à {jour} à la boutique. À bientôt — {boutique}"],
+  ["Récompense à réclamer", "commercial", "Bonjour, vous avez une récompense à réclamer sur votre carte de fidélité. À bientôt — {boutique}"],
+  ["Commande prête", "service", "Bonjour, votre commande est prête, vous pouvez passer la retirer. — {boutique}"],
+  ["Fermeture", "service", "Bonjour, la boutique sera fermée {quand}. Merci de votre compréhension. — {boutique}"]
+];
+
+function msgKind() { return S.msgKind === "commercial" ? "commercial" : "service"; }
+
+/* Qui recevra vraiment, et qui est écarté — la réponse dépend de la nature. */
+function msgSplit() {
+  var all = selClients();
+  var com = msgKind() === "commercial";
+  var keep = [], out = [];
+  all.forEach(function (c) {
+    if (com && !c.marketing) out.push(c); else keep.push(c);
+  });
+  return { keep: keep, out: out,
+    tel: keep.filter(function (c) { return normPhone(c.phone).length >= 9; }),
+    mail: keep.filter(function (c) { return (c.email || "").indexOf("@") > 0; }) };
+}
+
+function msgText() {
+  var t = S.msgText;
+  return typeof t === "string" ? t : "";
+}
+
+function msgModal() {
+  if (!selIds().length) { toast("Cochez d'abord des clients.", "bad"); return; }
+  modal("Écrire aux clients cochés", msgBody(), { nofocus: true });
+}
+
+function msgBody() {
+  var sp = msgSplit(), com = msgKind() === "commercial";
+  var modeles = MSG_MODELES.filter(function (m) { return m[1] === msgKind(); })
+    .map(function (m, i) {
+      return '<button type="button" class="chip" data-act="msg-modele" data-t="' + esc(m[2]) + '">' +
+        esc(m[0]) + '</button>';
+    }).join("");
+
+  var ecartes = sp.out.length
+    ? '<div class="banner warn"><span class="ico" aria-hidden="true">!</span><span class="grow">' +
+      '<b>' + nb(sp.out.length) + ' client' + (sp.out.length > 1 ? "s" : "") + ' retiré' +
+      (sp.out.length > 1 ? "s" : "") + ' de l\'envoi</b> : ' +
+      esc(sp.out.slice(0, 4).map(function (c) { return c.name; }).join(", ")) +
+      (sp.out.length > 4 ? "…" : "") + ' n\'' + (sp.out.length > 1 ? "ont" : "a") +
+      ' pas accepté de recevoir les offres. La loi interdit de leur en envoyer.' +
+      '</span></div>'
+    : "";
+
+  return '<div class="stack">' +
+    '<div class="field"><label>Nature du message</label>' +
+    '<div class="chips">' +
+    '<button type="button" class="chip" aria-pressed="' + (!com) + '" data-act="msg-kind" data-k="service">' +
+    'Message de service</button>' +
+    '<button type="button" class="chip" aria-pressed="' + com + '" data-act="msg-kind" data-k="commercial">' +
+    'Offre commerciale</button></div>' +
+    '<span class="hint">' + (com
+      ? 'Une offre ne part qu\'aux clients qui ont accepté d\'en recevoir. Les autres sont retirés automatiquement.'
+      : 'Commande prête, horaires, fermeture : cela répond à une demande du client, tout le monde peut le recevoir.') +
+    '</span></div>' +
+
+    ecartes +
+
+    '<div class="field"><label>Modèles</label><div class="chips">' + modeles + '</div>' +
+    '<span class="hint">Un modèle remplit le message ; les mots entre accolades sont à remplacer.</span></div>' +
+
+    '<div class="field"><label for="msg-t">Votre message</label>' +
+    '<textarea id="msg-t" rows="5" data-act="msg-type" ' +
+    'placeholder="Bonjour, …">' + esc(msgText()) + '</textarea>' +
+    '<span class="hint"><span class="num">' + msgText().length + '</span> caractères' +
+    (msgText().length > 160 ? ' — au-delà de 160, un SMS est facturé double par l\'opérateur.' : '') +
+    '</span></div>' +
+
+    '<div class="facts">' +
+    '<div class="fact"><span class="k">Destinataires</span><span class="v"><b>' + nb(sp.keep.length) + '</b>' +
+      (sp.out.length ? ' <span class="muted">sur ' + nb(sp.keep.length + sp.out.length) + ' cochés</span>' : '') + '</span></div>' +
+    '<div class="fact"><span class="k">Par SMS</span><span class="v">' + nb(sp.tel.length) + ' ont un téléphone</span></div>' +
+    '<div class="fact"><span class="k">Par e-mail</span><span class="v">' + nb(sp.mail.length) + ' ont une adresse</span></div>' +
+    '</div>' +
+
+    '<div class="btn-row">' +
+    '<button class="btn btn-primary" data-act="msg-sms"' + (sp.tel.length && msgText() ? "" : " disabled") + '>' +
+    'Ouvrir les SMS (' + nb(sp.tel.length) + ')</button>' +
+    '<button class="btn" data-act="msg-mail"' + (sp.mail.length && msgText() ? "" : " disabled") + '>' +
+    'Ouvrir l\'e-mail (' + nb(sp.mail.length) + ')</button>' +
+    '<button class="btn" data-act="msg-copy"' + (sp.tel.length ? "" : " disabled") + '>' +
+    'Copier les numéros</button>' +
+    '</div>' +
+    '<p class="small muted">L\'application n\'envoie rien elle-même : elle ouvre votre application ' +
+    'de messages avec les destinataires et le texte déjà remplis. Vous relisez, vous envoyez. ' +
+    'Au-delà d\'une vingtaine de numéros, certains téléphones refusent : envoyez en deux fois.</p>' +
+    '</div>';
+}
+
+/* Rafraîchit la fenêtre sans la refermer — le texte tapé est conservé. */
+function msgRefresh() {
+  var box = document.querySelector(".modal-body");
+  if (!box) return;
+  var t = document.getElementById("msg-t");
+  var pos = t ? t.selectionStart : null;
+  box.innerHTML = msgBody();
+  var t2 = document.getElementById("msg-t");
+  if (t2 && pos !== null) { t2.focus(); try { t2.setSelectionRange(pos, pos); } catch (e) {} }
+}
+
+function msgFinal() {
+  return msgText().replace(/\{boutique\}/g, DB.shop.name);
+}
+
+/* On consigne l'envoi, sans les noms ni le texte : ce qui compte pour une
+   vérification, c'est qu'un message soit parti, à combien de gens, et de
+   quelle nature. Le contenu, lui, est dans le téléphone du boucher. */
+function msgTrace(sp, voie) {
+  var m = "Message " + (msgKind() === "commercial" ? "commercial" : "de service") +
+    " préparé par " + voie + " pour " + (voie === "SMS" ? sp.tel.length : sp.mail.length) +
+    " client(s)" + (sp.out.length ? ", " + sp.out.length + " écarté(s) faute d'accord" : "");
+  logIt(m);
+  if (Store.mode === "supabase") {
+    // On n'attend pas la réponse : l'application de messages s'ouvre tout de suite.
+    try { sbFetch("/rest/v1/log", { method: "POST", prefer: "return=minimal", body: { m: m } }, true); }
+    catch (e) {}
+    return;
+  }
+  // En mode partagé, republier maintenant rechargerait la page en pleine
+  // rédaction : on se contente de la copie locale, le journal suivra.
+  DB.updated = today();
+  if (Store.mode !== "cloud") localSave();
+}
+
+/* Ces trois fonctions sont exposées pour les essais automatisés : le navigateur
+   refuse de suivre une adresse « sms: » dans un banc de test, il faut donc
+   pouvoir vérifier ce qu'elle contient sans l'ouvrir. */
+try {
+  window.__t_split = msgSplit;
+  window.__t_final = msgFinal;
+  window.__t_trace = msgTrace;
+} catch (e) {}
 
 /* ══════════════════════════ 8. Anniversaires & parrainage ══════════════════════════ */
 
@@ -3020,11 +3258,11 @@ function csv(rows) {
     }).join(";");
   }).join("\r\n");
 }
-function csvClients() {
+function csvClients(garde) {
   var rows = [["Numero", "Nom", "Telephone", "Email", "Anniversaire", "Inscription", "Points", "Points cumules",
     "Total depense", "Passages", "Dernier passage", "Statut", "Code parrain", "Parraine par",
     "Offres acceptees", "Consentement", "Signee le"]];
-  DB.clients.forEach(function (c) {
+  DB.clients.filter(garde || function () { return true; }).forEach(function (c) {
     var p = c.by ? byId(c.by) : null;
     rows.push([c.id, c.name, c.phone, c.email, bdayLabel(c), c.created, c.points, c.lifetime,
       String(c.spent).replace(".", ","), c.visits, lastVisit(c), tierOf(c.lifetime), c.code, p ? p.name : "",
@@ -3308,6 +3546,66 @@ var ACTS = {
   "open-client": function (el) { clientModal(el.dataset.id); },
   "edit-client": function (el) { editModal(el.dataset.id); },
   "adjust": function (el) { adjustModal(el.dataset.id); },
+  /* ── cocher, décocher ── */
+  "pick-client": function (el) {
+    S.sel = S.sel || {};
+    var id = el.dataset.id;
+    if (S.sel[id]) delete S.sel[id]; else S.sel[id] = true;
+    render();
+  },
+  "pick-all": function () {
+    var list = search(S.q || "");
+    S.sel = S.sel || {};
+    if (allPicked(list)) list.forEach(function (c) { delete S.sel[c.id]; });
+    else list.forEach(function (c) { S.sel[c.id] = true; });
+    render();
+  },
+  "sel-none": function () { S.sel = {}; render(); },
+  "sel-export": function () {
+    var ids = {}, n = 0;
+    selIds().forEach(function (i) { ids[i] = true; n++; });
+    if (!n) return;
+    offerFile("selection-" + n + "-clients.csv", csvClients(function (c) { return ids[c.id]; }));
+    toast(n + " fiche(s) exportée(s).", "ok");
+  },
+
+  /* ── écrire aux clients cochés ── */
+  "msg-open": function () { msgModal(); },
+  "msg-kind": function (el) { S.msgKind = el.dataset.k; msgRefresh(); },
+  "msg-modele": function (el) { S.msgText = el.dataset.t; msgRefresh(); },
+  "msg-sms": function () {
+    var sp = msgSplit(), txt = msgFinal();
+    if (!sp.tel.length || !txt) return;
+    var nums = sp.tel.map(function (c) { return normPhone(c.phone); }).join(",");
+    // iOS veut « & » avant le corps, Android « ? ». On sert le premier aux
+    // appareils Apple, le second à tous les autres.
+    var pomme = /iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent || "");
+    var url = "sms:" + nums + (pomme ? "&" : "?") + "body=" + encodeURIComponent(txt);
+    msgTrace(sp, "SMS");
+    location.href = url;
+  },
+  "msg-mail": function () {
+    var sp = msgSplit(), txt = msgFinal();
+    if (!sp.mail.length || !txt) return;
+    // En copie cachée : personne ne doit voir l'adresse des autres clients.
+    var bcc = sp.mail.map(function (c) { return c.email; }).join(",");
+    var url = "mailto:?bcc=" + encodeURIComponent(bcc) +
+      "&subject=" + encodeURIComponent(DB.shop.name) +
+      "&body=" + encodeURIComponent(txt);
+    msgTrace(sp, "e-mail");
+    location.href = url;
+  },
+  "msg-copy": function () {
+    var sp = msgSplit();
+    var t = sp.tel.map(function (c) { return normPhone(c.phone); }).join(", ");
+    try {
+      navigator.clipboard.writeText(t);
+      toast(sp.tel.length + " numéro(s) copié(s).", "ok");
+    } catch (e) {
+      modal("Numéros", '<textarea rows="6" readonly>' + esc(t) + '</textarea>');
+    }
+  },
+
   "new-client": function () { newClientModal(); },
   "till-pick": function (el) { S.till = { cid: el.dataset.id }; S.focusId = "amt"; go("admin", "till"); },
   "till-clear": function () { S.till = {}; render(); },
@@ -3706,6 +4004,7 @@ document.addEventListener("click", function (ev) {
   if (!el) return;
   var a = el.dataset.act;
   if (el.tagName === "FORM" || el.tagName === "INPUT" || el.tagName === "SELECT") return;
+  if (el.tagName === "TEXTAREA") return;
   if (ACTS[a]) { ev.preventDefault(); S.scroll = window.scrollY; touchLock(); ACTS[a](el, ev); }
 });
 document.addEventListener("submit", function (ev) {
@@ -3723,6 +4022,18 @@ document.addEventListener("change", function (ev) {
   if (el.dataset.act === "scan-file" && el.files && el.files[0]) scanPhoto(el.files[0]);
   if (el.dataset.act === "toggle-pub") { S.scroll = window.scrollY; ACTS["toggle-pub"](el); }
 });
+
+/* Le message se tape dans une fenêtre que l'on redessine (nature, modèle,
+   compte des destinataires) : le texte doit survivre à chaque redessin. */
+document.addEventListener("input", function (ev) {
+  var el = ev.target;
+  if (!el || !el.dataset || el.dataset.act !== "msg-type") return;
+  S.msgText = el.value;
+  var hint = el.parentNode ? el.parentNode.querySelector(".hint .num") : null;
+  if (hint) hint.textContent = String(el.value.length);
+  var send = document.querySelectorAll('[data-act="msg-sms"], [data-act="msg-mail"]');
+  for (var i = 0; i < send.length; i++) send[i].disabled = !el.value;
+});
 var qt = null;
 document.addEventListener("input", function (ev) {
   var el = ev.target;
@@ -3734,6 +4045,11 @@ document.addEventListener("input", function (ev) {
 document.addEventListener("keydown", function (ev) {
   if (ev.key === "Escape") closeModal();
   if (ev.key === "Enter" && ev.target.tagName === "TR" && ev.target.dataset.act) {
+    ACTS[ev.target.dataset.act](ev.target, ev);
+  }
+  if ((ev.key === " " || ev.key === "Enter") && ev.target.getAttribute &&
+      ev.target.getAttribute("role") === "checkbox" && ev.target.dataset.act) {
+    ev.preventDefault();
     ACTS[ev.target.dataset.act](ev.target, ev);
   }
 });
