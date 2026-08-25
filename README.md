@@ -138,9 +138,15 @@ démo publiée le fait automatiquement.
 - `DEPLOIEMENT.md` — mise en ligne pas à pas.
 - `dist/artifact.html` — la même application sans l'enveloppe `<html>/<head>/<body>`, format attendu par l'hébergement en ligne. Généré, ne pas modifier à la main.
 - `scripts/seed.mjs` — générateur du jeu de démonstration.
-- `vercel.json` + `scripts/build-site.mjs` — publication : `index.html` et
-  `scanner.js`, avec les en-têtes de sécurité (CSP restreinte au projet Supabase
-  et aux polices Google, testée avec l'application complète).
+- `vercel.json` + `scripts/build-site.mjs` — publication : `index.html`,
+  `scanner.js` et le dossier `police/`, avec les en-têtes de sécurité (CSP
+  restreinte au seul projet Supabase, testée avec l'application complète).
+- `assets/police/` — les six fichiers de la police Zen Kaku Gothic New
+  (sous-ensembles latin et latin-ext, graisses 400/500/700, 33 Ko en tout,
+  licence SIL OFL). Ils sont hébergés avec le site : aucune requête ne part
+  chez Google, et le texte est à sa place dès le premier affichage. Une
+  police de secours aux mêmes proportions est déclarée juste à côté, pour que
+  rien ne bouge si les fichiers arrivent en retard.
 - `vendor/jsqr.min.js` — lecteur de QR codes ([jsQR](https://github.com/cozmo/jsqr),
   licence Apache 2.0, texte dans `vendor/jsqr-LICENSE.txt`). Publié sous le nom
   `scanner.js` et **chargé uniquement quand le boucher ouvre le scanner** : il pèse

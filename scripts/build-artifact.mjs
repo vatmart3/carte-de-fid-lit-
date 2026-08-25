@@ -16,9 +16,19 @@ const noCfg = b => b.replace(
   /(<script id="sbcfg" type="application\/json">)[\s\S]*?(<\/script>)/,
   '$1{"url":"","key":""}$2');
 
-const keep = head
+// La vitrine est un fichier unique posé chez un hébergeur : elle n'a pas de
+// dossier « police/ » à côté d'elle. Là seulement, on repasse par la feuille
+// distante. Le site déployé, lui, garde ses fichiers en propre.
+const GF = '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n' +
+  '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap">';
+const distantFonts = t => t
+  .replace(/<style id="fontface">[\s\S]*?<\/style>/, GF)
+  .replace(/^\s*<link rel="preload"[^>]*>\s*$/gm, "");
+
+const keep = distantFonts(head)
   .split("\n")
   .filter(l => !/^\s*<meta /.test(l))   // charset / viewport / color-scheme : fournis par l'hôte
+  .filter(l => l.trim() !== "")
   .join("\n")
   .trim();
 // La vitrine, elle, est peuplée : le fichier de production part vide, mais une

@@ -53,6 +53,11 @@ Personne ne peut le faire à sa place.
 7. **Ne pas ajouter de mesure d'audience** — activer Vercel Analytics, Google
    Analytics ou un pixel publicitaire ferait retomber le site sous l'obligation
    de bandeau de consentement, et changerait la présente analyse.
+   Pour la même raison la police de caractères est hébergée avec le site et non
+   chargée depuis Google Fonts : appeler le serveur de Google transmettrait
+   l'adresse IP de chaque visiteur à un tiers, hors Union européenne et sans
+   son accord — ce que la CNIL et les tribunaux ont déjà sanctionné. Ne pas
+   réintroduire de lien vers `fonts.googleapis.com`.
 8. **Répondre aux demandes** — le client a un mois pour obtenir une réponse.
    L'application couvre déjà les cas courants en libre-service ; pour le reste,
    l'export CSV et la fiche client permettent de répondre.

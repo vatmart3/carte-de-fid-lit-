@@ -92,8 +92,9 @@ npx vercel --prod
 ### En-têtes de sécurité
 
 `vercel.json` installe aussi une politique de contenu (CSP) qui n'autorise la
-page à contacter que **ce projet Supabase** et les polices Google, et interdit
-tout le reste. Elle a été testée avec l'application complète avant livraison.
+page à contacter que **ce projet Supabase**, et interdit tout le reste — y
+compris les serveurs de Google, puisque la police est maintenant hébergée avec
+le site. Elle a été testée avec l'application complète avant livraison.
 En cas de changement de projet Supabase, mettre à jour l'adresse dans
 `connect-src`, sinon la page ne pourra plus joindre la base.
 

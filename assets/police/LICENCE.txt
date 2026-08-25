@@ -1,0 +1,11 @@
+Zen Kaku Gothic New — Copyright 2020 The Zen Kaku Gothic Project Authors
+(https://github.com/googlefonts/zen-kakugothic)
+
+Sous licence SIL Open Font License, version 1.1.
+Texte complet : https://openfontlicense.org/
+
+Seuls les sous-ensembles « latin » et « latin-ext » des graisses 400, 500 et
+700 sont embarqués ici : c'est tout ce dont la boutique se sert. Les fichiers
+proviennent de Google Fonts et sont hébergés avec le site plutôt que chargés
+depuis les serveurs de Google — la page ne communique ainsi l'adresse IP
+d'aucun visiteur à un tiers.
