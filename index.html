@@ -34,54 +34,64 @@ a{color:inherit}
    Deux couleurs qui travaillent, le reste en gris. Rouge : les actions et
    l'argent. Ambre : les points et les récompenses. Rien d'autre. */
 :root{
-  --ground:#F4F4F5; --surface-1:#FFFFFF; --surface-2:#FAFAFA; --surface-3:#F0F0F1;
-  --ink:#171718; --ink-2:#45454A; --muted:#6B6B73;
-  --hair:#E6E6E8; --hair-2:#D6D6DA;
-  --rouge:#C42B2B; --rouge-fill:#D93636; --rouge-on:#FFFFFF; --rouge-soft:#FDECEC;
-  --ambre:#9A6A11; --ambre-fill:#E9A93C; --ambre-on:#231705; --ambre-soft:#FDF3E2;
-  --good:#1F7A4C; --good-soft:#E6F4EC;
-  --warn:#9A6A11; --warn-soft:#FDF3E2;
-  --crit:#C42B2B; --crit-soft:#FDECEC;
-  --card-bg:#D93636; --card-ink:#FFFFFF;
-  --veil:rgba(244,244,245,.85);
-  --lift:0 1px 2px rgba(23,23,24,.05);
-  --lift-2:0 8px 30px -12px rgba(23,23,24,.22);
+  --ground:#F5F5F6; --surface-1:#FFFFFF; --surface-2:#FAFAFA; --surface-3:#F0F0F1;
+  --ink:#151517; --ink-2:#404046; --muted:#63636B;
+  --hair:#E7E7EA; --hair-2:#D8D8DD;
+  --rouge:#BE2B2B; --rouge-fill:#D33636; --rouge-on:#FFFFFF; --rouge-soft:#FCECEC;
+  --card-top:#E24444; --card-bot:#BF2A2A;
+  --ambre:#8E6210; --ambre-fill:#E5A231; --ambre-on:#231705; --ambre-soft:#FCF3E4;
+  --good:#1C7248; --good-soft:#E7F4ED;
+  --warn:#8E6210; --warn-soft:#FCF3E4;
+  --crit:#BE2B2B; --crit-soft:#FCECEC;
+  --card-bg:#D33636; --card-ink:#FFFFFF;
+  --veil:rgba(245,245,246,.82);
+  /* Les panneaux ne portent pas de trait en pleine lumière : une ombre très
+     basse suffit à les décoller du fond, et l'écran respire. */
+  --panel-line:transparent;
+  --lift:0 1px 2px rgba(21,21,23,.04), 0 12px 30px -22px rgba(21,21,23,.30);
+  --lift-2:0 10px 40px -16px rgba(21,21,23,.28);
   /* Une seule famille, large et ouverte : la plupart des clients de la
      boutique ont passé soixante-dix ans, un condensé gras les perd. */
   --titre:"Zen Kaku Gothic New", "Zen secours", Arial, sans-serif;
   --sans:"Zen Kaku Gothic New", "Zen secours", Arial, sans-serif;
   --mono:"Zen Kaku Gothic New", "Zen secours", Arial, sans-serif;
-  --r:16px; --r-sm:11px; --r-xs:8px;
+  --r:18px; --r-sm:12px; --r-xs:9px;
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
-    --ground:#0F0F10; --surface-1:#18181A; --surface-2:#1D1D20; --surface-3:#26262A;
-    --ink:#F4F4F5; --ink-2:#C4C4CA; --muted:#9A9AA2;
-    --hair:#26262A; --hair-2:#34343A;
-    --rouge:#FF7070; --rouge-fill:#D93636; --rouge-on:#FFFFFF; --rouge-soft:#2A1618;
-    --ambre:#F0BC66; --ambre-fill:#E9A93C; --ambre-on:#231705; --ambre-soft:#2A2113;
-    --good:#5FC08D; --good-soft:#12241B;
-    --warn:#F0BC66; --warn-soft:#2A2113;
-    --crit:#FF7070; --crit-soft:#2A1618;
-    --card-bg:#D93636; --card-ink:#FFFFFF;
-    --veil:rgba(15,15,16,.85);
-    --lift:0 1px 2px rgba(0,0,0,.4);
-    --lift-2:0 8px 30px -12px rgba(0,0,0,.8);
+    --ground:#0E0E10; --surface-1:#17171A; --surface-2:#1C1C20; --surface-3:#26262B;
+    --ink:#F5F5F6; --ink-2:#C7C7CE; --muted:#A1A1A9;
+    --hair:#27272C; --hair-2:#36363D;
+    --rouge:#FF7B7B; --rouge-fill:#D33636; --rouge-on:#FFFFFF; --rouge-soft:#2B1618;
+    --card-top:#E24444; --card-bot:#B92828;
+    --ambre:#F2C173; --ambre-fill:#E5A231; --ambre-on:#231705; --ambre-soft:#2A2114;
+    --good:#63C692; --good-soft:#11241B;
+    --warn:#F2C173; --warn-soft:#2A2114;
+    --crit:#FF7B7B; --crit-soft:#2B1618;
+    --card-bg:#D33636; --card-ink:#FFFFFF;
+    --veil:rgba(14,14,16,.82);
+    /* Dans le noir une ombre ne se voit pas : c'est le trait qui dessine. */
+    --panel-line:var(--hair);
+    --lift:none;
+    --lift-2:0 10px 40px -14px rgba(0,0,0,.85);
   }
 }
 :root[data-theme="dark"]{
-  --ground:#0F0F10; --surface-1:#18181A; --surface-2:#1D1D20; --surface-3:#26262A;
-  --ink:#F4F4F5; --ink-2:#C4C4CA; --muted:#9A9AA2;
-  --hair:#26262A; --hair-2:#34343A;
-  --rouge:#FF7070; --rouge-fill:#D93636; --rouge-on:#FFFFFF; --rouge-soft:#2A1618;
-  --ambre:#F0BC66; --ambre-fill:#E9A93C; --ambre-on:#231705; --ambre-soft:#2A2113;
-  --good:#5FC08D; --good-soft:#12241B;
-  --warn:#F0BC66; --warn-soft:#2A2113;
-  --crit:#FF7070; --crit-soft:#2A1618;
-  --card-bg:#D93636; --card-ink:#FFFFFF;
-  --veil:rgba(15,15,16,.85);
-  --lift:0 1px 2px rgba(0,0,0,.4);
-  --lift-2:0 8px 30px -12px rgba(0,0,0,.8);
+  --ground:#0E0E10; --surface-1:#17171A; --surface-2:#1C1C20; --surface-3:#26262B;
+  --ink:#F5F5F6; --ink-2:#C7C7CE; --muted:#A1A1A9;
+  --hair:#27272C; --hair-2:#36363D;
+  --rouge:#FF7B7B; --rouge-fill:#D33636; --rouge-on:#FFFFFF; --rouge-soft:#2B1618;
+  --card-top:#E24444; --card-bot:#B92828;
+  --ambre:#F2C173; --ambre-fill:#E5A231; --ambre-on:#231705; --ambre-soft:#2A2114;
+  --good:#63C692; --good-soft:#11241B;
+  --warn:#F2C173; --warn-soft:#2A2114;
+  --crit:#FF7B7B; --crit-soft:#2B1618;
+  --card-bg:#D33636; --card-ink:#FFFFFF;
+  --veil:rgba(14,14,16,.82);
+  /* Dans le noir une ombre ne se voit pas : c'est le trait qui dessine. */
+  --panel-line:var(--hair);
+  --lift:none;
+  --lift-2:0 10px 40px -14px rgba(0,0,0,.85);
 }
 /* noms hérités, conservés pour ne rien casser */
 :root{--paper:var(--ground); --surface:var(--surface-1); --line:var(--hair); --line-2:var(--hair-2);
@@ -97,9 +107,9 @@ body{
 :focus-visible{outline:2px solid var(--rouge-fill); outline-offset:2px; border-radius:6px}
 @media (prefers-reduced-motion: reduce){*{animation:none !important;transition:none !important}}
 
-h1,h2,h3{text-wrap:balance;line-height:1.1;font-weight:400}
+h1,h2,h3{text-wrap:balance;line-height:1.12;font-weight:400;letter-spacing:-.015em}
 .num{font-variant-numeric:tabular-nums;font-feature-settings:"tnum";letter-spacing:.01em}
-.eyebrow{font-size:12.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.eyebrow{font-size:12.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);font-weight:700}
 .muted{color:var(--muted)}
 .small{font-size:14.5px}
 .sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
@@ -109,8 +119,9 @@ h1,h2,h3{text-wrap:balance;line-height:1.1;font-weight:400}
 .topbar-in{max-width:1180px;margin:0 auto;padding:12px 18px;display:flex;align-items:center;gap:14px}
 .mark{display:flex;align-items:center;gap:11px;min-width:0;text-decoration:none}
 .mark-glyph{
-  width:38px;height:38px;flex:none;border-radius:10px;display:grid;place-items:center;
+  width:38px;height:38px;flex:none;border-radius:11px;display:grid;place-items:center;
   font-weight:700;font-size:18px;background:var(--rouge-fill);color:var(--rouge-on);
+  box-shadow:0 2px 6px -2px rgba(190,43,43,.45);
 }
 .mark-txt{min-width:0}
 .mark-name{display:block;font-family:var(--titre);font-weight:700;font-size:17px;line-height:1.2;
@@ -121,20 +132,31 @@ h1,h2,h3{text-wrap:balance;line-height:1.1;font-weight:400}
 /* ─────────── commandes ─────────── */
 .btn{
   display:inline-flex;align-items:center;justify-content:center;gap:8px;
-  padding:14px 20px;border-radius:var(--r-sm);font-weight:700;font-size:15px;
+  padding:14px 22px;border-radius:var(--r-sm);font-weight:700;font-size:15.5px;
   border:1px solid var(--hair-2);background:var(--surface-1);color:var(--ink);
-  transition:background .15s, border-color .15s, opacity .15s;text-align:center;
+  transition:background .15s, border-color .15s, opacity .15s, transform .08s;
+  text-align:center;line-height:1.3;
 }
-.btn:hover{background:var(--surface-3)}
-.btn:active{transform:scale(.99)}
+.btn:hover{background:var(--surface-3);border-color:var(--hair-2)}
+.btn:active{transform:scale(.985)}
 .btn[disabled]{opacity:.4;cursor:not-allowed}
-.btn-primary{background:var(--rouge-fill);border-color:var(--rouge-fill);color:var(--rouge-on)}
+.btn-primary{background:var(--rouge-fill);border-color:var(--rouge-fill);color:var(--rouge-on);
+  box-shadow:0 1px 2px rgba(190,43,43,.24)}
 .btn-primary:hover{background:var(--rouge);border-color:var(--rouge)}
+/* Le rouge est réservé à ce qui touche au client et à l'argent : créer une
+   carte, encaisser, utiliser une récompense. Les enregistrements de réglage
+   prennent le bouton sombre — sinon toute la page crie en même temps. */
+.btn-ink{background:var(--ink);border-color:var(--ink);color:var(--ground)}
+.btn-ink:hover{background:var(--ink-2);border-color:var(--ink-2)}
 .btn-brass{background:var(--ambre-fill);border-color:var(--ambre-fill);color:var(--ambre-on)}
 .btn-brass:hover{opacity:.88}
+/* Cinq pavés ambre l'un sous l'autre, c'est une liste qui hurle. Le contour
+   suffit : la pastille du jour dit déjà lequel presse. */
+.btn-brass-o{background:transparent;border-color:var(--ambre-fill);color:var(--ambre);font-weight:700}
+.btn-brass-o:hover{background:var(--ambre-soft);border-color:var(--ambre-fill)}
 .btn-ghost{background:transparent;border-color:transparent;color:var(--ink-2);font-weight:500}
 .btn-ghost:hover{background:var(--surface-3);color:var(--ink)}
-.btn-sm{padding:9px 14px;font-size:13.5px;border-radius:var(--r-xs)}
+.btn-sm{padding:10px 15px;font-size:14px;border-radius:var(--r-xs)}
 .btn-danger{color:var(--crit);border-color:var(--hair-2);background:transparent}
 .btn-danger:hover{background:var(--crit-soft);border-color:var(--crit)}
 .btn-full{width:100%}
@@ -143,12 +165,17 @@ h1,h2,h3{text-wrap:balance;line-height:1.1;font-weight:400}
 /* ─────────── saisie ─────────── */
 .field{display:flex;flex-direction:column;gap:8px}
 .field > label{font-size:15px;font-weight:700;color:var(--ink)}
-.field .hint{font-size:14px;color:var(--muted);line-height:1.6}
-input[type=text],input[type=tel],input[type=email],input[type=date],input[type=number],input[type=password],input[type=search],select,textarea{
-  width:100%;padding:14px 15px;border-radius:var(--r-sm);border:1px solid var(--hair-2);
+.field .hint{font-size:14.5px;color:var(--muted);line-height:1.6}
+/* Attention : « input[type=text] » ne retient pas un <input> sans attribut
+   type. Une douzaine de champs échappaient ainsi à la feuille de style et
+   gardaient le fond gris du navigateur — invisible en clair, criant en sombre. */
+input:not([type]),input[type=text],input[type=tel],input[type=email],input[type=date],
+input[type=number],input[type=password],input[type=search],select,textarea{
+  width:100%;padding:14px 16px;border-radius:var(--r-sm);border:1px solid var(--hair-2);
   background:var(--surface-1);color:var(--ink);transition:border-color .15s, box-shadow .15s;
 }
-input:focus,select:focus,textarea:focus{outline:none;border-color:var(--rouge-fill);box-shadow:0 0 0 4px var(--rouge-soft)}
+input:hover,select:hover,textarea:hover{border-color:var(--muted)}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--rouge-fill);box-shadow:0 0 0 3px var(--rouge-soft)}
 input::placeholder,textarea::placeholder{color:var(--muted)}
 input:-webkit-autofill,input:-webkit-autofill:focus{
   -webkit-text-fill-color:var(--ink);-webkit-box-shadow:0 0 0 40px var(--surface-1) inset;caret-color:var(--ink);
@@ -157,32 +184,42 @@ input:-webkit-autofill,input:-webkit-autofill:focus{
 @media (max-width:560px){.grid-2{grid-template-columns:1fr}}
 .check{display:flex;gap:12px;align-items:flex-start;font-size:15px;color:var(--ink-2);line-height:1.55}
 .check input{margin-top:3px;accent-color:var(--rouge-fill);width:18px;height:18px;flex:none}
-.err{color:var(--crit);font-size:14.5px;font-weight:700}
+/* Un message d'erreur doit se voir : une ligne rouge se perd dans un formulaire. */
+.err:not(:empty){color:var(--crit);font-size:14.5px;font-weight:700;
+  background:var(--crit-soft);padding:12px 15px;border-radius:var(--r-sm);line-height:1.5}
 
 /* ─────────── surfaces ─────────── */
-.panel{background:var(--surface-1);border:1px solid var(--hair);border-radius:var(--r);box-shadow:var(--lift)}
-.panel-pad{padding:22px}
-@media (max-width:520px){.panel-pad{padding:18px}}
-.sect-head{display:flex;align-items:baseline;gap:12px;margin-bottom:16px;flex-wrap:wrap}
-.sect-head h2{font-family:var(--titre);font-weight:700;font-size:20px}
+.panel{background:var(--surface-1);border:1px solid var(--panel-line);border-radius:var(--r);box-shadow:var(--lift)}
+.panel-pad{padding:26px}
+@media (max-width:520px){.panel-pad{padding:20px}}
+/* Le titre de section porte la hiérarchie : plus de boîte dans la boîte. */
+.sect-head{display:flex;align-items:baseline;gap:12px;margin-bottom:20px;flex-wrap:wrap}
+.sect-head h2{font-family:var(--titre);font-weight:700;font-size:21px;letter-spacing:-.012em}
 .sect-head .sp{flex:1}
-.stack{display:flex;flex-direction:column;gap:16px}
+.stack{display:flex;flex-direction:column;gap:20px}
 .stack-sm{display:flex;flex-direction:column;gap:10px}
 .divide{height:1px;background:var(--hair);border:0;margin:0}
 
 /* ─────────── parcours client ─────────── */
-.client-wrap{max-width:500px;margin:0 auto;padding:22px 18px 90px;display:flex;flex-direction:column;gap:16px}
-.hero{text-align:center;padding:16px 0 4px}
-.hero h1{font-family:var(--titre);font-weight:700;font-size:clamp(30px,8.5vw,40px);line-height:1.15}
-.hero p{color:var(--ink-2);margin-top:16px;font-size:16.5px;max-width:34ch;margin-inline:auto;line-height:1.65}
+.client-wrap{max-width:520px;margin:0 auto;padding:26px 18px 90px;display:flex;flex-direction:column;gap:20px}
+.hero{text-align:center;padding:20px 0 6px}
+.hero .eyebrow{margin-bottom:12px}
+.hero h1{font-family:var(--titre);font-weight:700;font-size:clamp(32px,9vw,44px);line-height:1.08;letter-spacing:-.025em}
+.hero p{color:var(--ink-2);margin-top:18px;font-size:17px;max-width:40ch;margin-inline:auto;line-height:1.6}
 .hero-rule{display:none}
 
 /* ─────────── la carte ─────────── */
 .loyalty{
   position:relative;border-radius:22px;overflow:hidden;color:var(--card-ink);
-  background:var(--card-bg);padding:24px;box-shadow:var(--lift-2);
+  background:var(--card-bg);
+  background-image:linear-gradient(157deg, var(--card-top) 0%, var(--card-bot) 100%);
+  padding:26px;box-shadow:0 14px 40px -18px rgba(190,43,43,.55);
   animation:pose .45s ease both;
 }
+/* un voile très doux en haut à droite : la carte prend du relief sans bruit */
+.loyalty::after{content:"";position:absolute;top:-45%;right:-25%;width:75%;height:150%;
+  background:radial-gradient(closest-side, rgba(255,255,255,.16), transparent 70%);pointer-events:none}
+.loyalty > *{position:relative;z-index:1}
 /* La carte se pose en fondu, sans glisser : un texte qui se déplace après
    coup, c'est exactement ce qu'on cherche à supprimer. Et elle ne se pose
    qu'une fois — pas à chaque encaissement. */
@@ -191,10 +228,12 @@ input:-webkit-autofill,input:-webkit-autofill:focus{
 .loyalty-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
 .loyalty-shop{font-family:var(--titre);font-weight:700;font-size:19px;line-height:1.25}
 .loyalty-city{font-size:13px;opacity:.85;margin-top:3px;font-weight:500}
-.tier{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;
-  padding:6px 12px;border-radius:99px;background:rgba(255,255,255,.2);color:#fff;white-space:nowrap}
+.tier{font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;
+  padding:7px 13px;border-radius:99px;background:rgba(255,255,255,.18);color:#fff;white-space:nowrap;
+  border:1px solid rgba(255,255,255,.22)}
 .loyalty-pts{display:flex;align-items:baseline;gap:10px;margin-top:34px}
-.loyalty-pts b{font-family:var(--titre);font-weight:700;font-size:62px;line-height:1;font-variant-numeric:tabular-nums}
+.loyalty-pts b{font-family:var(--titre);font-weight:700;font-size:62px;line-height:1;
+  font-variant-numeric:tabular-nums;letter-spacing:-.03em}
 .loyalty-pts span{font-size:14px;text-transform:uppercase;letter-spacing:.06em;opacity:.85;font-weight:700}
 .loyalty-name{margin-top:24px;font-size:18px;font-weight:700}
 .loyalty-foot{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;margin-top:2px}
@@ -204,66 +243,82 @@ input:-webkit-autofill,input:-webkit-autofill:focus{
 /* ─────────── jauge ─────────── */
 .rail-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:10px}
 .rail-head strong{font-size:15px;font-weight:700}
-.rail{height:10px;border-radius:99px;background:var(--surface-3);overflow:hidden}
-.rail-fill{height:100%;border-radius:99px;background:var(--ambre-fill);transition:width .6s cubic-bezier(.2,.8,.3,1)}
+.rail{height:12px;border-radius:99px;background:var(--surface-3);overflow:hidden}
+.rail-fill{height:100%;border-radius:99px;transition:width .6s cubic-bezier(.2,.8,.3,1);
+  background:linear-gradient(90deg, #EFBB5C, var(--ambre-fill))}
 .rail-foot{margin-top:10px;font-size:14px;color:var(--ink-2);line-height:1.55}
 
 /* ─────────── listes ─────────── */
-.rw{display:flex;flex-direction:column;gap:8px}
-.rw-row{display:flex;align-items:center;gap:14px;padding:14px;border-radius:var(--r-sm);background:var(--surface-2);border:1px solid var(--hair)}
-.rw-row.on{background:var(--ambre-soft);border-color:transparent}
-.rw-seal{width:38px;height:38px;flex:none;border-radius:50%;display:grid;place-items:center;
-  font-size:12px;font-weight:700;background:var(--surface-3);color:var(--muted);font-variant-numeric:tabular-nums}
-.rw-row.on .rw-seal{background:var(--ambre-fill);color:var(--ambre-on)}
+/* Une liste de lignes, séparées par un filet. Empiler des cartons dans un
+   carton faisait trois bordures pour une seule information. */
+.rw{display:flex;flex-direction:column}
+.rw-row{display:flex;align-items:center;gap:15px;padding:16px 0;border-top:1px solid var(--hair)}
+.rw-row:first-child{border-top:0;padding-top:2px}
+.rw-row:last-child{padding-bottom:2px}
+.rw-seal{width:40px;height:40px;flex:none;border-radius:50%;display:grid;place-items:center;
+  font-size:12.5px;font-weight:700;background:var(--surface-3);color:var(--muted);font-variant-numeric:tabular-nums}
+.rw-row.on .rw-seal{background:var(--ambre-fill);color:var(--ambre-on);box-shadow:0 0 0 4px var(--ambre-soft)}
 .rw-txt{flex:1;min-width:0}
 .rw-txt b{display:block;font-size:16px;font-weight:700;line-height:1.4}
 .rw-txt span{font-size:14px;color:var(--muted);display:block;margin-top:3px}
 .rw-row.on .rw-txt span{color:var(--ambre)}
+.rw-row.on .rw-txt span b{font-weight:700}
 
 /* ─────────── ticket ─────────── */
 .receipt{display:flex;flex-direction:column}
-.receipt li{display:grid;grid-template-columns:auto 1fr auto;gap:2px 12px;padding:14px 0;border-bottom:1px solid var(--hair)}
+.receipt li{display:grid;grid-template-columns:auto 1fr auto;gap:2px 14px;padding:15px 0;border-bottom:1px solid var(--hair)}
 .receipt li:last-child{border-bottom:0}
 .receipt .d{color:var(--muted);font-size:14px;font-weight:500;white-space:nowrap}
 .receipt .w{grid-column:2;color:var(--ink);font-size:15.5px;font-weight:500}
 .receipt .a{grid-row:1;grid-column:3;text-align:right;font-weight:700;font-variant-numeric:tabular-nums}
 .receipt .p{grid-row:2;grid-column:3;text-align:right;color:var(--ambre);font-size:14px;font-weight:700}
 .receipt .p.neg{color:var(--rouge)}
-.empty{text-align:center;padding:30px 14px;color:var(--muted);font-size:15px}
+.empty{text-align:center;padding:34px 14px;color:var(--muted);font-size:15px}
 
 /* ─────────── compteurs ─────────── */
-.stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-.stat-row div{background:var(--surface-1);border:1px solid var(--hair);border-radius:var(--r-sm);padding:16px 8px;text-align:center}
-.stat-row b{display:block;font-family:var(--titre);font-weight:700;font-size:24px;font-variant-numeric:tabular-nums;line-height:1.2}
-.stat-row span{font-size:12.5px;color:var(--muted);font-weight:500;margin-top:7px;display:block}
+/* Trois chiffres, un seul bloc : des filets suffisent à les séparer. */
+.stat-row{display:grid;grid-template-columns:repeat(3,1fr);
+  background:var(--surface-1);border:1px solid var(--panel-line);border-radius:var(--r);
+  box-shadow:var(--lift);overflow:hidden}
+.stat-row div{padding:20px 8px;text-align:center;border-left:1px solid var(--hair)}
+.stat-row div:first-child{border-left:0}
+.stat-row b{display:block;font-family:var(--titre);font-weight:700;font-size:25px;
+  font-variant-numeric:tabular-nums;line-height:1.2;letter-spacing:-.02em}
+.stat-row span{font-size:12.5px;color:var(--muted);font-weight:500;margin-top:6px;display:block}
 .codebox{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
-  padding:16px;border-radius:var(--r-sm);background:var(--ambre-soft)}
-.codebox .c{font-family:var(--titre);font-weight:700;font-size:23px;letter-spacing:.04em;color:var(--ambre);display:block;margin-top:2px}
-.bday{display:flex;gap:12px;align-items:center;padding:16px;border-radius:var(--r-sm);background:var(--ambre-soft);font-size:14px;line-height:1.5}
+  padding:18px 20px;border-radius:var(--r-sm);background:var(--ambre-soft)}
+.codebox .c{font-family:var(--titre);font-weight:700;font-size:25px;letter-spacing:.06em;
+  color:var(--ambre);display:block;margin-top:3px}
+.bday{display:flex;gap:12px;align-items:center;padding:18px;border-radius:var(--r-sm);
+  background:var(--ambre-soft);font-size:14.5px;line-height:1.5}
 
 /* ─────────── espace boucher ─────────── */
-.admin-wrap{max-width:1180px;margin:0 auto;padding:20px 18px 90px}
-.tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-bottom:20px;scrollbar-width:thin}
-.tab{padding:11px 18px;border-radius:99px;font-size:15px;font-weight:700;color:var(--muted);white-space:nowrap;
-  border:1px solid transparent;transition:background .15s,color .15s}
-.tab:hover{background:var(--surface-3);color:var(--ink)}
-.tab[aria-selected="true"]{background:var(--ink);color:var(--ground)}
-.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(175px,1fr));gap:10px}
-.tile{background:var(--surface-1);border:1px solid var(--hair);border-radius:var(--r-sm);padding:18px;display:flex;flex-direction:column;gap:4px}
-.tile .k{font-size:14px;color:var(--muted);font-weight:500;min-height:2.6em}
-.tile .v{font-family:var(--titre);font-weight:700;font-size:30px;line-height:1.15;font-variant-numeric:tabular-nums}
+.admin-wrap{max-width:1180px;margin:0 auto;padding:24px 18px 90px}
+.tabs{display:flex;gap:4px;overflow-x:auto;padding:4px;margin-bottom:24px;scrollbar-width:thin;
+  background:var(--surface-3);border-radius:99px;width:fit-content;max-width:100%}
+.tab{padding:10px 18px;border-radius:99px;font-size:15px;font-weight:700;color:var(--muted);white-space:nowrap;
+  border:1px solid transparent;transition:background .15s,color .15s,box-shadow .15s}
+.tab:hover{color:var(--ink)}
+.tab[aria-selected="true"]{background:var(--surface-1);color:var(--ink);box-shadow:0 1px 3px rgba(21,21,23,.10)}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(175px,1fr));gap:14px}
+.tile{background:var(--surface-1);border:1px solid var(--panel-line);border-radius:var(--r);
+  box-shadow:var(--lift);padding:20px 22px;display:flex;flex-direction:column;gap:3px}
+.tile .k{font-size:14px;color:var(--muted);font-weight:500}
+.tile .v{font-family:var(--titre);font-weight:700;font-size:32px;line-height:1.15;
+  font-variant-numeric:tabular-nums;letter-spacing:-.025em}
 .tile .s{font-size:13.5px;color:var(--muted)}
 .tile .s.up{color:var(--good);font-weight:700}
-.cols{display:grid;grid-template-columns:1.4fr 1fr;gap:16px;align-items:start}
+.cols{display:grid;grid-template-columns:1.4fr 1fr;gap:20px;align-items:start}
 @media (max-width:900px){.cols{grid-template-columns:1fr}}
 
 /* graphique */
-.chart{display:flex;align-items:flex-end;gap:4px;height:150px;padding-top:24px;position:relative}
+.chart{display:flex;align-items:flex-end;gap:7px;height:160px;padding-top:24px;position:relative}
 .chart-grid{position:absolute;inset:24px 0 0;pointer-events:none}
 .chart-grid i{position:absolute;left:0;right:0;height:1px;background:var(--hair)}
 .bar{flex:1;min-width:0;position:relative;display:flex;flex-direction:column;justify-content:flex-end;height:100%}
-.bar i{display:block;background:var(--rouge-fill);border-radius:6px 6px 0 0;min-height:3px;transition:opacity .15s}
-.bar.zero i{background:var(--hair-2)}
+.bar i{display:block;border-radius:7px 7px 3px 3px;min-height:4px;transition:opacity .15s;
+  background:linear-gradient(180deg, #E24A4A, var(--rouge-fill))}
+.bar.zero i{background:var(--hair);min-height:3px}
 .bar:hover i,.bar:focus-visible i{opacity:.75}
 .bar .tip{position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);
   background:var(--ink);color:var(--ground);font-size:12px;font-weight:700;
@@ -273,27 +328,51 @@ input:-webkit-autofill,input:-webkit-autofill:focus{
 .chart-x span{flex:1;text-align:center;font-size:12px;color:var(--muted);font-weight:500;overflow:hidden}
 
 /* classement */
-.rank{display:flex;flex-direction:column;gap:14px}
-.rank-row{display:grid;grid-template-columns:1fr auto;gap:6px 12px;align-items:baseline}
+/* fiche d'identité : intitulé / valeur */
+.facts{display:flex;flex-direction:column}
+.fact{display:flex;align-items:baseline;gap:16px;padding:9px 0;border-top:1px solid var(--hair)}
+.fact:first-child{border-top:0;padding-top:0}
+.fact .k{flex:none;width:118px;font-size:13.5px;color:var(--muted);font-weight:500}
+.fact .v{flex:1;min-width:0;font-size:15px;font-weight:500;overflow-wrap:anywhere}
+@media (max-width:430px){
+  .fact{flex-direction:column;gap:1px;padding:10px 0}
+  .fact .k{width:auto;font-size:12.5px}
+}
+/* Dans une fenêtre, les trois chiffres ne portent pas leur propre ombre. */
+.modal .stat-row{box-shadow:none;border:1px solid var(--hair)}
+
+/* le journal */
+.jrn-row{display:flex;gap:14px;padding:11px 0;border-top:1px solid var(--hair)}
+.jrn-row:first-child{border-top:0;padding-top:0}
+.jrn-row > .num{flex:none;width:60px}
+.rank{display:flex;flex-direction:column;gap:16px}
+.rank-row{display:grid;grid-template-columns:1fr auto;gap:7px 12px;align-items:baseline}
 .rank-row .n{font-size:16px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .rank-row .v{font-size:14px;font-variant-numeric:tabular-nums;color:var(--muted);font-weight:500}
-.rank-row .b{grid-column:1/-1;height:8px;border-radius:99px;background:var(--surface-3);overflow:hidden}
-.rank-row .b i{display:block;height:100%;border-radius:99px;background:var(--rouge-fill)}
+.rank-row .b{grid-column:1/-1;height:6px;border-radius:99px;background:var(--surface-3);overflow:hidden}
+.rank-row .b i{display:block;height:100%;border-radius:99px;
+  background:linear-gradient(90deg, #E24A4A, var(--rouge-fill))}
 
 /* tableau */
-.tbl-wrap{overflow-x:auto;border:1px solid var(--hair);border-radius:var(--r);background:var(--surface-1)}
+.tbl-wrap{overflow-x:auto;border:1px solid var(--panel-line);border-radius:var(--r);
+  background:var(--surface-1);box-shadow:var(--lift)}
+/* Dans un panneau, le tableau n'a pas besoin de sa propre surface. */
+.panel .tbl-wrap{border:0;border-radius:0;background:transparent;box-shadow:none}
+.panel .tbl th{padding-top:0}
+.panel .tbl tr:last-child td{border-bottom:0}
 .tbl{font-size:15px;min-width:700px}
-.tbl th{text-align:left;font-size:13px;color:var(--muted);font-weight:700;padding:14px 16px;
-  border-bottom:1px solid var(--hair);white-space:nowrap;background:var(--surface-2)}
+.tbl th{text-align:left;font-size:12.5px;color:var(--muted);font-weight:700;padding:15px 18px;
+  border-bottom:1px solid var(--hair);white-space:nowrap;background:transparent;
+  letter-spacing:.04em;text-transform:uppercase}
 .tbl th.r,.tbl td.r{text-align:right}
-.tbl td{padding:14px 16px;border-bottom:1px solid var(--hair);vertical-align:middle}
+.tbl td{padding:15px 18px;border-bottom:1px solid var(--hair);vertical-align:middle}
 .tbl tr:last-child td{border-bottom:0}
 .tbl tbody tr{cursor:pointer;transition:background .12s}
 .tbl tbody tr:hover{background:var(--surface-2)}
 .tbl .no{font-weight:700;font-variant-numeric:tabular-nums}
 .tbl .num{font-size:14.5px}
 .pill{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:99px;
-  font-size:13px;font-weight:700;white-space:nowrap;background:var(--surface-3);color:var(--ink-2)}
+  font-size:12.5px;font-weight:700;white-space:nowrap;background:var(--surface-3);color:var(--ink-2)}
 .pill.brass{background:var(--ambre-soft);color:var(--ambre)}
 .pill.good{background:var(--good-soft);color:var(--good)}
 .pill.crit{background:var(--crit-soft);color:var(--crit)}
@@ -311,41 +390,54 @@ input:-webkit-autofill,input:-webkit-autofill:focus{
 .filter-row select{width:auto;min-width:0}
 .till-find{display:flex;gap:10px;flex-wrap:wrap}
 .till-find input[name="q"]{flex:1 1 220px;min-width:0}
-.till-found{display:flex;align-items:center;gap:14px;padding:16px;border-radius:var(--r-sm);background:var(--surface-2);border:1px solid var(--hair)}
+.till-found{display:flex;align-items:center;gap:15px;padding:18px;border-radius:var(--r-sm);
+  background:var(--surface-2);border:1px solid var(--hair)}
 .till-found .who{flex:1 1 auto;min-width:0}
-.till-found .av{width:46px;height:46px;border-radius:50%;display:grid;place-items:center;
+.till-found .av{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;
   font-weight:700;font-size:17px;flex:none;background:var(--rouge-fill);color:var(--rouge-on)}
-.chips{display:flex;flex-wrap:wrap;gap:8px}
-.chip{padding:11px 16px;border-radius:99px;border:1px solid var(--hair-2);background:var(--surface-1);
-  font-size:15px;font-weight:500;transition:background .12s,border-color .12s}
-.chip:hover{background:var(--surface-3)}
-.chip[aria-pressed="true"]{background:var(--rouge-fill);border-color:var(--rouge-fill);color:var(--rouge-on)}
+.chips{display:flex;flex-wrap:wrap;gap:9px}
+.chip{padding:11px 17px;border-radius:99px;border:1px solid var(--hair-2);background:var(--surface-1);
+  font-size:15px;font-weight:500;transition:background .12s,border-color .12s,color .12s}
+.chip:hover{background:var(--surface-3);border-color:var(--muted)}
+.chip[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--ground);font-weight:700}
 
 /* fenêtre */
 .scrim{position:fixed;inset:0;background:rgba(10,10,11,.5);backdrop-filter:blur(3px);z-index:60;display:flex;align-items:flex-end;justify-content:center}
 @media (min-width:700px){.scrim{align-items:center;padding:26px}}
-.modal{background:var(--surface-1);width:100%;max-width:600px;max-height:92vh;overflow-y:auto;
-  border-radius:var(--r) var(--r) 0 0;box-shadow:var(--lift-2);border:1px solid var(--hair)}
-@media (min-width:700px){.modal{border-radius:var(--r)}}
-.modal-head{display:flex;align-items:center;gap:12px;padding:20px 22px;border-bottom:1px solid var(--hair);position:sticky;top:0;background:var(--surface-1);z-index:2}
-.modal-head h3{font-family:var(--titre);font-weight:700;font-size:19px;flex:1}
-.modal-body{padding:22px;display:flex;flex-direction:column;gap:16px}
+.modal{background:var(--surface-1);width:100%;max-width:620px;max-height:92vh;overflow-y:auto;
+  border-radius:22px 22px 0 0;box-shadow:var(--lift-2);border:1px solid var(--panel-line)}
+@media (min-width:700px){.modal{border-radius:22px}}
+.modal-head{display:flex;align-items:center;gap:12px;padding:20px 24px;border-bottom:1px solid var(--hair);
+  position:sticky;top:0;background:var(--surface-1);z-index:2}
+.modal-head h3{font-family:var(--titre);font-weight:700;font-size:20px;flex:1;letter-spacing:-.015em}
+.modal-body{padding:24px;display:flex;flex-direction:column;gap:18px}
 
 /* avis */
 .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:90;
-  background:var(--ink);color:var(--ground);padding:14px 20px;border-radius:99px;
-  font-size:14.5px;font-weight:700;box-shadow:var(--lift-2);max-width:calc(100vw - 32px);
-  animation:rise .25s cubic-bezier(.2,.8,.3,1)}
+  background:var(--ink);color:var(--ground);padding:14px 22px;border-radius:99px;
+  font-size:14.5px;font-weight:700;box-shadow:0 12px 32px -10px rgba(21,21,23,.45);
+  max-width:calc(100vw - 32px);animation:rise .25s cubic-bezier(.2,.8,.3,1)}
 .toast.ok{background:var(--good);color:#fff}
 .toast.bad{background:var(--rouge-fill);color:#fff}
 @keyframes rise{from{opacity:0;transform:translate(-50%,10px)}to{opacity:1;transform:translate(-50%,0)}}
 
 /* bandeaux et pied */
 .grow{flex:1;min-width:0}
-.banner{display:flex;gap:12px;align-items:flex-start;padding:16px;border-radius:var(--r-sm);
+.banner{display:flex;gap:12px;align-items:flex-start;padding:17px 18px;border-radius:var(--r-sm);
   font-size:15px;line-height:1.55;color:var(--ink-2);background:var(--surface-2);border:1px solid var(--hair)}
 .banner.warn{background:var(--warn-soft);border-color:transparent;color:var(--warn)}
-.foot{text-align:center;font-size:13.5px;color:var(--muted);padding:28px 0 0;line-height:1.8}
+.banner-brass{background:var(--ambre-soft);border-color:transparent;color:var(--ambre)}
+.banner .ico{flex:none;font-size:16px;line-height:1.55}
+/* l'échelle des paliers, sur l'accueil : ce qu'on gagne, et à quel prix */
+.ladder{display:flex;flex-direction:column}
+.ladder li{display:flex;align-items:baseline;justify-content:space-between;gap:16px;
+  padding:15px 0;border-top:1px solid var(--hair)}
+.ladder li:first-child{border-top:0;padding-top:2px}
+.ladder li:last-child{padding-bottom:2px}
+.ladder .l{font-size:16px;font-weight:700;line-height:1.4}
+.ladder .p{flex:none;font-size:15px;font-weight:700;color:var(--ambre);
+  font-variant-numeric:tabular-nums;white-space:nowrap}
+.foot{text-align:center;font-size:13.5px;color:var(--muted);padding:34px 0 0;line-height:1.8}
 .foot b{color:var(--ink-2);font-weight:700}
 .linklike{color:var(--rouge);font-weight:700;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
 
@@ -356,8 +448,8 @@ input:-webkit-autofill,input:-webkit-autofill:focus{
 
 /* ─────────── le code à scanner ─────────── */
 .qr-panel{text-align:center}
-.qr{display:inline-block;padding:12px;background:#fff;border-radius:12px;line-height:0;
-  box-shadow:0 1px 3px rgba(23,23,24,.12)}
+.qr{display:inline-block;padding:14px;background:#fff;border-radius:16px;line-height:0;
+  box-shadow:0 2px 10px -4px rgba(21,21,23,.22)}
 .qr svg{display:block;width:172px;height:172px}
 .qr-lead{margin-top:14px;font-weight:700;font-size:16px}
 
@@ -407,12 +499,13 @@ p,li,td,th,label,.hint,.small,.banner,.tile .k,.foot{overflow-wrap:break-word}
   /* ── les onglets du boucher : les six visibles d'un coup ──
      Ils défilaient sur le côté : « Réglages » et « Parrainage » n'existaient
      tout simplement pas pour qui ne pensait pas à faire glisser. */
-  .tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;
-    overflow:visible;padding-bottom:0;margin-bottom:16px}
+  .tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;width:auto;
+    overflow:visible;background:none;padding:0;border-radius:0;margin-bottom:18px}
   .tab{padding:11px 6px;font-size:13.5px;text-align:center;white-space:normal;
-    line-height:1.25;display:grid;place-items:center;min-height:44px;
-    background:var(--surface-1);border-color:var(--hair)}
-  .tab[aria-selected="true"]{border-color:var(--ink)}
+    line-height:1.25;display:grid;place-items:center;min-height:46px;
+    background:var(--surface-1);border-color:var(--hair-2);box-shadow:none}
+  .tab[aria-selected="true"]{background:var(--ink);border-color:var(--ink);
+    color:var(--ground);box-shadow:none}
 
   /* ── les compteurs : deux par ligne ──
      Un par ligne donnait un tableau de bord de trois écrans de haut. */
@@ -430,10 +523,10 @@ p,li,td,th,label,.hint,.small,.banner,.tile .k,.foot{overflow-wrap:break-word}
   .tbl thead{display:none}
   .tbl tbody{display:block}
   .tbl tr{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:9px 8px;
-    background:var(--surface-1);border:1px solid var(--hair);border-radius:var(--r-sm);
-    padding:13px 15px;margin-bottom:9px;align-items:start;line-height:1.45}
+    background:var(--surface-2);border:1px solid var(--hair);border-radius:var(--r-sm);
+    padding:14px 16px;margin-bottom:9px;align-items:start;line-height:1.45}
   .tbl tr:last-child{margin-bottom:0}
-  .tbl tbody tr:hover{background:var(--surface-1)}
+  .tbl tbody tr:hover{background:var(--surface-2)}
   /* chaque valeur porte son intitulé au-dessus d'elle, en petit */
   .tbl td{display:block;padding:0;border:0;text-align:left;grid-column:span 2;min-width:0}
   .tbl td::before{content:attr(data-l);display:block;color:var(--muted);
@@ -455,7 +548,7 @@ p,li,td,th,label,.hint,.small,.banner,.tile .k,.foot{overflow-wrap:break-word}
   .tbl td.c-wide{grid-column:1/-1;grid-row:3}
   .tbl td.empty{grid-column:1/-1;grid-row:1;text-align:center}
   /* un trait discret sépare l'identité des chiffres */
-  .tbl td.c-a,.tbl td.c-b,.tbl td.c-c{border-top:1px solid var(--hair);padding-top:9px}
+  .tbl td.c-a,.tbl td.c-b,.tbl td.c-c{border-top:1px solid var(--hair-2);padding-top:9px}
 
   /* ── le bandeau du haut ──
      Le flou derrière un bandeau collant fait saccader le défilement sur les
@@ -517,9 +610,11 @@ p,li,td,th,label,.hint,.small,.banner,.tile .k,.foot{overflow-wrap:break-word}
   .till-found{flex-wrap:wrap}
   .till-found .who{flex:1 1 100%;order:3}
   .till-found .pill{margin-left:auto}
+  /* L'icône ne quitte jamais sa phrase ; seul le bouton descend d'une ligne. */
   .banner,.bday{flex-wrap:wrap}
-  .banner .grow,.bday .grow{flex:1 1 100%}
   .banner .btn,.bday .btn{margin-left:auto}
+  .banner:has(.btn),.bday:has(.btn){display:grid;grid-template-columns:auto minmax(0,1fr);gap:12px}
+  .banner:has(.btn) .btn,.bday:has(.btn) .btn{grid-column:1/-1;justify-self:end;margin:0}
 
   /* ── divers ── */
   .sect-head h2{font-size:19px}
@@ -1564,8 +1659,8 @@ function vHome() {
   }).join("");
 
   var ladder = r.map(function (x) {
-    return '<li class="rw-row"><span class="rw-seal">' + x.p + '</span>' +
-      '<span class="rw-txt"><b>' + esc(x.label) + '</b><span>' + x.p + ' points</span></span></li>';
+    return '<li><span class="l">' + esc(x.label) + '</span>' +
+      '<span class="p">' + nb(x.p) + ' pts</span></li>';
   }).join("");
 
   return '<main class="client-wrap">' +
@@ -1589,7 +1684,7 @@ function vHome() {
 
     '<section class="panel panel-pad">' +
     '<div class="sect-head"><h2>Ce que vous débloquez</h2></div>' +
-    '<ul class="rw">' + ladder + '</ul>' +
+    '<ul class="ladder">' + ladder + '</ul>' +
     '<p class="small muted" style="margin-top:14px">Cadeau d\'anniversaire : ' + nb(sh.birthday) +
       ' points offerts. Parrainage : ' + nb(sh.godfather) + ' points pour vous, ' + nb(sh.godchild) + ' pour votre filleul.</p>' +
     '</section>' + footer() + '</main>';
@@ -1683,20 +1778,25 @@ function vCard() {
   for (var i = 0; i < r.length; i++) if (r[i].p <= c.points) prev = r[i].p;
   var pct = nx ? Math.max(4, Math.round((c.points - prev) / (nx.p - prev) * 100)) : 100;
 
-  var rail = '<section class="panel panel-pad">' +
+  var rail = '<section class="panel">' +
+    '<div class="panel-pad" style="padding-bottom:22px">' +
     '<div class="rail-head"><strong>' + (nx ? "Prochaine récompense" : "Toutes les récompenses sont débloquées") + '</strong>' +
     (nx ? '<span class="num small muted">' + nb(c.points) + ' / ' + nb(nx.p) + '</span>' : '') + '</div>' +
     '<div class="rail"><div class="rail-fill" style="width:' + pct + '%"></div></div>' +
     '<p class="rail-foot">' + (nx
       ? 'Encore <b>' + nb(nx.p - c.points) + ' points</b> (' + eur0((nx.p - c.points) / sh.ppe) + ' d\'achats) pour ' + esc(nx.label) + '.'
-      : 'Présentez votre carte en caisse pour en profiter.') + '</p></section>';
+      : 'Présentez votre carte en caisse pour en profiter.') + '</p></div>' +
+    '<div class="stat-row">' +
+    '<div><b>' + nb(c.visits) + '</b><span>passages</span></div>' +
+    '<div><b>' + eur0(c.spent) + '</b><span>d\'achats</span></div>' +
+    '<div><b>' + nb(c.lifetime) + '</b><span>points cumulés</span></div></div></section>';
 
   var rw = r.map(function (x) {
     var on = x.p <= c.points;
     return '<li class="rw-row' + (on ? " on" : "") + '">' +
       '<span class="rw-seal">' + (on ? "✓" : x.p) + '</span>' +
       '<span class="rw-txt"><b>' + esc(x.label) + '</b>' +
-      '<span>' + (on ? "Disponible — à demander en caisse" : nb(x.p - c.points) + " points restants") + '</span></span></li>';
+      '<span>' + (on ? "<b>Disponible</b> — à demander en caisse" : nb(x.p - c.points) + " points restants") + '</span></span></li>';
   }).join("");
 
   var hist = c.hist.length ? c.hist.slice(0, 25).map(function (h) {
@@ -1720,8 +1820,8 @@ function vCard() {
 
   return '<main class="client-wrap">' +
     cardHTML(c) +
-    (un.length ? '<div class="banner" style="background:var(--brass-soft);border-color:var(--brass-fill);color:var(--brass)">' +
-      '<span aria-hidden="true">★</span><span><b>' + un.length + ' récompense' + (un.length > 1 ? "s" : "") +
+    (un.length ? '<div class="banner banner-brass">' +
+      '<span class="ico" aria-hidden="true">★</span><span class="grow"><b>' + un.length + ' récompense' + (un.length > 1 ? "s" : "") +
       ' disponible' + (un.length > 1 ? "s" : "") + '.</b> Demandez-la en caisse, le boucher la valide sur votre carte.</span></div>' : "") +
     '<section class="panel panel-pad qr-panel">' +
     '<div class="qr">' + qrSVG(tillLink(c.id), 172) + '</div>' +
@@ -1729,10 +1829,6 @@ function vCard() {
     '<p class="small muted">ou donnez votre numéro : <b class="num">' + esc(c.id) + '</b></p>' +
     '</section>' +
     bd + rail +
-    '<div class="stat-row">' +
-    '<div><b>' + nb(c.visits) + '</b><span>passages</span></div>' +
-    '<div><b>' + eur0(c.spent) + '</b><span>d\'achats</span></div>' +
-    '<div><b>' + nb(c.lifetime) + '</b><span>points cumulés</span></div></div>' +
 
     '<section class="panel panel-pad">' +
     '<div class="sect-head"><h2>Vos récompenses</h2></div><ul class="rw">' + rw + '</ul></section>' +
@@ -2024,8 +2120,8 @@ function vDash() {
     ["Passages", nb(passages), '<span class="s">' + nb(mBuys.length) + " ce mois-ci</span>"],
     ["Encaissé", eur0(ca), '<span class="s">' + eur0(caM) + " ce mois-ci</span>"],
     ["Panier moyen", passages ? eur(ca / passages) : "—", '<span class="s">sur ' + nb(passages) + " achats</span>"],
-    ["Points en circulation", nb(pts), '<span class="s">' + nb(aReclamer) + " client" + (aReclamer > 1 ? "s" : "") + " ont une récompense à réclamer</span>"],
-    ["Récompenses ce mois", nb(used), '<span class="s">' + nb(bd) + " anniversaire" + (bd > 1 ? "s" : "") + " ce mois</span>"]
+    ["Points en circulation", nb(pts), '<span class="s">' + nb(aReclamer) + " récompense" + (aReclamer > 1 ? "s" : "") + " à réclamer</span>"],
+    ["Récompenses utilisées", nb(used), '<span class="s">ce mois-ci · ' + nb(bd) + " anniversaire" + (bd > 1 ? "s" : "") + "</span>"]
   ].map(function (t) {
     return '<div class="tile"><span class="k">' + t[0] + '</span><span class="v">' + t[1] + '</span>' + t[2] + '</div>';
   }).join("");
@@ -2040,8 +2136,8 @@ function vDash() {
   }).join("");
 
   var jrn = DB.log.slice(0, 8).map(function (l) {
-    return '<li style="display:flex;gap:12px;padding:9px 0;border-bottom:1px dashed var(--line)">' +
-      '<span class="num small muted" style="flex:none;width:58px">' + dShort(l.t) + '</span>' +
+    return '<li class="jrn-row">' +
+      '<span class="num small muted">' + dShort(l.t) + '</span>' +
       '<span class="small">' + logLine(l) + '</span></li>';
   }).join("") || '<li class="empty">Rien pour l\'instant.</li>';
 
@@ -2073,7 +2169,7 @@ function vTill() {
     '<input name="q" type="text" inputmode="numeric" autocomplete="off" ' +
     'placeholder="N° de carte, téléphone ou nom" value="">' +
     '<button class="btn" type="button" data-act="scan">Scanner</button>' +
-    '<button class="btn btn-primary" type="submit">Rechercher</button>' +
+    '<button class="btn ' + (c ? "" : "btn-ink ") + '" type="submit">Rechercher</button>' +
     (c ? '<button class="btn btn-ghost" type="button" data-act="till-clear">Changer</button>' : "") +
     '</form>';
 
@@ -2105,8 +2201,8 @@ function vTill() {
       (gotBdayGift(c) ? "" : '<button class="btn btn-sm btn-brass" data-act="gift-bday" data-id="' + c.id + '">Offrir ' + nb(sh.birthday) + ' pts</button>') +
       '</span></div>' : "") +
 
-    (un.length ? '<div class="banner" style="background:var(--brass-soft);border-color:var(--brass-fill);color:var(--brass)">' +
-      '<span aria-hidden="true">★</span><span class="grow"><b>Récompense disponible :</b> ' +
+    (un.length ? '<div class="banner banner-brass">' +
+      '<span class="ico" aria-hidden="true">★</span><span class="grow"><b>Récompense disponible :</b> ' +
       esc(un[un.length - 1].label) + '</span>' +
       '<button class="btn btn-sm btn-brass" data-act="use-reward" data-id="' + c.id + '">Utiliser</button></div>' : "") +
 
@@ -2196,6 +2292,15 @@ function vClients() {
     '</section></div>';
 }
 
+/* Une fiche d'identité se lit en colonnes : l'intitulé à gauche, la valeur à
+   droite. En un seul paragraphe gris, personne ne trouvait le téléphone. */
+function facts(rows) {
+  var out = rows.filter(Boolean).map(function (r) {
+    return '<div class="fact"><span class="k">' + r[0] + '</span><span class="v">' + r[1] + '</span></div>';
+  }).join("");
+  return '<div class="facts">' + out + '</div>';
+}
+
 function clientModal(id) {
   var c = byId(id); if (!c) return;
   if (Store.mode === "supabase" && c.hist === null) {
@@ -2218,12 +2323,18 @@ function clientModal(id) {
     '<div class="stat-row"><div><b>' + nb(c.points) + '</b><span>points</span></div>' +
     '<div><b>' + nb(c.visits) + '</b><span>passages</span></div>' +
     '<div><b>' + eur0(c.spent) + '</b><span>dépensé</span></div></div>' +
-    '<div class="small muted num">n° ' + c.id + ' · ' + esc(prettyPhone(c.phone)) +
-    (c.email ? ' · ' + esc(c.email) : "") + '<br>Anniversaire : ' + bdayLabel(c) + ' · client depuis le ' + dFull(c.created) +
-    ' · code parrain ' + esc(c.code) + '<br>' + nb(c.lifetime) + ' points cumulés · statut ' + esc(tierOf(c.lifetime)) +
-    (parrain ? '<br>Parrainé par ' + esc(parrain.name) : "") +
-    (filleuls.length ? '<br>' + filleuls.length + ' filleul' + (filleuls.length > 1 ? "s" : "") + ' : ' +
-      esc(filleuls.map(function (f) { return f.name; }).join(", ")) : "") + '</div>' +
+    facts([
+      ["Carte", '<span class="num">n° ' + c.id + '</span>'],
+      ["Téléphone", '<span class="num">' + esc(prettyPhone(c.phone)) + '</span>'],
+      c.email ? ["E-mail", esc(c.email)] : null,
+      ["Anniversaire", bdayLabel(c)],
+      ["Client depuis", dFull(c.created)],
+      ["Statut", esc(tierOf(c.lifetime)) + ' · ' + nb(c.lifetime) + ' points cumulés'],
+      ["Code parrain", '<span class="num">' + esc(c.code) + '</span>'],
+      parrain ? ["Parrainé par", esc(parrain.name)] : null,
+      filleuls.length ? ["Filleul" + (filleuls.length > 1 ? "s" : ""),
+        esc(filleuls.map(function (f) { return f.name; }).join(", "))] : null
+    ]) +
     '<div class="btn-row">' +
     '<button class="btn btn-primary btn-sm" data-act="till-pick" data-id="' + c.id + '">Encaisser un achat</button>' +
     (un.length ? '<button class="btn btn-brass btn-sm" data-act="use-reward" data-id="' + c.id + '">Utiliser une récompense</button>' : "") +
@@ -2247,7 +2358,7 @@ function editModal(id) {
     '<select id="e-bd" name="bd" class="grow"><option value="">Jour</option>' + dayOpts(c.bday_day) + '</select>' +
     '<select name="bm" style="flex:2"><option value="">Mois</option>' + monthOpts(c.bday_month) + '</select></div></div></div>' +
     '<div class="field"><label for="e-mail">E-mail</label><input id="e-mail" name="email" type="email" value="' + esc(c.email || "") + '"></div>' +
-    '<button class="btn btn-primary btn-full" type="submit">Enregistrer</button></form>');
+    '<button class="btn btn-ink btn-full" type="submit">Enregistrer</button></form>');
 }
 
 function adjustModal(id) {
@@ -2257,7 +2368,7 @@ function adjustModal(id) {
     'Un nombre négatif retire des points.</p>' +
     '<div class="field"><label for="a-p">Points</label><input id="a-p" name="p" type="number" step="1" value="50" required></div>' +
     '<div class="field"><label for="a-w">Motif</label><input id="a-w" name="w" value="Geste commercial" required></div>' +
-    '<button class="btn btn-primary btn-full" type="submit">Appliquer</button></form>');
+    '<button class="btn btn-ink btn-full" type="submit">Appliquer</button></form>');
 }
 
 function newClientModal() {
@@ -2287,13 +2398,13 @@ function vBday() {
       '<span class="num">n° ' + c.id + ' · ' + esc(prettyPhone(c.phone)) + (c.email ? ' · ' + esc(c.email) : "") +
       (c.marketing ? '' : ' · <b>refuse les offres</b>') + '</span></span>' +
       (done ? '<span class="pill good"><i></i>offert</span>'
-        : '<button class="btn btn-sm btn-brass" data-act="gift-bday" data-id="' + c.id + '">Offrir ' + nb(sh.birthday) + ' pts</button>') +
+        : '<button class="btn btn-sm btn-brass-o" data-act="gift-bday" data-id="' + c.id + '">Offrir ' + nb(sh.birthday) + ' pts</button>') +
       '</div>';
   }).join("") || '<p class="empty">Aucun anniversaire en ' + MOIS_L[m - 1] + '.</p>';
 
   var next = DB.clients.filter(function (c) { return Number(c.bday_month) === (m % 12) + 1; })
     .sort(function (a, b) { return a.bday_day - b.bday_day; })
-    .map(function (c) { return '<li class="small" style="padding:6px 0;border-bottom:1px dashed var(--line)"><span class="num">' +
+    .map(function (c) { return '<li class="jrn-row small"><span class="num">' +
       bdayLabel(c) + '</span> — ' + esc(c.name) + ' <span class="muted num">n° ' + c.id + '</span></li>'; }).join("")
     || '<li class="empty">Personne.</li>';
 
@@ -2379,13 +2490,13 @@ function vSet() {
     '<div class="field"><label for="s-bd">Cadeau anniversaire</label><input id="s-bd" name="birthday" type="number" step="5" min="0" value="' + sh.birthday + '"></div>' +
     '<div class="field"><label for="s-gf">Parrain</label><input id="s-gf" name="godfather" type="number" step="5" min="0" value="' + sh.godfather + '"></div>' +
     '<div class="field"><label for="s-gc">Filleul</label><input id="s-gc" name="godchild" type="number" step="5" min="0" value="' + sh.godchild + '"></div></div>' +
-    '<button class="btn btn-primary btn-full" type="submit">Enregistrer</button></form>' +
+    '<button class="btn btn-ink btn-full" type="submit">Enregistrer</button></form>' +
 
     '<form class="panel panel-pad stack" data-act="save-rewards">' +
     '<div class="sect-head"><h2>Récompenses</h2><span class="sp"></span>' +
     '<button class="btn btn-sm" type="button" data-act="add-reward">Ajouter</button></div>' +
     '<div class="stack-sm" id="rw-list">' + rw + '</div>' +
-    '<button class="btn btn-primary btn-full" type="submit">Enregistrer le barème</button>' +
+    '<button class="btn btn-ink btn-full" type="submit">Enregistrer le barème</button>' +
     '<p class="small muted">Les paliers s\'appliquent immédiatement sur toutes les cartes.</p></form>' +
     '</div>' +
 
@@ -2402,7 +2513,7 @@ function vSet() {
         '<div class="field"><label for="p-new">Nouveau code</label><input id="p-new" name="neo" type="password" inputmode="numeric" required>' +
         '<span class="hint">4 chiffres minimum. Notez-le : il n\'y a pas de récupération.</span></div>' +
         '<div id="pin-err"></div>' +
-        '<button class="btn btn-primary btn-full" type="submit">Changer le code</button></form>') +
+        '<button class="btn btn-ink btn-full" type="submit">Changer le code</button></form>') +
     sbPanel() + rgpdPanel() +
 
     '<section class="panel panel-pad stack">' +
@@ -2459,7 +2570,7 @@ function rgpdPanel() {
     (DB.shop.retention_years || 3) + '">' +
     '<span class="hint">Au-delà, la fiche et son historique n\'ont plus lieu d\'être conservés. ' +
     'La CNIL recommande trois ans après le dernier contact.</span></div>' +
-    '<button class="btn btn-primary btn-full" type="submit">Enregistrer</button>' +
+    '<button class="btn btn-ink btn-full" type="submit">Enregistrer</button>' +
     '<hr class="divide">' +
     '<div class="banner' + (stale.length ? " warn" : "") + '"><span aria-hidden="true">' +
     (stale.length ? "!" : "i") + '</span><span>' +
@@ -2506,7 +2617,7 @@ function sbPanel() {
         '<div class="field"><label for="sb-key">Clé publique (anon)</label>' +
         '<input id="sb-key" name="key" placeholder="eyJhbGciOi…" value="' + esc((cfg && cfg.key) || "") + '"></div>' +
         '<div id="sb-err"></div>' +
-        '<button class="btn btn-primary btn-full" type="submit">Tester et connecter</button></form>') +
+        '<button class="btn btn-ink btn-full" type="submit">Tester et connecter</button></form>') +
     '</section>';
 }
 
@@ -2617,7 +2728,7 @@ function restoreModal() {
     '<div class="field"><label for="r-txt">…ou collez le contenu JSON</label>' +
     '<textarea id="r-txt" name="json" rows="7" style="font-family:var(--mono);font-size:12px"></textarea></div>' +
     '<div id="r-err"></div>' +
-    '<button class="btn btn-primary btn-full" type="submit">Restaurer</button></form>');
+    '<button class="btn btn-ink btn-full" type="submit">Restaurer</button></form>');
 }
 
 /* ══════════════════════════ 10. Assemblage ══════════════════════════ */
@@ -2757,7 +2868,7 @@ var ACTS = {
       '<select id="m-bd" name="bd" class="grow">' + dayOpts(c.bday_day) + '</select>' +
       '<select name="bm" style="flex:2">' + monthOpts(c.bday_month) + '</select></div></div>' +
       '<div id="my-err"></div>' +
-      '<button class="btn btn-primary btn-full" type="submit">Enregistrer</button></form>');
+      '<button class="btn btn-ink btn-full" type="submit">Enregistrer</button></form>');
   },
   "my-export": function () {
     var c = byId(S.cid); if (!c) return;
