@@ -118,6 +118,9 @@ h1,h2,h3{text-wrap:balance;line-height:1.12;font-weight:400;letter-spacing:-.015
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .logo-try .box .mark-glyph{width:40px;height:40px}
 .logo-vide{font-size:13.5px;color:var(--muted)}
+/* Depuis quand ces chiffres sont-ils vrais. Une caisse qui affiche un total
+   sans dire de quand il date invite à s'y fier plus qu'il ne le mérite. */
+.frais{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 /* Un bouton qui se lit comme un lien, dans une phrase. */
 .lien{font:inherit;color:var(--rouge);font-weight:600;text-decoration:underline;
   text-underline-offset:2px;padding:0}
@@ -1010,6 +1013,13 @@ function lockNow(msg) {
 }
 setInterval(function () { if (lockExpired()) lockNow("Session verrouillée après inactivité."); }, 20000);
 
+/* Une tablette de comptoir passe sa journée en veille. Au réveil, ce qu'elle
+   affiche a le plus de chances d'être périmé : c'est le moment de relire. */
+document.addEventListener("visibilitychange", function () {
+  if (!document.hidden) relire(false);
+});
+window.addEventListener("focus", function () { relire(false); });
+
 function saveSession() { ssSet(SS, JSON.stringify(S)); }
 function loadSession() {
   var d = { view: "home", tab: "dash", cid: "", admin: false, flash: "", till: {}, sel: {} };
@@ -1189,6 +1199,44 @@ function sbShop() {
   });
 }
 
+/* Le tableau de bord était une photo prise à la connexion : une carte créée
+   par une cliente depuis son téléphone n'apparaissait qu'au rechargement
+   suivant. On relit donc la base quand le boucher a des raisons de vouloir la
+   vérité — il revient sur l'onglet, il rallume la tablette — sans jamais
+   bloquer l'écran : les chiffres à l'affichage restent, ils sont remplacés
+   quand les nouveaux arrivent. */
+var luLe = 0, relitEnCours = false;
+function relire(force, apres) {
+  if (Store.mode !== "supabase" || !S.admin || relitEnCours) return;
+  if (!force) {
+    if (Date.now() - luLe < 8000) return;
+    // Jamais au milieu d'un geste : une vente commencée, une fenêtre ouverte.
+    // Redessiner sous les doigts du boucher vaut mieux que rien nulle part.
+    if (S.tab === "till" && S.till && S.till.cid) return;
+    if (document.querySelector(".scrim")) return;
+  }
+  relitEnCours = true;
+  sbLoadAll().then(function () {
+    luLe = Date.now(); relitEnCours = false;
+    if (!S.admin) return;
+    S.scroll = window.scrollY; render();
+    if (apres) apres();
+  })["catch"](function (e) {
+    relitEnCours = false;
+    // Une relecture ratée ne doit pas jeter le boucher hors de sa caisse :
+    // les chiffres affichés restent ceux d'avant, et on le dit.
+    if (e && e.status === 401) return;
+    if (force) toast("Impossible de relire la base — " + errMsg(e), "bad");
+  });
+}
+function majTexte() {
+  if (!luLe) return "";
+  var s = Math.round((Date.now() - luLe) / 1000);
+  if (s < 45) return "à l'instant";
+  if (s < 5400) return "il y a " + Math.round(s / 60) + " min";
+  return "il y a " + Math.round(s / 3600) + " h";
+}
+
 function sbLoadAll() {
   var since = new Date(new Date(today()).getTime() - 62 * 864e5).toISOString().slice(0, 10);
   var yearStart = today().slice(0, 4) + "-01-01";
@@ -1223,6 +1271,7 @@ function sbLoadAll() {
       }),
       log: (r[4] || []).map(function (l) { return { t: d10(l.t), m: l.m, cid: l.client_id || "" }; })
     };
+    luLe = Date.now();
     return DB;
   });
 }
@@ -2743,6 +2792,11 @@ function vDash() {
   }).join("") || '<li class="empty">Rien pour l\'instant.</li>';
 
   return '<div class="stack">' +
+    (Store.mode === "supabase"
+      ? '<div class="frais"><span class="small muted">Chiffres lus dans la base ' +
+        esc(majTexte() || "à l\'ouverture") + '.</span><span class="sp"></span>' +
+        '<button class="btn btn-sm" data-act="relire">Actualiser</button></div>'
+      : "") +
     '<div class="tiles">' + tiles + '</div>' +
     (dormants.length ? '<div class="banner warn"><span aria-hidden="true">!</span><span><b>' + dormants.length +
       ' client' + (dormants.length > 1 ? "s" : "") + ' sans passage depuis plus de 3 mois.</b> ' +
@@ -4049,6 +4103,10 @@ var ACTS = {
     if (Store.mode === "supabase") { sbLogout(); location.replace(location.pathname); return; }
     go("home");
   },
+  "relire": function () {
+    toast("Lecture de la base…", "ok");
+    relire(true, function () { toast("À jour : " + nb(DB.clients.length) + " client(s).", "ok"); });
+  },
   "sb-check": function () {
     modal("Vérification de la base", '<p class="empty">Contrôles en cours…</p>', { nofocus: true });
     diagRun().then(function (r) {
@@ -4092,6 +4150,8 @@ var ACTS = {
     // Revenir sur « Encaisser », c'est vouloir servir le client suivant.
     if (el.dataset.t === "till" && S.tab !== "till") { S.till = {}; S.tillQ = ""; }
     S.tab = el.dataset.t; S.q = ""; closeModal(); render();
+    // Les écrans qui montrent l'état de la boutique doivent le montrer à jour.
+    if (/^(dash|clients|bday|ref)$/.test(S.tab)) relire(false);
   },
   "copy": function (el) {
     var v = el.dataset.val;
