@@ -98,10 +98,94 @@ le site. Elle a été testée avec l'application complète avant livraison.
 En cas de changement de projet Supabase, mettre à jour l'adresse dans
 `connect-src`, sinon la page ne pourra plus joindre la base.
 
-### Nom de domaine (facultatif)
+### Brancher un nom de domaine acheté chez IONOS
 
-Acheter `fidelite-boucherie-xxx.fr` (OVH, Gandi, Infomaniak : ~12 €/an), puis
-Vercel → **Settings → Domains → Add**. Le certificat HTTPS est automatique.
+Le site vit chez **Vercel**, le nom de domaine chez **IONOS**. Brancher l'un
+sur l'autre, c'est dire à IONOS : « quand on demande cette adresse, réponds
+l'adresse de Vercel ». Rien ne bouge chez Vercel, tout se règle chez IONOS,
+en deux enregistrements.
+
+**Avant de commencer**, le site doit déjà être publié sur Vercel (étapes
+ci-dessus) et fonctionner sur son adresse `…vercel.app`. Sans cela il n'y a
+rien à désigner.
+
+Gardez **deux onglets ouverts** : le tableau de bord Vercel et celui d'IONOS.
+
+**1. Déclarer le domaine chez Vercel.** Projet → **Settings → Domains** →
+taper `boucherie-vatuone.fr` → **Add**. Vercel propose d'ajouter aussi la
+version `www` : acceptez les deux. Il affiche alors *Invalid Configuration*
+— c'est normal, rien n'est encore fait chez IONOS — **avec les deux
+enregistrements exacts à créer**. Ne fermez pas cette page : c'est elle qui
+fait foi, pas ce document.
+
+**2. Libérer le domaine chez IONOS.** Menu **Domaines & SSL** → repérer le
+domaine. Si la colonne *Utilisation* ou *Destination* montre un site IONOS,
+une page de garde ou une redirection, il faut la retirer : menu **⋮** →
+*Adapter la destination* → choisir *Aucune destination*. **Sans cela IONOS
+réécrit vos enregistrements** et le branchement ne tiendra pas.
+
+**3. Ouvrir les enregistrements.** Sur la même ligne : **⋮ → DNS** (ou cliquer
+le domaine puis l'onglet *DNS*). La liste des enregistrements s'affiche.
+
+**4. L'adresse principale.** Chercher la ligne de type **A** dont le nom est
+`@` (parfois vide, parfois le domaine lui-même) → crayon → remplacer la valeur
+par **l'adresse IP affichée par Vercel** à l'étape 1 (au moment où ceci est
+écrit, Vercel donne `76.76.21.21` — mais **fiez-vous à son écran**, pas à ce
+chiffre). TTL : 1 heure, ou 5 minutes le temps des essais. Enregistrer.
+S'il n'y a aucune ligne `A` sur `@`, la créer.
+
+**5. L'adresse en `www`.** Chercher une ligne nommée **www** :
+
+- si c'est déjà un **CNAME**, remplacer sa valeur par `cname.vercel-dns.com` ;
+- si c'est un **A**, le supprimer et créer un **CNAME** à la place.
+
+Type `CNAME`, nom `www`, valeur `cname.vercel-dns.com`, TTL 1 heure.
+
+**6. Faire le ménage, mais pas trop.** Supprimer les autres lignes **A**,
+**AAAA** ou **CNAME** portant sur `@` ou `www` qui pointent encore vers IONOS.
+En revanche **ne touchez pas** aux lignes **MX** ni aux **TXT** : ce sont vos
+courriels et leur authentification. Les supprimer couperait la messagerie du
+domaine.
+
+**7. Attendre, puis vérifier.** Retour sur la page *Domains* de Vercel →
+**Refresh**. Le plus souvent quelques minutes, parfois quelques heures. Quand
+les deux lignes affichent *Valid Configuration* en vert, c'est branché :
+Vercel installe le certificat HTTPS tout seul, il n'y a rien à acheter ni à
+renouveler.
+
+**8. Choisir l'adresse principale.** Toujours dans *Domains*, désigner celle
+des deux qui est la vraie ; l'autre redirigera dessus. Prenez la version
+**sans `www`** : c'est celle qui ira sur le carton du comptoir et dans le QR
+code, autant qu'elle soit courte.
+
+**9. Le dire à l'application.** Réglages → **Envoi automatique** → *Adresse du
+site* → la nouvelle adresse, puis **Vérifier la connexion**. C'est elle qui
+construit le lien de désinscription au bas des offres envoyées par Brevo.
+
+**10. Refaire le carton du comptoir** avec le QR code de la nouvelle adresse.
+Les liens déjà donnés aux clients continuent de fonctionner : Vercel garde
+l'ancienne adresse `…vercel.app` en service, personne ne perd sa carte.
+
+Rien d'autre n'est à changer dans l'application : les liens des cartes et le
+QR code sont construits à partir de l'adresse par laquelle on arrive, jamais
+d'une adresse écrite en dur.
+
+#### Si ça ne prend pas
+
+| Ce que vous voyez | Ce que c'est |
+|---|---|
+| Vercel reste sur *Invalid Configuration* après plusieurs heures | Le domaine est resté « connecté » à un produit IONOS : reprendre l'étape 2. |
+| IONOS refuse un CNAME sur `@` | C'est normal et sans gravité : la racine prend un **A**, jamais un CNAME. Étape 4. |
+| L'ancienne page IONOS s'affiche encore | Une *redirection de domaine* est active chez IONOS et passe avant le DNS : la supprimer. |
+| Ça marche sur l'ordinateur, pas sur le téléphone | Simple retard : l'ancienne réponse est encore en mémoire quelque part. Attendre, ou essayer en navigation privée. |
+
+IONOS propose aussi de confier le domaine aux serveurs de noms de Vercel. **À
+éviter ici** : IONOS gère sans doute aussi vos courriels sur ce domaine, et
+vous devriez les reconfigurer ailleurs. Les deux enregistrements ci-dessus
+suffisent.
+
+Pour un autre hébergeur de domaine (OVH, Gandi, Infomaniak), la marche est la
+même : un **A** sur la racine, un **CNAME** `www` vers `cname.vercel-dns.com`.
 
 ### Autres hébergeurs
 
