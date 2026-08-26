@@ -118,6 +118,17 @@ h1,h2,h3{text-wrap:balance;line-height:1.12;font-weight:400;letter-spacing:-.015
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .logo-try .box .mark-glyph{width:40px;height:40px}
 .logo-vide{font-size:13.5px;color:var(--muted)}
+/* Le sélecteur de fichier du navigateur est en anglais et on ne peut pas le
+   traduire : on cache le vrai champ (il reste au clavier) et on habille son
+   étiquette, qui l'ouvre tout aussi bien. */
+.file-lab{display:inline-flex;align-items:center;gap:9px;align-self:flex-start;
+  padding:11px 18px;border-radius:99px;border:1px solid var(--hair-2);
+  background:var(--surface-1);font-size:15px;font-weight:600;cursor:pointer;
+  transition:background .12s,border-color .12s}
+.file-lab:hover{background:var(--surface-3);border-color:var(--muted)}
+.file-in:focus-visible + .file-lab{outline:2px solid var(--rouge);outline-offset:2px}
+.file-nom{font-size:13.5px;color:var(--muted);margin-left:10px;
+  overflow-wrap:anywhere}
 .mark-txt{min-width:0}
 .mark-name{display:block;font-family:var(--titre);font-weight:700;font-size:17px;line-height:1.2;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -2154,7 +2165,10 @@ function logoApercu() {
   return '<div class="logo-try">' +
     '<div class="box clair">' + markGlyph() + '<span class="nm">' + nom + '</span></div>' +
     '<div class="box sombre">' + markGlyph() + '<span class="nm">' + nom + '</span></div>' +
-    '</div>';
+    '</div>' +
+    // le retrait vit ici, avec l'aperçu : les deux se redessinent ensemble
+    '<button type="button" class="btn btn-sm btn-ghost" data-act="logo-off" ' +
+    'style="margin-top:11px">Retirer le logo</button>';
 }
 
 function cleaverSVG() {
@@ -3394,7 +3408,10 @@ function vSet() {
     '<div class="field"><label for="s-tag">Accroche</label><input id="s-tag" name="tagline" value="' + esc(sh.tagline) + '"></div></div>' +
     '<hr class="divide"><div class="sect-head" style="margin:0"><h2 style="font-size:16px">Logo</h2></div>' +
     '<div class="field"><label for="s-logo">Le logo de la boutique</label>' +
-    '<input id="s-logo" type="file" accept="image/png,image/jpeg,image/svg+xml,image/webp" data-act="pick-logo">' +
+    '<input id="s-logo" class="sr file-in" type="file" ' +
+    'accept="image/png,image/jpeg,image/svg+xml,image/webp" data-act="pick-logo">' +
+    '<div><label class="file-lab" for="s-logo">Choisir un fichier…</label>' +
+    '<span class="file-nom" id="logo-nom"></span></div>' +
     '<span class="hint">PNG, JPEG, SVG ou WebP. Il remplace l\'initiale dans le bandeau ' +
     'et le fer du boucher sur les cartes. Prenez le fichier d\'origine, le plus net que ' +
     'vous ayez : il est réduit et réencodé tout seul, pour ne pas alourdir ' +
@@ -3405,8 +3422,6 @@ function vSet() {
     'Mon logo est dessiné en blanc ou en couleurs claires</label>' +
     '<span class="hint">Cochez si le logo disparaît sur le fond blanc ci-dessus : ' +
     'l\'application lui posera une plaque foncée dessous.</span></div>' +
-    (shopLogo() ? '<button type="button" class="btn btn-sm btn-ghost" data-act="logo-off">' +
-      'Retirer le logo</button>' : "") +
     '<hr class="divide">' +
     '<div class="field"><label>Allure de la carte</label>' +
     '<div class="styles">' + CARD_STYLES.map(function (st) {
@@ -3793,7 +3808,9 @@ function offerFile(name, data) {
 function restoreModal() {
   modal("Restaurer une sauvegarde", '<form data-act="do-restore" class="stack">' +
     '<div class="banner warn"><span aria-hidden="true">!</span><span>La restauration remplace toutes les données actuelles.</span></div>' +
-    '<div class="field"><label for="r-file">Fichier de sauvegarde</label><input id="r-file" type="file" accept=".json,application/json" data-act="pick-file"></div>' +
+    '<div class="field"><label for="r-file">Fichier de sauvegarde</label>' +
+    '<input id="r-file" class="sr file-in" type="file" accept=".json,application/json" data-act="pick-file">' +
+    '<div><label class="file-lab" for="r-file">Choisir un fichier…</label></div></div>' +
     '<div class="field"><label for="r-txt">…ou collez le contenu JSON</label>' +
     '<textarea id="r-txt" name="json" rows="7" style="font-family:var(--mono);font-size:12px"></textarea></div>' +
     '<div id="r-err"></div>' +
@@ -4305,6 +4322,8 @@ var ACTS = {
         return;
       }
       DB.shop.logo = png;
+      var nom = document.getElementById("logo-nom");
+      if (nom) nom.textContent = f.name;
       var box = document.getElementById("logo-try");
       if (box) box.innerHTML = logoApercu();
       var glyphes = document.querySelectorAll(".topbar .mark-glyph");
