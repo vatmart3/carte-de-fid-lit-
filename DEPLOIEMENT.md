@@ -134,6 +134,41 @@ code en ligne fait l'affaire à partir de l'adresse du site.
 
 ---
 
+## 5 bis. Mettre son logo
+
+**Réglages → Logo → *Le logo de la boutique*.** Choisissez le fichier, il
+apparaît aussitôt. Puis **Enregistrer les réglages** en bas du panneau — tant
+que ce n'est pas fait, il n'est posé que sur cet appareil.
+
+Une fois enregistré, il remplace l'initiale dans le bandeau, sur toutes les
+pages, pour le boucher **comme pour les clients**, et il vient sur les cartes
+de fidélité à la place du fer du boucher — posé sur une petite plaque, comme
+sur un emballage.
+
+Ce que l'application fait du fichier, et pourquoi :
+
+- **Elle le redessine en PNG.** Un logo d'imprimeur pèse souvent plusieurs
+  mégaoctets ; il est ramené à 384 pixels de côté, ce qui suffit au plus grand
+  usage (la plaque de la carte sur un téléphone très fin). Sans cela, chaque
+  ouverture du site traînerait le poids du fichier d'origine.
+- **Elle ne garde jamais le fichier tel quel.** Un SVG n'est pas une image,
+  c'est du code, et ce code finirait dans la page. Redessiné, il n'en reste
+  qu'une image : ce qu'un SVG pourrait contenir de malveillant ne survit pas
+  au passage.
+- Le fichier d'origine est refusé au-delà de 6 Mo, et le résultat au-delà de
+  130 Ko. Dans ce cas, réduisez-le avant de le reprendre.
+
+**Si votre logo est dessiné en blanc** — c'est fréquent, les logos sont
+souvent faits pour une devanture ou un fond sombre — il devient invisible sur
+le fond blanc de l'application. Cochez **« Mon logo est dessiné en blanc ou en
+couleurs claires »** : l'application lui pose une plaque foncée dessous,
+partout. Les deux aperçus juste au-dessus de la case, l'un sur fond clair et
+l'autre sur fond sombre, montrent tout de suite ce qu'il en est.
+
+**Pour retirer le logo** : bouton *Retirer le logo*, puis **Enregistrer**. Le
+bandeau revient à l'initiale du nom de la boutique et les cartes au fer du
+boucher.
+
 ## 6. Trouver le bon client
 
 Au comptoir, la file attend : chercher un client ne doit pas prendre plus de

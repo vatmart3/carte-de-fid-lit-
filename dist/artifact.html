@@ -102,6 +102,22 @@ h1,h2,h3{text-wrap:balance;line-height:1.12;font-weight:400;letter-spacing:-.015
   font-weight:700;font-size:18px;background:var(--rouge-fill);color:var(--rouge-on);
   box-shadow:0 2px 6px -2px rgba(190,43,43,.45);
 }
+/* Le logo de la boutique remplace l'initiale. On lui laisse un cadre carré et
+   on l'y pose entier : un logo rogné n'est plus le logo de personne. */
+.mark-glyph.has-logo{background:transparent;box-shadow:none;border-radius:9px;padding:0}
+.mark-glyph img{width:100%;height:100%;object-fit:contain;display:block}
+/* Certains logos sont dessinés en blanc, pour une devanture sombre. Sur fond
+   clair ils disparaissent : on leur pose une plaque foncée dessous. */
+.mark-glyph.has-logo.clair{background:var(--ink);padding:3px}
+.logo-try{display:flex;gap:12px;flex-wrap:wrap}
+.logo-try .box{flex:1 1 150px;min-width:0;border-radius:var(--r-sm);border:1px solid var(--hair);
+  padding:14px;display:flex;align-items:center;gap:11px}
+.logo-try .box.sombre{background:#151517;border-color:#2A2A30;color:#F5F5F6}
+.logo-try .box.clair{background:#FFFFFF;border-color:#E7E7EA;color:#151517}
+.logo-try .box .nm{font-family:var(--titre);font-weight:700;font-size:15px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.logo-try .box .mark-glyph{width:40px;height:40px}
+.logo-vide{font-size:13.5px;color:var(--muted)}
 .mark-txt{min-width:0}
 .mark-name{display:block;font-family:var(--titre);font-weight:700;font-size:17px;line-height:1.2;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -219,6 +235,14 @@ input:-webkit-autofill,input:-webkit-autofill:focus{
 .loyalty-mark{position:absolute;right:-42px;top:50%;width:190px;height:94px;
   color:var(--cmark);pointer-events:none;z-index:0;transform:translateY(-54%) rotate(-7deg)}
 .loyalty-mark svg{width:100%;height:100%;display:block}
+/* Le fer du boucher est un motif : il déborde et s'efface. Un vrai logo est
+   une signature : il se pose entier, sur une plaque, comme sur un emballage.
+   D'où deux traitements séparés plutôt qu'un compromis qui abîmerait les deux. */
+.loyalty-mark.plaque{right:16px;width:100px;height:100px;padding:9px;border-radius:15px;
+  background:#FFFFFF;box-shadow:0 6px 18px -8px rgba(0,0,0,.45);
+  transform:translateY(-50%) rotate(-5deg)}
+.loyalty-mark.plaque.sombre{background:#151517}
+.loyalty-mark .cmark-img{width:100%;height:100%;object-fit:contain;display:block}
 /* Papier du boucher — kraft rosé, encre brune */
 [data-style="papier"]{
   --ca:#F6E3D4; --cb:#E9C9B2; --cfg:#4A2A1C; --cdim:rgba(74,42,28,.72);
@@ -1744,6 +1768,19 @@ function closeModal() {
   var m = document.querySelector(".scrim"); if (m) m.remove();
 }
 
+/* L'image de marque de la boutique : son logo si elle en a posé un, sinon
+   l'initiale de son nom. Le même bloc sert au bandeau et aux aperçus. */
+function shopLogo() { return String((DB.shop || {}).logo || ""); }
+function markGlyph() {
+  var l = shopLogo();
+  if (!l) {
+    return '<span class="mark-glyph" aria-hidden="true">' +
+      esc(String(DB.shop.name || "B").trim().charAt(0).toUpperCase() || "B") + '</span>';
+  }
+  return '<span class="mark-glyph has-logo' + (DB.shop.logo_clair ? " clair" : "") + '">' +
+    '<img src="' + esc(l) + '" alt="' + esc(DB.shop.name) + '"></span>';
+}
+
 function topbar() {
   var sh = DB.shop;
   var right = S.view === "card"
@@ -1755,8 +1792,7 @@ function topbar() {
       '<button class="btn btn-sm btn-ghost" data-act="leave-admin">Quitter</button>'
     : '<button class="btn btn-sm btn-ghost" data-act="home">Retour</button>';
   return '<header class="topbar"><div class="topbar-in">' +
-    '<a class="mark" href="#" data-act="home">' +
-    '<span class="mark-glyph" aria-hidden="true">B</span>' +
+    '<a class="mark" href="#" data-act="home">' + markGlyph() +
     '<span class="mark-txt"><span class="mark-name">' + esc(sh.name) + '</span>' +
     '<span class="mark-sub">Carte de fidélité</span></span></a>' +
     '<span class="topbar-sp"></span>' + right +
@@ -1962,7 +1998,7 @@ function scanPhoto(file) {
 function specimenHTML() {
   var sh = DB.shop;
   return '<div class="loyalty specimen" aria-hidden="true" data-style="' + styleOf(null) + '">' +
-    '<span class="loyalty-mark">' + cleaverSVG() + '</span>' +
+    '<span class="loyalty-mark' + cardMark().cls + '">' + cardMark().html + '</span>' +
     '<div class="loyalty-top"><div>' +
     '<div class="loyalty-shop">' + esc(sh.name) + '</div>' +
     '<div class="loyalty-city">' + esc(sh.city) + '</div></div>' +
@@ -2097,6 +2133,30 @@ function styleOf(c) {
 }
 /* Le fer du boucher : un couperet, tracé une fois pour toutes. Le coin avant
    coupé et le manche fin suffisent à le rendre lisible en filigrane. */
+/* Sur la carte, la marque en filigrane : le logo de la boutique s'il existe,
+   le couperet dessiné sinon. */
+function cardMark() {
+  var l = shopLogo();
+  if (!l) return { cls: "", html: cleaverSVG() };
+  return {
+    cls: " plaque" + (DB.shop.logo_clair ? " sombre" : ""),
+    html: '<img class="cmark-img" src="' + esc(l) + '" alt="">'
+  };
+}
+/* Le même logo, essayé sur fond clair et sur fond sombre : c'est le seul
+   moyen de voir tout de suite qu'un logo blanc a besoin de sa plaque. */
+function logoApercu() {
+  if (!shopLogo()) {
+    return '<p class="logo-vide">Aucun logo pour l\'instant : le bandeau affiche ' +
+      'l\'initiale du nom de la boutique, et les cartes le fer du boucher.</p>';
+  }
+  var nom = esc(DB.shop.name || "");
+  return '<div class="logo-try">' +
+    '<div class="box clair">' + markGlyph() + '<span class="nm">' + nom + '</span></div>' +
+    '<div class="box sombre">' + markGlyph() + '<span class="nm">' + nom + '</span></div>' +
+    '</div>';
+}
+
 function cleaverSVG() {
   return '<svg viewBox="0 0 150 74" fill="currentColor" aria-hidden="true">' +
     '<path d="M9 5h65l18 19v38a6 6 0 0 1-6 6H9a5 5 0 0 1-5-5V10a5 5 0 0 1 5-5z"/>' +
@@ -2107,7 +2167,7 @@ function cleaverSVG() {
 function cardHTML(c) {
   var sh = DB.shop;
   return '<div class="loyalty' + (posed ? " posed" : "") + '" data-style="' + styleOf(c) + '">' +
-    '<span class="loyalty-mark" aria-hidden="true">' + cleaverSVG() + '</span>' +
+    '<span class="loyalty-mark' + cardMark().cls + '" aria-hidden="true">' + cardMark().html + '</span>' +
     '<div class="loyalty-top"><div>' +
     '<div class="loyalty-shop">' + esc(sh.name) + '</div>' +
     '<div class="loyalty-city">' + esc(sh.city) + '</div></div>' +
@@ -3332,6 +3392,22 @@ function vSet() {
     '<div class="grid-2">' +
     '<div class="field"><label for="s-city">Ville</label><input id="s-city" name="city" value="' + esc(sh.city) + '"></div>' +
     '<div class="field"><label for="s-tag">Accroche</label><input id="s-tag" name="tagline" value="' + esc(sh.tagline) + '"></div></div>' +
+    '<hr class="divide"><div class="sect-head" style="margin:0"><h2 style="font-size:16px">Logo</h2></div>' +
+    '<div class="field"><label for="s-logo">Le logo de la boutique</label>' +
+    '<input id="s-logo" type="file" accept="image/png,image/jpeg,image/svg+xml,image/webp" data-act="pick-logo">' +
+    '<span class="hint">PNG, JPEG, SVG ou WebP. Il remplace l\'initiale dans le bandeau ' +
+    'et le fer du boucher sur les cartes. Prenez le fichier d\'origine, le plus net que ' +
+    'vous ayez : il est réduit et réencodé tout seul, pour ne pas alourdir ' +
+    'l\'ouverture du site.</span></div>' +
+    '<div id="logo-try">' + logoApercu() + '</div>' +
+    '<div class="field"><label class="check"><input type="checkbox" name="logo_clair"' +
+    (DB.shop.logo_clair ? " checked" : "") + ' data-act="logo-clair"> ' +
+    'Mon logo est dessiné en blanc ou en couleurs claires</label>' +
+    '<span class="hint">Cochez si le logo disparaît sur le fond blanc ci-dessus : ' +
+    'l\'application lui posera une plaque foncée dessous.</span></div>' +
+    (shopLogo() ? '<button type="button" class="btn btn-sm btn-ghost" data-act="logo-off">' +
+      'Retirer le logo</button>' : "") +
+    '<hr class="divide">' +
     '<div class="field"><label>Allure de la carte</label>' +
     '<div class="styles">' + CARD_STYLES.map(function (st) {
       return '<button type="button" class="style-pick" data-style="' + st[0] + '" ' +
@@ -4197,6 +4273,63 @@ var ACTS = {
     DB.clients = []; DB.log = []; DB.seq = 1000;
     closeModal(); persist("Base vidée.");
   },
+  /* Le fichier choisi est redessiné dans un canevas puis réencodé en PNG.
+     Deux raisons : la taille (un logo d'imprimeur pèse plusieurs mégaoctets,
+     il doit tenir dans une fiche de base), et la sûreté — un SVG est du code,
+     et celui-ci finit dans la page. Redessiné, il n'en reste qu'une image. */
+  "pick-logo": function (el) {
+    var f = el.files && el.files[0]; if (!f) return;
+    if (f.size > 6e6) { toast("Fichier trop lourd (6 Mo au maximum).", "bad"); return; }
+    var url = URL.createObjectURL(f);
+    var img = new Image();
+    img.onload = function () {
+      URL.revokeObjectURL(url);
+      // 384 px suffisent : le plus grand emploi est la plaque de la carte,
+      // 100 points d'écran, soit 300 pixels sur un téléphone très fin. Au-delà
+      // on alourdirait chaque ouverture du site pour rien.
+      var MAX = 384;
+      var w = img.naturalWidth || MAX, h = img.naturalHeight || MAX;
+      if (!w || !h) { toast("Image illisible.", "bad"); return; }
+      var k = Math.min(1, MAX / Math.max(w, h));
+      var cv = document.createElement("canvas");
+      cv.width = Math.max(1, Math.round(w * k));
+      cv.height = Math.max(1, Math.round(h * k));
+      var cx = cv.getContext("2d");
+      cx.imageSmoothingQuality = "high";
+      cx.drawImage(img, 0, 0, cv.width, cv.height);
+      var png;
+      try { png = cv.toDataURL("image/png"); }
+      catch (e) { toast("Image illisible.", "bad"); return; }
+      if (png.length > 130000) {
+        toast("Logo trop détaillé pour être enregistré. Réduisez-le avant de le reprendre.", "bad");
+        return;
+      }
+      DB.shop.logo = png;
+      var box = document.getElementById("logo-try");
+      if (box) box.innerHTML = logoApercu();
+      var glyphes = document.querySelectorAll(".topbar .mark-glyph");
+      for (var i = 0; i < glyphes.length; i++) {
+        glyphes[i].outerHTML = markGlyph();
+      }
+      toast("Logo chargé. Enregistrez pour le garder.", "ok");
+    };
+    img.onerror = function () {
+      URL.revokeObjectURL(url);
+      toast("Ce fichier n\'est pas une image que le navigateur sait ouvrir.", "bad");
+    };
+    img.src = url;
+  },
+  "logo-clair": function (el) {
+    DB.shop.logo_clair = !!el.checked;
+    var box = document.getElementById("logo-try");
+    if (box) box.innerHTML = logoApercu();
+  },
+  "logo-off": function () {
+    DB.shop.logo = ""; DB.shop.logo_clair = false;
+    var box = document.getElementById("logo-try");
+    if (box) box.innerHTML = logoApercu();
+    toast("Logo retiré. Enregistrez pour valider.", "ok");
+  },
   "pick-file": function (el) {
     var f = el.files && el.files[0]; if (!f) return;
     var r = new FileReader();
@@ -4446,6 +4579,9 @@ var FORMS = {
     sh.lock_minutes = Math.max(0, Math.round(Number(f.lock_minutes.value)));
     sh.legal = sh.legal || {};
     sh.retention_years = sh.retention_years || 3;
+    // le logo a été posé dans DB.shop au moment du choix du fichier
+    sh.logo = DB.shop.logo || "";
+    sh.logo_clair = !!DB.shop.logo_clair;
     if (Store.mode === "supabase") return remote(saveShopRemote(sh), "Réglages enregistrés.");
     logIt("Réglages de la boutique modifiés");
     persist("Réglages enregistrés.");
@@ -4509,6 +4645,8 @@ document.addEventListener("change", function (ev) {
   if (!el) return;
   if (el.dataset.act === "sort") { S.scroll = window.scrollY; ACTS.sort(el); }
   if (el.dataset.act === "pick-file") ACTS["pick-file"](el);
+  if (el.dataset.act === "pick-logo") ACTS["pick-logo"](el);
+  if (el.dataset.act === "logo-clair") ACTS["logo-clair"](el);
   if (el.dataset.act === "scan-file" && el.files && el.files[0]) scanPhoto(el.files[0]);
   if (el.dataset.act === "toggle-pub") { S.scroll = window.scrollY; ACTS["toggle-pub"](el); }
 });
