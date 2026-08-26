@@ -144,6 +144,9 @@ démo publiée le fait automatiquement.
   personnel, relit les destinataires en base plutôt que de croire le navigateur,
   refait le tri du consentement, et joint le lien de désinscription. Déploiement
   dans `DEPLOIEMENT.md`.
+- `scripts/brevo.sh` — installe l'envoi Brevo en une commande : la clé est saisie
+  à l'aveugle et transmise directement aux secrets Supabase, sans passer par le
+  disque ni par l'historique du terminal.
 - `scripts/build-essai.mjs` — produit `dist/carte-essai.html` : l'application
   entière dans un fichier unique, lecteur de QR compris, sans base branchée.
   Sert à essayer la caméra sur un vrai téléphone avant la mise en ligne — la

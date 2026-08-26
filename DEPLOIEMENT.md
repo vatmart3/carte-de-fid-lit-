@@ -238,7 +238,46 @@ La clé reste donc sur un serveur — une **fonction Supabase**, qui reçoit la
 demande du boucher, vérifie qu'il est bien du personnel, relit les fiches en
 base, refait le tri du consentement, et seule appelle Brevo.
 
+### « Et si on mettait la clé du côté boucher, il est protégé par mot de passe ? »
+
+Non, et c'est le piège le plus naturel. Le mot de passe cache un **écran**, pas
+un **fichier**.
+
+Le côté client et le côté boucher sont **le même fichier**, à la même adresse.
+Quand une cliente ouvre sa carte, son navigateur télécharge l'application
+entière — y compris le code de l'espace boucher. Le mot de passe décide
+seulement de ce que ce code accepte d'**afficher**. Il intervient bien après
+que tout est arrivé chez elle.
+
+Vérifié en fabriquant exactement cette version — clé posée dans le code, du
+côté boucher — puis en l'attaquant depuis la carte d'une cliente qui n'a pas le
+mot de passe. L'espace boucher lui est bien refusé. La clé, elle, sort de trois
+façons, en quelques secondes et sans compétence particulière :
+
+1. menu **Afficher le code source de la page** (Ctrl+U), puis chercher `xkeysib` ;
+2. la console du navigateur, en lisant le script comme du texte ;
+3. `curl https://…/index.html | grep xkeysib`, sans même ouvrir de navigateur.
+
+Une clé posée dans une page web est une clé publiée. Celle-ci donne le droit
+d'envoyer des SMS aux frais de la boutique : le crédit peut être vidé par
+n'importe qui.
+
+C'est pour cette seule raison que l'envoi passe par une fonction serveur.
+Ce n'est pas de la prudence excessive, c'est la seule façon.
+
 ### Ce qu'il faut faire, une fois
+
+**Le plus simple** — une commande, depuis le dossier du projet :
+
+```bash
+sh scripts/brevo.sh
+```
+
+Elle installe tout : connexion, rattachement du projet, saisie de la clé (à
+l'aveugle, elle n'est ni affichée, ni écrite sur le disque, ni conservée dans
+l'historique du terminal), et publication de la fonction.
+
+**Ou à la main**, si vous préférez voir chaque étape :
 
 **1. Créer un compte Brevo** sur [brevo.com](https://www.brevo.com) et récupérer
 la clé d'API : Paramètres → **SMTP & API** → onglet **Clés d'API** → *Générer
