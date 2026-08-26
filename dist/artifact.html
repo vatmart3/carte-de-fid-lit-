@@ -1036,6 +1036,39 @@ var ERRS = {
   points_nuls: "Indiquez un nombre de points.",
   acces_refuse: "Ce compte n'est pas autorisé. Ajoutez-le à la table « staff »."
 };
+/* Pourquoi la connexion du boucher est refusée. Supabase répond 400 pour des
+   raisons qui n'ont rien à voir entre elles ; les confondre sous « mot de passe
+   incorrect » envoie chercher pendant des heures ce qui n'est pas le problème.
+   Le cas le plus fréquent est le compte créé sans cocher « Auto Confirm User ». */
+function refusLogin(e) {
+  var code = (e && e.code) || "";
+  var m = (e && e.message) || "";
+  if (code === "email_not_confirmed" || /not confirmed/i.test(m)) {
+    return '<b>Ce compte existe, mais il n\'est pas confirmé.</b> Dans Supabase → ' +
+      '<b>Authentication → Users</b>, ouvrez la ligne du compte et confirmez son adresse ' +
+      '(menu <b>⋮</b> → <i>Confirm email</i>). À la création, c\'est la case ' +
+      '<b>Auto Confirm User</b> qui l\'évite.';
+  }
+  if (code === "invalid_credentials" || /invalid.*(credential|grant|login)/i.test(m)) {
+    return '<b>Adresse ou mot de passe incorrect.</b> Attention aux majuscules et aux ' +
+      'espaces collés par le clavier du téléphone. Le mot de passe se réinitialise dans ' +
+      'Supabase → Authentication → Users → <b>⋮</b> → <i>Reset password</i>.';
+  }
+  if (code === "user_not_found" || /user not found/i.test(m)) {
+    return '<b>Aucun compte à cette adresse.</b> Créez-le dans Supabase → ' +
+      '<b>Authentication → Users → Add user</b>, en cochant <b>Auto Confirm User</b>.';
+  }
+  if (e && e.status === 429) {
+    return '<b>Trop de tentatives.</b> Supabase bloque quelques minutes. Patientez, ' +
+      'puis réessayez.';
+  }
+  if (/API key|apikey|JWT/i.test(m)) {
+    return '<b>La base refuse la clé publique de cette page.</b> Elle a dû être ' +
+      'regénérée : appuyez sur « Vérifier l\'installation ».';
+  }
+  return esc(errMsg(e));
+}
+
 function errMsg(e) {
   var m = (e && (e.message || e.msg)) || "";
   if (ERRS[m]) return ERRS[m];
@@ -1103,7 +1136,18 @@ function sbFetch(path, opts, asUser, retried) {
     return r.text().then(function (t) {
       var d = null;
       try { d = t ? JSON.parse(t) : null; } catch (e) { d = t; }
-      if (!r.ok) throw { status: r.status, message: (d && (d.message || d.error_description || d.error)) || ("HTTP " + r.status) };
+      // GoTrue répond « msg » et « error_code » là où PostgREST répond
+      // « message ». Ne lire que l'un des deux, c'est transformer toutes les
+      // erreurs d'authentification en « HTTP 400 » — et donc en « mot de passe
+      // incorrect », quelle qu'en soit la vraie cause.
+      if (!r.ok) {
+        throw {
+          status: r.status,
+          code: (d && (d.error_code || d.code)) || "",
+          message: (d && (d.message || d.msg || d.error_description || d.error)) ||
+                   ("HTTP " + r.status)
+        };
+      }
       if (!useUser) sbBearer = withBearer;
       return d;
     });
@@ -4518,17 +4562,26 @@ var FORMS = {
     var box = document.getElementById("login-err");
     if (Store.mode === "supabase") {
       box.innerHTML = '<p class="small muted">Connexion…</p>';
+      var entre = false;
       sbLogin(f.mail.value.trim(), f.pin.value)
-        .then(function () { return sbLoadAll(); })
+        .then(function () { entre = true; return sbLoadAll(); })
         .then(function () {
           S.admin = true; S.lockEmail = ""; S.tab = "dash"; touchLock();
           if (S.pendingTill) { S.till = { cid: S.pendingTill }; S.tab = "till"; S.pendingTill = ""; }
           render(); toast("Bonjour.", "ok");
         })
         ["catch"](function (e) {
+          // Deux pannes très différentes se ressemblaient à l'écran : le compte
+          // refusé, et le compte accepté par une base sans schéma. On les sépare.
+          if (entre) {
+            box.innerHTML = '<p class="err"><b>Compte reconnu, mais la base est vide.</b> ' +
+              'Le schéma n\'a pas été installé : ' + esc(errMsg(e)) + '</p>' +
+              '<p class="small muted">Appuyez sur <b>Vérifier l\'installation</b> ci-dessous, ' +
+              'la marche à suivre y est écrite.</p>';
+            return;
+          }
           sbLogout();
-          box.innerHTML = '<p class="err">' + esc(e && e.status === 400
-            ? "E-mail ou mot de passe incorrect." : errMsg(e)) + '</p>';
+          box.innerHTML = '<p class="err">' + refusLogin(e) + '</p>';
         });
       return;
     }
