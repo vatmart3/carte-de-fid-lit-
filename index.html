@@ -139,6 +139,9 @@ h1,h2,h3{text-wrap:balance;line-height:1.12;font-weight:400;letter-spacing:-.015
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .logo-try .box .mark-glyph{width:40px;height:40px}
 .logo-vide{font-size:13.5px;color:var(--muted)}
+/* Un bouton qui se lit comme un lien, dans une phrase. */
+.lien{font:inherit;color:var(--rouge);font-weight:600;text-decoration:underline;
+  text-underline-offset:2px;padding:0}
 /* Le sélecteur de fichier du navigateur est en anglais et on ne peut pas le
    traduire : on cache le vrai champ (il reste au clavier) et on habille son
    étiquette, qui l'ouvre tout aussi bien. */
@@ -2657,7 +2660,13 @@ function vAdminLogin() {
     '<div id="login-err"></div>' +
     '<button class="btn btn-primary btn-full" type="submit">Entrer</button>' +
     '<button class="btn btn-ghost btn-full" type="button" data-act="home">Retour</button>' +
-    '</form>' + footer() + '</main>';
+    '</form>' +
+    (Store.mode === "supabase"
+      ? '<p class="small muted" style="text-align:center;margin-top:16px">' +
+        'La connexion est refusée alors que le compte existe ? ' +
+        '<button class="lien" type="button" data-act="sb-check">Vérifier l\'installation</button></p>'
+      : "") +
+    footer() + '</main>';
 }
 
 function chart14() {
@@ -3807,33 +3816,72 @@ function sbPanel() {
    Chaque contrôle public est fait avec la clé publique, jamais avec la session. */
 function diagRun() {
   var out = [];
-  var add = function (ok, txt) { out.push({ ok: ok, txt: txt }); };
+  var add = function (ok, txt, quoi) { out.push({ ok: ok, txt: txt, quoi: quoi || "" }); };
 
   return rpc("public_shop", {}).then(function (d) {
-    if (d && d.name) add(true, "Schéma installé — boutique « " + d.name + " »");
-    else add(false, "Le schéma répond mais aucun réglage : rejouez supabase/schema.sql.");
+    if (d && d.name) { add(true, "Schéma installé — boutique « " + d.name + " »"); return true; }
+    add(false, "Le schéma répond mais la fiche boutique est vide.", "schema");
+    return true;
   })["catch"](function (e) {
-    add(false, "Projet injoignable ou schéma absent — " + errMsg(e));
-  }).then(function () {
+    var m = errMsg(e);
+    // On distingue les deux pannes qui se ressemblent à l'écran mais n'ont
+    // rien à voir : la base qui n'a pas de schéma, et la clé qui est refusée.
+    if (/API key|apikey|JWT|401/i.test(m)) {
+      add(false, "La base refuse la clé publique de cette page.", "cle");
+    } else if (/does not exist|schema|404|relation/i.test(m)) {
+      add(false, "Le schéma n'a jamais été installé dans ce projet.", "schema");
+    } else {
+      add(false, "Projet injoignable — " + m, "reseau");
+    }
+    return false;
+  }).then(function (schema) {
+    // Sans schéma, les contrôles suivants échoueraient pour la mauvaise
+    // raison et afficheraient des feux verts trompeurs.
+    if (!schema) {
+      add(false, "Contrôles de sécurité impossibles tant que le schéma manque.");
+      return;
+    }
     return sbFetch("/rest/v1/clients?select=id&limit=1", {}, false).then(function () {
-      add(false, "ALERTE : le fichier clients est lisible sans connexion. Rejouez schema.sql.");
-    })["catch"](function () { add(true, "Fichier clients fermé au public"); });
-  }).then(function () {
-    return rpc("record_purchase", { p_id: "0", p_amount: 1, p_label: "contrôle" }, false)
-      .then(function () { add(false, "ALERTE : un visiteur peut créditer des points. Rejouez schema.sql."); })
-      ["catch"](function (e) {
-        var m = (e && e.message) || "";
-        if (m === "client_inconnu") add(false, "ALERTE : l'encaissement n'est pas réservé au personnel. Rejouez schema.sql.");
-        else add(true, "Encaissement réservé au personnel");
-      });
-  }).then(function () {
-    if (!SB.token) { add(true, "Compte boucher : non connecté ici, contrôle ignoré"); return; }
-    return rpc("is_staff", {}, true).then(function (r) {
-      add(!!r, r ? "Compte « " + SB.email + " » reconnu comme personnel"
-                 : "Compte connecté mais absent de la table staff : ajoutez-le, sinon il ne verra rien.");
-    })["catch"](function (e) { add(false, "Contrôle du compte impossible — " + errMsg(e)); });
+      add(false, "ALERTE : le fichier clients est lisible sans connexion.", "schema");
+    })["catch"](function () { add(true, "Fichier clients fermé au public"); })
+    .then(function () {
+      return rpc("record_purchase", { p_id: "0", p_amount: 1, p_label: "contrôle" }, false)
+        .then(function () { add(false, "ALERTE : un visiteur peut créditer des points.", "schema"); })
+        ["catch"](function (e) {
+          var m = (e && e.message) || "";
+          if (m === "client_inconnu") add(false, "ALERTE : l'encaissement n'est pas réservé au personnel.", "schema");
+          else add(true, "Encaissement réservé au personnel");
+        });
+    }).then(function () {
+      if (!SB.token) { add(true, "Compte boucher : pas connecté ici, contrôle ignoré"); return; }
+      return rpc("is_staff", {}, true).then(function (r) {
+        add(!!r, r ? "Compte « " + SB.email + " » reconnu comme personnel"
+                   : "Compte connecté mais absent de la table staff.", r ? "" : "staff");
+      })["catch"](function (e) { add(false, "Contrôle du compte impossible — " + errMsg(e)); });
+    });
   }).then(function () { return out; });
 }
+
+/* Ce qu'il faut faire, écrit là où on le lit — pas « reportez-vous au
+   document ». Le boucher est devant son site qui ne marche pas. */
+var DIAG_SOINS = {
+  schema: '<b>Le schéma de la base n\'est pas installé.</b> Sur ' +
+    '<b>supabase.com</b> → votre projet → <b>SQL Editor</b> → <i>New query</i> : ' +
+    'collez tout le contenu du fichier <b>supabase/schema.sql</b> du dépôt, puis ' +
+    '<b>Run</b>. Rechargez cette page ensuite. C\'est la cause la plus fréquente : ' +
+    'sans lui, la base est vide et l\'application n\'a rien à quoi parler.',
+  cle: '<b>La clé publique inscrite dans la page est refusée.</b> Sur ' +
+    '<b>supabase.com</b> → votre projet → <b>Project Settings → API Keys</b>, ' +
+    'copiez la clé <b>publishable</b> (jamais la <i>secret</i> ni la ' +
+    '<i>service_role</i>) et faites-la corriger dans le fichier.',
+  reseau: '<b>Le projet ne répond pas.</b> Vérifiez sur supabase.com qu\'il n\'est ' +
+    'pas en pause — un projet gratuit s\'endort après une semaine sans usage et se ' +
+    'réveille d\'un bouton.',
+  staff: '<b>Ce compte n\'est pas inscrit comme personnel.</b> Sur <b>supabase.com</b> ' +
+    '→ <b>SQL Editor</b>, jouez : <code>insert into public.staff(user_id, name) ' +
+    'select id, \'Le boucher\' from auth.users where email = \'…\';</code> avec ' +
+    'l\'adresse du compte.'
+};
 
 function csv(rows) {
   return rows.map(function (r) {
@@ -3967,6 +4015,12 @@ function vError(msg) {
     '<p>La base de la boutique ne répond pas.</p><div class="hero-rule"></div></section>' +
     '<div class="banner warn"><span aria-hidden="true">!</span><span>' + esc(msg) + '</span></div>' +
     '<button class="btn btn-primary btn-full" data-act="reload">Réessayer</button>' +
+    // Le diagnostic doit être atteignable ici : quand la base ne répond pas,
+    // personne ne peut se connecter, et c'est précisément le moment où il faut
+    // savoir ce qui manque.
+    '<button class="btn btn-full" data-act="sb-check">Vérifier l\'installation</button>' +
+    '<p class="small muted" style="text-align:center">Le contrôle dit ce qui manque, ' +
+    'sans avoir à se connecter.</p>' +
     '</main>';
 }
 
@@ -4025,6 +4079,11 @@ var ACTS = {
     modal("Vérification de la base", '<p class="empty">Contrôles en cours…</p>', { nofocus: true });
     diagRun().then(function (r) {
       var bad = r.filter(function (x) { return !x.ok; }).length;
+      var vus = {}, soins = [];
+      r.forEach(function (x) {
+        if (x.ok || !x.quoi || vus[x.quoi]) return;
+        vus[x.quoi] = true; soins.push(x.quoi);
+      });
       modal("Vérification de la base",
         '<ul class="rw">' + r.map(function (x) {
           return '<div class="rw-row"><span class="rw-seal" style="' +
@@ -4032,10 +4091,16 @@ var ACTS = {
                   : "background:var(--crit);color:#fff;border-style:solid;border-color:var(--crit)") + '">' +
             (x.ok ? "✓" : "!") + '</span><span class="rw-txt"><b>' + esc(x.txt) + '</b></span></div>';
         }).join("") + '</ul>' +
-        '<div class="banner' + (bad ? " warn" : "") + '"><span aria-hidden="true">' + (bad ? "!" : "i") + '</span><span>' +
-        (bad ? "Reprenez l\'étape correspondante de DEPLOIEMENT.md, puis relancez la vérification."
-             : "Installation conforme : les données ne sont accessibles qu\'au personnel et à chaque client pour sa propre carte.") +
-        '</span></div>', { nofocus: true });
+        (bad
+          ? soins.map(function (k) {
+              return '<div class="banner warn"><span aria-hidden="true">!</span><span>' +
+                DIAG_SOINS[k] + '</span></div>';
+            }).join("") ||
+            '<div class="banner warn"><span aria-hidden="true">!</span><span>' +
+            'Reprenez l\'étape correspondante de DEPLOIEMENT.md, puis relancez la vérification.</span></div>'
+          : '<div class="banner"><span aria-hidden="true">i</span><span>' +
+            'Installation conforme : les données ne sont accessibles qu\'au personnel ' +
+            'et à chaque client pour sa propre carte.</span></div>'), { nofocus: true });
     });
   },
   "sb-forget": function () {
