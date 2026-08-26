@@ -104,6 +104,9 @@ h1,h2,h3{text-wrap:balance;line-height:1.12;font-weight:400;letter-spacing:-.015
 }
 /* Le logo de la boutique remplace l'initiale. On lui laisse un cadre carré et
    on l'y pose entier : un logo rogné n'est plus le logo de personne. */
+/* La vache est le logo, elle n'a pas besoin d'une tuile derrière elle. */
+.mark-glyph.vache{background:transparent;box-shadow:none;color:var(--rouge-fill);padding:0}
+.mark-glyph.vache svg{width:100%;height:100%;display:block}
 .mark-glyph.has-logo{background:transparent;box-shadow:none;border-radius:9px;padding:0}
 .mark-glyph img{width:100%;height:100%;object-fit:contain;display:block}
 /* Certains logos sont dessinés en blanc, pour une devanture sombre. Sur fond
@@ -245,7 +248,10 @@ input:-webkit-autofill,input:-webkit-autofill:focus{
    sort du cadre. Placé à mi-hauteur, là où le texte ne va jamais. */
 .loyalty-mark{position:absolute;right:-42px;top:50%;width:190px;height:94px;
   color:var(--cmark);pointer-events:none;z-index:0;transform:translateY(-54%) rotate(-7deg)}
-.loyalty-mark svg{width:100%;height:100%;display:block}
+.loyalty-mark > svg{width:100%;height:100%;display:block}
+/* Le couperet était couché et débordait ; une tête de vache est haute et se
+   regarde de face. Elle a donc son propre cadre, debout et entier. */
+.loyalty-mark.vache{right:20px;width:124px;height:158px;transform:translateY(-52%) rotate(-4deg)}
 /* Le fer du boucher est un motif : il déborde et s'efface. Un vrai logo est
    une signature : il se pose entier, sur une plaque, comme sur un emballage.
    D'où deux traitements séparés plutôt qu'un compromis qui abîmerait les deux. */
@@ -302,7 +308,11 @@ input:-webkit-autofill,input:-webkit-autofill:focus{
 @keyframes pose{from{opacity:0}to{opacity:1}}
 .loyalty.posed{animation:none}
 .loyalty-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
-.loyalty-shop{font-family:var(--titre);font-weight:700;font-size:19px;line-height:1.25}
+.loyalty-shop{font-family:var(--titre);font-weight:700;font-size:19px;line-height:1.25;
+  display:flex;align-items:center;gap:8px}
+/* Signature au-dessus du nom : c'est ce qui fait lire « carte de la boucherie »
+   au premier coup d'œil, avant même de lire le nom. */
+.loyalty-sign{width:21px;height:27px;flex:none;color:var(--cfg);display:block}
 .loyalty-city{font-size:13px;color:var(--cdim);margin-top:3px;font-weight:500}
 .tier{font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;
   padding:7px 13px;border-radius:99px;background:var(--cchip);color:var(--cfg);white-space:nowrap;
@@ -1784,10 +1794,7 @@ function closeModal() {
 function shopLogo() { return String((DB.shop || {}).logo || ""); }
 function markGlyph() {
   var l = shopLogo();
-  if (!l) {
-    return '<span class="mark-glyph" aria-hidden="true">' +
-      esc(String(DB.shop.name || "B").trim().charAt(0).toUpperCase() || "B") + '</span>';
-  }
+  if (!l) return '<span class="mark-glyph vache" aria-hidden="true">' + vacheSVG() + '</span>';
   return '<span class="mark-glyph has-logo' + (DB.shop.logo_clair ? " clair" : "") + '">' +
     '<img src="' + esc(l) + '" alt="' + esc(DB.shop.name) + '"></span>';
 }
@@ -2011,7 +2018,7 @@ function specimenHTML() {
   return '<div class="loyalty specimen" aria-hidden="true" data-style="' + styleOf(null) + '">' +
     '<span class="loyalty-mark' + cardMark().cls + '">' + cardMark().html + '</span>' +
     '<div class="loyalty-top"><div>' +
-    '<div class="loyalty-shop">' + esc(sh.name) + '</div>' +
+    '<div class="loyalty-shop">' + vacheSVG("loyalty-sign") + esc(sh.name) + '</div>' +
     '<div class="loyalty-city">' + esc(sh.city) + '</div></div>' +
     '<span class="tier">Nouveau</span></div>' +
     '<div class="loyalty-pts"><b>' + nb(sh.welcome) + '</b><span>points</span></div>' +
@@ -2148,7 +2155,7 @@ function styleOf(c) {
    le couperet dessiné sinon. */
 function cardMark() {
   var l = shopLogo();
-  if (!l) return { cls: "", html: cleaverSVG() };
+  if (!l) return { cls: " vache", html: vacheSVG() };
   return {
     cls: " plaque" + (DB.shop.logo_clair ? " sombre" : ""),
     html: '<img class="cmark-img" src="' + esc(l) + '" alt="">'
@@ -2158,8 +2165,9 @@ function cardMark() {
    moyen de voir tout de suite qu'un logo blanc a besoin de sa plaque. */
 function logoApercu() {
   if (!shopLogo()) {
-    return '<p class="logo-vide">Aucun logo pour l\'instant : le bandeau affiche ' +
-      'l\'initiale du nom de la boutique, et les cartes le fer du boucher.</p>';
+    return '<p class="logo-vide">Aucun fichier déposé : l\'application porte la tête ' +
+      'de vache dessinée, dans le bandeau et sur les cartes. Déposez un fichier ' +
+      'pour la remplacer par le logo de votre boutique.</p>';
   }
   var nom = esc(DB.shop.name || "");
   return '<div class="logo-try">' +
@@ -2171,19 +2179,30 @@ function logoApercu() {
     'style="margin-top:11px">Retirer le logo</button>';
 }
 
-function cleaverSVG() {
-  return '<svg viewBox="0 0 150 74" fill="currentColor" aria-hidden="true">' +
-    '<path d="M9 5h65l18 19v38a6 6 0 0 1-6 6H9a5 5 0 0 1-5-5V10a5 5 0 0 1 5-5z"/>' +
-    '<path d="M92 31h48a8 8 0 0 1 0 16H92z"/>' +
-    '<circle cx="17" cy="15" r="4" fill="#000" fill-opacity=".26"/></svg>';
+/* La tête de vache de la boutique, redessinée en vectoriel. Le corps est peint
+   par un masque plutôt qu'en chemin plein : les cornes, les oreilles et le
+   chanfrein se chevauchent, et une règle « evenodd » les trouerait les uns les
+   autres. Le masque, lui, ne connaît que blanc — de la matière — et noir — un
+   creux. Résultat : l'œil et les naseaux laissent voir le support, quel qu'il
+   soit, et la couleur suit « currentColor ». */
+var VACHE_CORPS = "M44 6 C 46 64, 64 118, 98 156 C 118 178, 142 192, 164 192 C 170 178, 166 164, 156 156 C 166 146, 168 134, 162 126 C 136 130, 110 106, 88 70 C 72 44, 58 20, 44 6 Z M472 70 C 454 110, 424 146, 386 170 C 362 184, 340 188, 326 180 C 322 168, 328 158, 336 152 C 328 142, 328 132, 336 126 C 358 136, 390 120, 420 94 C 442 76, 460 64, 472 70 Z M150 200 C 118 194, 74 208, 46 234 C 30 250, 34 264, 56 272 C 88 282, 122 272, 138 250 C 152 232, 154 214, 150 200 Z M330 214 C 364 202, 420 212, 462 234 C 486 246, 486 264, 464 274 C 430 288, 386 282, 362 262 C 342 246, 330 230, 330 214 Z M160 152 C 176 194, 186 250, 184 302 C 182 344, 190 366, 206 382 C 194 392, 184 396, 176 394 C 154 386, 132 332, 132 272 C 132 212, 144 172, 160 152 Z M334 150 C 320 190, 314 250, 316 302 C 318 344, 314 368, 300 384 C 312 392, 322 396, 330 394 C 348 382, 364 330, 362 270 C 360 210, 348 170, 334 150 Z M192 358 C 212 342, 236 336, 264 336 C 294 336, 320 344, 336 360 C 352 378, 352 416, 336 442 C 316 474, 250 488, 202 470 C 170 458, 154 426, 162 396 C 168 374, 178 364, 192 358 Z M132 328 C 138 388, 158 450, 186 498 C 206 532, 218 562, 220 592 C 206 594, 192 574, 176 546 C 144 492, 124 422, 120 352 Z M198 480 C 228 496, 264 504, 296 500 C 284 524, 258 552, 242 580 C 232 558, 210 520, 198 480 Z";
+var VACHE_CREUX = "M150 236 C 150 226, 158 220, 168 222 C 178 225, 182 235, 180 246 C 178 257, 169 262, 161 258 C 152 254, 150 246, 150 236 Z M320 256 C 320 246, 328 240, 338 242 C 348 245, 352 255, 350 266 C 348 277, 339 282, 331 278 C 322 274, 320 266, 320 256 Z M222 400 C 234 396, 243 404, 239 413 C 234 421, 221 419, 219 410 Z M282 400 C 294 396, 303 404, 299 413 C 294 421, 281 419, 279 410 Z";
+function vacheSVG(cls) {
+  return '<svg class="' + (cls || "") + '" viewBox="20 0 460 600" aria-hidden="true" ' +
+    'preserveAspectRatio="xMidYMid meet">' +
+    '<mask id="vache-m" maskUnits="userSpaceOnUse" x="20" y="0" width="460" height="600">' +
+    '<path fill="#fff" d="' + VACHE_CORPS + '"/>' +
+    '<path fill="#000" d="' + VACHE_CREUX + '"/></mask>' +
+    '<rect x="20" y="0" width="460" height="600" fill="currentColor" mask="url(#vache-m)"/></svg>';
 }
+
 
 function cardHTML(c) {
   var sh = DB.shop;
   return '<div class="loyalty' + (posed ? " posed" : "") + '" data-style="' + styleOf(c) + '">' +
     '<span class="loyalty-mark' + cardMark().cls + '" aria-hidden="true">' + cardMark().html + '</span>' +
     '<div class="loyalty-top"><div>' +
-    '<div class="loyalty-shop">' + esc(sh.name) + '</div>' +
+    '<div class="loyalty-shop">' + vacheSVG("loyalty-sign") + esc(sh.name) + '</div>' +
     '<div class="loyalty-city">' + esc(sh.city) + '</div></div>' +
     '<span class="tier">' + esc(tierOf(c.lifetime)) + '</span></div>' +
     '<div class="loyalty-pts"><b>' + nb(c.points) + '</b><span>points</span></div>' +
@@ -3415,7 +3434,8 @@ function vSet() {
     '<span class="hint">PNG, JPEG, SVG ou WebP. Il remplace l\'initiale dans le bandeau ' +
     'et le fer du boucher sur les cartes. Prenez le fichier d\'origine, le plus net que ' +
     'vous ayez : il est réduit et réencodé tout seul, pour ne pas alourdir ' +
-    'l\'ouverture du site.</span></div>' +
+    'l\'ouverture du site. Sans fichier, c\'est la tête de vache dessinée qui ' +
+    'sert.</span></div>' +
     '<div id="logo-try">' + logoApercu() + '</div>' +
     '<div class="field"><label class="check"><input type="checkbox" name="logo_clair"' +
     (DB.shop.logo_clair ? " checked" : "") + ' data-act="logo-clair"> ' +

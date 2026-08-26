@@ -134,16 +134,22 @@ code en ligne fait l'affaire à partir de l'adresse du site.
 
 ---
 
-## 5 bis. Mettre son logo
+## 5 bis. Le logo
 
-**Réglages → Logo → *Le logo de la boutique*.** Choisissez le fichier, il
-apparaît aussitôt. Puis **Enregistrer les réglages** en bas du panneau — tant
+**Par défaut, l'application porte la tête de vache de la Boucherie Vatuone**,
+redessinée en vectoriel : dans le bandeau de toutes les pages, à côté du nom
+sur chaque carte de fidélité, et en filigrane sur la carte. Elle est dessinée
+en code, pas en image : elle prend la couleur de son support, reste nette à
+n'importe quelle taille, et ne pèse rien au chargement.
+
+Pour une autre boutique — ou pour remplacer ce dessin par le fichier
+d'origine — **Réglages → Logo → *Le logo de la boutique*.** Choisissez le
+fichier, il apparaît aussitôt. Puis **Enregistrer les réglages** en bas du panneau — tant
 que ce n'est pas fait, il n'est posé que sur cet appareil.
 
-Une fois enregistré, il remplace l'initiale dans le bandeau, sur toutes les
-pages, pour le boucher **comme pour les clients**, et il vient sur les cartes
-de fidélité à la place du fer du boucher — posé sur une petite plaque, comme
-sur un emballage.
+Une fois enregistré, il remplace la tête de vache dans le bandeau, sur toutes
+les pages, pour le boucher **comme pour les clients**, et il vient sur les
+cartes de fidélité — posé sur une petite plaque, comme sur un emballage.
 
 Ce que l'application fait du fichier, et pourquoi :
 
@@ -165,9 +171,8 @@ couleurs claires »** : l'application lui pose une plaque foncée dessous,
 partout. Les deux aperçus juste au-dessus de la case, l'un sur fond clair et
 l'autre sur fond sombre, montrent tout de suite ce qu'il en est.
 
-**Pour retirer le logo** : bouton *Retirer le logo*, puis **Enregistrer**. Le
-bandeau revient à l'initiale du nom de la boutique et les cartes au fer du
-boucher.
+**Pour retirer le logo** : bouton *Retirer le logo*, puis **Enregistrer**. Tout
+revient à la tête de vache dessinée.
 
 ## 6. Trouver le bon client
 
