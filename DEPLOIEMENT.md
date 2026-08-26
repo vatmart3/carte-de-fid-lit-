@@ -123,8 +123,7 @@ les parrainages et les numéros de carte sont conservés.
 - **Le boucher** ouvre le site, Espace boucher, se connecte une fois : sa
   tablette reste connectée. Onglet **Encaisser**, il choisit **Numéro** ou
   **Nom**, tape les premiers caractères, et le client apparaît dans une liste
-  de propositions — nom, numéro de carte, téléphone et points. Un doigt dessus
-  ouvre l'encaissement, il ne reste que le montant.
+  de propositions. Un doigt dessus, le montant au pavé, **Encaisser**.
 - **Le client** reçoit un lien personnel à la création de sa carte
   (`…/?c=xxxx`). À ajouter en favori ou sur l'écran d'accueil du téléphone.
   S'il le perd : bouton **J'ai déjà une carte**, téléphone + date de naissance.
@@ -135,7 +134,7 @@ code en ligne fait l'affaire à partir de l'adresse du site.
 
 ---
 
-## 4 bis. Trouver le bon client
+## 6. Trouver le bon client
 
 Au comptoir, la file attend : chercher un client ne doit pas prendre plus de
 deux secondes. L'onglet **Encaisser** offre trois voies, dans cet ordre de
@@ -143,7 +142,7 @@ rapidité.
 
 **Le scanner** — le client montre le code de sa carte, la caméra le lit, la
 fiche s'ouvre. C'est le plus rapide quand le client a son téléphone en main
-(voir la section suivante).
+(voir « Le scanner », plus bas).
 
 **Par numéro** — le choix par défaut. Le téléphone ouvre son **clavier
 chiffres**. Dès le premier chiffre, les cartes qui commencent par ce chiffre
@@ -170,7 +169,55 @@ Côté client, la page « J'ai déjà une carte » ne propose **aucun nom** : ce
 serait donner la liste des clients de la boutique au premier venu. Les
 propositions n'existent que derrière le mot de passe du boucher.
 
-## 4 ter. Le scanner
+## 7. Encaisser
+
+L'écran d'encaissement ressemble à un terminal de paiement, et pas par hasard :
+au comptoir, avec la file qui attend et les mains occupées, il ne faut rien
+avoir à chercher. Une fois le client trouvé, la recherche s'efface et il ne
+reste que trois choses.
+
+**Le montant, au pavé.** Les chiffres entrent **par la droite, en centimes**,
+comme sur un terminal bancaire : `4` `2` `5` `0` donne `42,50 €`. Pas de
+virgule à trouver. `C` remet à zéro, `⌫` corrige le dernier chiffre. Sur un
+ordinateur ou une tablette à clavier, les touches du clavier font la même
+chose, et **Retour arrière** corrige.
+
+Au-dessus du pavé, le montant en grand et, juste dessous, **les points que le
+client va gagner** — mis à jour à chaque chiffre. Le boucher voit ce qu'il
+donne avant de valider, et le client aussi s'il regarde l'écran.
+
+**La raison de la venue** (facultative) — c'est ce qui a remplacé la liste des
+morceaux achetés. Six réponses, un seul appui :
+
+| | |
+|---|---|
+| **Habitué** | il serait venu de toute façon |
+| **A reçu le SMS** | c'est le message qui l'a fait venir |
+| **Nouveau client** | première fois |
+| **Bouche à oreille** | on lui en a parlé |
+| **Passait devant** | la vitrine a fait le travail |
+| **Pour une récompense** | il vient chercher ce qu'il a gagné |
+
+Ce n'est pas de la statistique pour la statistique. C'est la seule façon de
+répondre à la question qui compte le jour où l'on paie des SMS : **est-ce que
+ça fait revenir quelqu'un ?** Le tableau de bord affiche le compte des trois
+derniers mois sous « Pourquoi ils viennent », et la colonne se retrouve dans
+l'export des achats. Au bout de quelques semaines, le boucher sait si ses
+envois lui rapportent plus qu'ils ne lui coûtent.
+
+Rien n'oblige à répondre : sans appui, l'achat est enregistré comme « Achat en
+boutique » et le reste fonctionne à l'identique.
+
+**Le bouton**, enfin, reste accroché au bas de l'écran quel que soit le
+défilement, et porte le montant : *Encaisser 42,50 €*. Il est fermé tant
+qu'aucun montant n'est tapé — impossible de valider un achat à zéro. Une fois
+validé, la caisse se vide d'elle-même et se remet en recherche pour le client
+suivant : le même montant ne peut pas partir deux fois.
+
+Les bandeaux qui comptent restent au-dessus : l'anniversaire du jour, et la
+récompense disponible avec son bouton **Utiliser**.
+
+## 8. Le scanner
 
 Le bouton **Scanner** de l'écran d'encaissement ouvre l'appareil photo du
 boucher. Trois conditions :
@@ -211,7 +258,7 @@ connaît pas votre base Supabase.
 Une fois le site publié sur Vercel (partie 3), la question ne se pose plus : la
 page est en pleine fenêtre, en HTTPS, et la caméra s'ouvre au premier appui.
 
-## 4 quater. La signature du client
+## 9. La signature du client
 
 Depuis l'inscription, le client **signe du doigt dans une case blanche**, que la
 carte soit créée par lui-même sur son téléphone ou par le boucher au comptoir.
@@ -228,7 +275,7 @@ Données personnelles indique combien il en reste ; ouvrez la fiche du client à
 son prochain passage et utilisez **Faire signer**. Le client peut aussi le faire
 lui-même depuis sa carte.
 
-## 4 quinquies. Écrire à une partie des clients
+## 10. Écrire à une partie des clients
 
 Dans **Clients**, un carré à cocher précède chaque nom. Cochez qui vous voulez —
 ou **Tout cocher**, qui ne prend que les fiches actuellement affichées : tapez
@@ -258,7 +305,7 @@ l'opérateur facture deux SMS. Le compteur de caractères le rappelle.
 Chaque envoi laisse une ligne dans le journal : la nature, la voie, le nombre
 de destinataires et le nombre d'écartés. Ni les noms, ni le texte.
 
-## 4 sexies. Envoyer vraiment, par Brevo (facultatif)
+## 11. Envoyer vraiment, par Brevo (facultatif)
 
 Par défaut, l'application prépare le message et ouvre votre application de
 messages : c'est vous qui appuyez sur envoyer. Avec **Brevo**, elle envoie
@@ -421,7 +468,7 @@ confirmation avant tout envoi de SMS et affiche le crédit restant après coup.
 Tout continue de fonctionner : l'application ouvre votre application de
 messages avec les destinataires et le texte remplis. Brevo n'est qu'un confort.
 
-## 6. Se mettre en règle (RGPD)
+## 12. Se mettre en règle (RGPD)
 
 Une fois le site en ligne, ouvrir **Réglages → Données personnelles** et
 compléter raison sociale, adresse, SIRET, directeur de la publication et

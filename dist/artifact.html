@@ -467,6 +467,46 @@ input:-webkit-autofill,input:-webkit-autofill:focus{
 .till-found .who{flex:1 1 auto;min-width:0}
 .till-found .av{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;
   font-weight:700;font-size:17px;flex:none;background:var(--rouge-fill);color:var(--rouge-on)}
+/* ─────────── la caisse ───────────
+   Un terminal de paiement, pas un formulaire : le montant en grand, un pavé
+   sous le pouce, un seul bouton. Le boucher ne doit jamais chercher où taper. */
+.pay{display:flex;flex-direction:column;gap:16px}
+.pay-who{display:flex;align-items:center;gap:13px;padding:13px 15px;border-radius:var(--r-sm);
+  background:var(--surface-2);border:1px solid var(--hair)}
+.pay-who .av{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;flex:none;
+  font-weight:700;font-size:15px;background:var(--rouge-fill);color:var(--rouge-on)}
+.pay-who .who{flex:1 1 auto;min-width:0}
+.pay-who .who b{display:block;font-size:16.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pay-amt{text-align:center;padding:20px 12px 16px;border-radius:var(--r);
+  background:var(--surface-2);border:1px solid var(--hair)}
+.pay-amt .v{display:block;font-family:var(--titre);font-weight:700;line-height:1;
+  font-size:clamp(46px,15vw,64px);letter-spacing:-.03em;font-variant-numeric:tabular-nums;
+  color:var(--ink)}
+.pay-amt .v.zero{color:var(--hair-2)}
+.pay-amt .p{display:block;margin-top:11px;font-size:15px;font-weight:700;color:var(--ambre)}
+.pay-amt .p.none{color:var(--muted);font-weight:500}
+.pad{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.pad button{height:62px;border-radius:var(--r-sm);border:1px solid var(--hair-2);
+  background:var(--surface-1);font-family:var(--titre);font-size:25px;font-weight:600;
+  font-variant-numeric:tabular-nums;transition:background .1s,transform .06s}
+.pad button:hover{background:var(--surface-3)}
+.pad button:active{background:var(--surface-3);transform:scale(.97)}
+.pad button.aux{font-size:19px;font-weight:600;color:var(--muted)}
+@media (min-width:700px){.pad button{height:56px}}
+/* Les raisons vont à la ligne plutôt que de défiler : une pastille cachée à
+   droite ne serait jamais lue, et le bouton reste de toute façon sous le pouce. */
+.pay-why{display:flex;flex-wrap:wrap;gap:8px}
+.pay-why .chip{padding:10px 15px;font-size:14.5px}
+.pay-why .chip.on{background:var(--ink);border-color:var(--ink);color:var(--ground);font-weight:700}
+/* Le bouton reste sous le pouce quoi qu'il arrive : au comptoir, on ne fait
+   pas défiler la page d'une main en tenant la carte de l'autre. Il vit dans une
+   barre accrochée au bas de l'écran — posée, pas flottante par-dessus le pavé. */
+.pay-bar{position:sticky;bottom:0;z-index:3;margin:2px -26px -26px;padding:12px 26px 14px;
+  padding-bottom:calc(14px + env(safe-area-inset-bottom));
+  background:var(--surface-1);border-top:1px solid var(--hair);
+  border-radius:0 0 var(--r) var(--r)}
+@media (max-width:520px){.pay-bar{margin:2px -20px -20px;padding-left:20px;padding-right:20px}}
+.pay-go{height:60px;font-size:18px;font-weight:700;border-radius:var(--r-sm)}
 /* Le choix « par numéro / par nom » : deux moitiés d'une même touche. */
 .seg{display:inline-flex;padding:3px;gap:3px;border-radius:99px;background:var(--surface-3);
   border:1px solid var(--hair-2);align-self:flex-start;max-width:100%}
@@ -1809,7 +1849,7 @@ function scanFound(text) {
   var c = byId(id);
   if (!c) { scanMsg('<span class="err">Carte n° ' + esc(id) + ' inconnue.</span>'); return false; }
   closeModal();
-  S.till = { cid: c.id }; S.focusId = "amt"; S.tab = "till"; render();
+  S.till = { cid: c.id }; S.tab = "till"; render();
   toast(c.name + " — carte n° " + c.id, "ok");
   return true;
 }
@@ -2449,6 +2489,37 @@ function chart14() {
     '</section>';
 }
 
+/* Pourquoi les clients sont venus, sur les trois derniers mois. C'est la
+   réponse à la seule question qui compte quand on paie des SMS : est-ce que
+   ça fait revenir quelqu'un ? Sans réponse, on paie à l'aveugle. */
+function venues() {
+  var n = {}, total = 0;
+  allBuys().forEach(function (b) {
+    if (daysAgo(d10(b.t)) > 90) return;
+    var r = String(b.w || "").trim();
+    if (!r || RAISONS.indexOf(r) < 0) return;
+    n[r] = (n[r] || 0) + 1; total++;
+  });
+  if (!total) {
+    return '<section class="panel panel-pad"><div class="sect-head"><h2>Pourquoi ils viennent</h2></div>' +
+      '<p class="small muted">Rien à compter pour l\'instant. À chaque encaissement, un appui ' +
+      'sur une des raisons suffit — au bout de quelques semaines, vous saurez si les SMS ' +
+      'font revenir du monde ou non.</p></section>';
+  }
+  var lignes = RAISONS.filter(function (r) { return n[r]; })
+    .sort(function (a, b) { return n[b] - n[a]; })
+    .map(function (r) {
+      var part = Math.round(n[r] / total * 100);
+      return '<div class="rank-row"><span class="n">' + esc(r) + '</span>' +
+        '<span class="v">' + nb(n[r]) + ' · ' + part + ' %</span>' +
+        '<span class="b"><i style="width:' + Math.max(3, part) + '%"></i></span></div>';
+    }).join("");
+  return '<section class="panel panel-pad"><div class="sect-head"><h2>Pourquoi ils viennent</h2>' +
+    '<span class="sp"></span><span class="small muted">' + nb(total) + ' passage' +
+    (total > 1 ? "s" : "") + ' renseigné' + (total > 1 ? "s" : "") + ' sur 3 mois</span></div>' +
+    '<div class="rank">' + lignes + '</div></section>';
+}
+
 function vDash() {
   var buys = allBuys(), mk = monthKey(today());
   var mBuys = buys.filter(function (b) { return monthKey(b.t) === mk; });
@@ -2501,7 +2572,7 @@ function vDash() {
     '<div class="rank">' + rank + '</div></section>' +
     '<section class="panel panel-pad"><div class="sect-head"><h2>Journal</h2></div>' +
     '<ul>' + jrn + '</ul></section>' +
-    '</div></div>';
+    '</div>' + venues() + '</div>';
 }
 
 /* ══════════════════════════ 6. Encaisser ══════════════════════════ */
@@ -2617,6 +2688,10 @@ function vTill() {
     suggHtml(q, par) + '</div>' +
     '</div>';
 
+  // Une fois le client trouvé, la recherche n'a plus rien à dire : elle laisse
+  // la place au pavé. On la remplace par une ligne « qui, et comment changer ».
+  if (c) head = '<section class="panel panel-pad stack">';
+
   if (!c) {
     var recent = DB.clients.slice().sort(function (a, b) {
       return (lastVisit(b) || "").localeCompare(lastVisit(a) || "");
@@ -2628,48 +2703,95 @@ function vTill() {
   }
 
   var un = unlocked(c.points), nx = nextReward(c.points);
-  var baskets = ["Bœuf", "Agneau", "Volaille", "Porc", "Merguez", "Brochettes", "Charcuterie", "Plat préparé"]
-    .map(function (b) { return '<button class="chip" type="button" data-act="add-w" data-w="' + b + '">' + b + '</button>'; }).join("");
-  var quick = [10, 15, 20, 30, 50, 80]
-    .map(function (v) { return '<button class="chip" type="button" data-act="set-amt" data-v="' + v + '">' + v + ' €</button>'; }).join("");
+  var touches = ["1", "2", "3", "4", "5", "6", "7", "8", "9"]
+    .map(function (t) { return '<button type="button" data-act="pad" data-k="' + t + '">' + t + '</button>'; })
+    .join("") +
+    '<button type="button" class="aux" data-act="pad" data-k="C" aria-label="Effacer le montant">C</button>' +
+    '<button type="button" data-act="pad" data-k="0">0</button>' +
+    '<button type="button" class="aux" data-act="pad" data-k="<" aria-label="Corriger le dernier chiffre">⌫</button>';
 
   return head +
-    '<div class="till-found"><span class="av">' + esc(initials(c.name)) + '</span>' +
-    '<span class="who"><b>' + esc(c.name) + '</b><br>' +
-    '<span class="small muted num">n° ' + c.id + ' · ' + esc(prettyPhone(c.phone)) + ' · ' +
-    nb(c.points) + ' points · ' + nb(c.visits) + ' passages</span></span>' +
-    '<span class="pill brass">' + esc(tierOf(c.lifetime)) + '</span></div>' +
+    '<div class="pay">' +
+    '<div class="pay-who"><span class="av" aria-hidden="true">' + esc(initials(c.name)) + '</span>' +
+    '<span class="who"><b>' + esc(c.name) + '</b>' +
+    '<span class="small muted num">n° ' + c.id + ' · ' + nb(c.points) + ' pts · ' +
+    nb(c.visits) + ' passage' + (c.visits > 1 ? "s" : "") + '</span></span>' +
+    '<button class="btn btn-sm btn-ghost" type="button" data-act="till-clear">Changer</button></div>' +
 
     (bdayToday(c) ? '<div class="bday"><span aria-hidden="true">🎂</span><span class="grow">' +
       '<b>C\'est son anniversaire aujourd\'hui.</b>' + (gotBdayGift(c) ? " Cadeau déjà offert cette année." : "") + '</span>' +
       (gotBdayGift(c) ? "" : '<button class="btn btn-sm btn-brass" data-act="gift-bday" data-id="' + c.id + '">Offrir ' + nb(sh.birthday) + ' pts</button>') +
-      '</span></div>' : "") +
+      '</div>' : "") +
 
     (un.length ? '<div class="banner banner-brass">' +
       '<span class="ico" aria-hidden="true">★</span><span class="grow"><b>Récompense disponible :</b> ' +
       esc(un[un.length - 1].label) + '</span>' +
       '<button class="btn btn-sm btn-brass" data-act="use-reward" data-id="' + c.id + '">Utiliser</button></div>' : "") +
 
-    '<form data-act="till-save" class="stack">' +
-    '<div class="field"><label for="amt">Montant de l\'achat</label>' +
-    '<input id="amt" name="amt" type="text" inputmode="decimal" placeholder="0,00" autocomplete="off" required></div>' +
-    '<div class="chips">' + quick + '</div>' +
-    '<div class="field"><label for="w">Détail de l\'achat <span class="muted">(facultatif)</span></label>' +
-    '<input id="w" name="w" type="text" autocomplete="off" placeholder="Bavette, merguez…"></div>' +
-    '<div class="chips">' + baskets + '</div>' +
-    '<button class="btn btn-primary btn-full" type="submit">Valider l\'achat et créditer les points</button>' +
-    '<p class="small muted" style="text-align:center">' + nb(sh.ppe) + ' point' + (sh.ppe > 1 ? "s" : "") +
-    ' par euro' + (nx ? ' · encore ' + nb(nx.p - c.points) + ' pts pour « ' + esc(nx.label) + ' »' : "") + '</p>' +
-    '</form></section>';
+    '<form data-act="till-save" class="pay">' +
+    '<div class="pay-amt"><span id="pay-v" class="v zero" role="status" aria-live="polite" ' +
+    'aria-label="Montant de l\'achat">' + payTexte() + '</span>' +
+    '<span id="pay-p" class="p none">' + payPoints(c) + '</span></div>' +
+    '<div class="pad">' + touches + '</div>' +
+
+    '<div><p class="small muted" style="margin-bottom:8px">Pourquoi est-il venu ? ' +
+    '<span class="muted">(facultatif)</span></p>' +
+    '<div class="pay-why" role="group" aria-label="Raison de la venue">' + RAISONS.map(function (r) {
+      return '<button type="button" class="chip' + (S.till.why === r ? " on" : "") + '" ' +
+        'data-act="pay-why" data-r="' + esc(r) + '" aria-pressed="' + (S.till.why === r) + '">' +
+        esc(r) + '</button>';
+    }).join("") + '</div></div>' +
+
+    '<p class="small muted" style="text-align:center;margin:2px 0 0">' + nb(sh.ppe) + ' point' +
+    (sh.ppe > 1 ? "s" : "") + ' par euro' +
+    (nx ? ' · encore ' + nb(nx.p - c.points) + ' pts pour « ' + esc(nx.label) + ' »' : "") + '</p>' +
+    '<div class="pay-bar">' +
+    '<button id="pay-go" class="btn btn-primary btn-full pay-go" type="submit"' +
+    (payCents() ? "" : " disabled") + '>' + payBouton() + '</button></div>' +
+    '</form></div></section>';
+}
+
+/* Les raisons de la venue. Ce n'est pas de la statistique pour la statistique :
+   c'est la seule façon de savoir si les SMS servent à quelque chose, et donc
+   s'il faut continuer à les payer. */
+var RAISONS = ["Habitué", "A reçu le SMS", "Nouveau client", "Bouche à oreille",
+  "Passait devant", "Pour une récompense"];
+
+/* Le montant se tape comme sur un terminal de paiement : les chiffres entrent
+   par la droite, en centimes. Pas de virgule à chercher. */
+function payCents() { return Number(String(S.till.amt || "").slice(0, 7)) || 0; }
+function payTexte() { return eur(payCents() / 100); }
+function payPoints(c) {
+  var cts = payCents();
+  if (!cts) return "Tapez le montant";
+  var p = Math.round(cts / 100 * DB.shop.ppe);
+  return "+" + nb(p) + " point" + (p > 1 ? "s" : "") + " pour " +
+    String((c || {}).name || "").split(" ")[0];
+}
+function payBouton() {
+  return payCents() ? "Encaisser " + payTexte() : "Encaisser";
+}
+/* On ne redessine que ce qui bouge : redessiner la page à chaque chiffre
+   ferait sauter le pavé sous le doigt. */
+function payRefresh() {
+  var c = byId(S.till.cid);
+  var v = document.getElementById("pay-v");
+  var p = document.getElementById("pay-p");
+  var b = document.getElementById("pay-go");
+  if (v) { v.textContent = payTexte(); v.className = "v" + (payCents() ? "" : " zero"); }
+  if (p) { p.textContent = payPoints(c); p.className = "p" + (payCents() ? "" : " none"); }
+  if (b) { b.textContent = payBouton(); b.disabled = !payCents(); }
 }
 
 function tillSave(f) {
   var c = byId(S.till.cid); if (!c) return;
-  var raw = String(f.amt.value).replace(/\s/g, "").replace(",", ".");
-  var a = parseFloat(raw);
-  if (!(a > 0)) { toast("Montant invalide.", "bad"); return; }
-  a = Math.round(a * 100) / 100;
-  var w = f.w.value.trim() || "Achat en boutique";
+  var cts = payCents();
+  if (!cts) { toast("Tapez d\'abord le montant.", "bad"); return; }
+  var a = Math.round(cts) / 100;
+  var w = S.till.why || "Achat en boutique";
+  // La caisse se vide dès l'achat validé : sans cela le même montant reste à
+  // l'écran et un second appui le passerait une deuxième fois.
+  S.till = {}; S.tillQ = "";
   if (Store.mode === "supabase") {
     return remote(rpc("record_purchase", { p_id: c.id, p_amount: a, p_label: w }, true), function (r) {
       return "+" + r.gagnes + " points pour " + String(r.name).split(" ")[0] + " · solde " + nb(r.points);
@@ -3545,7 +3667,7 @@ function csvClients(garde) {
   return "﻿" + csv(rows);
 }
 function csvBuys() {
-  var rows = [["Date", "Numero", "Client", "Type", "Montant", "Points", "Detail"]];
+  var rows = [["Date", "Numero", "Client", "Type", "Montant", "Points", "Raison de la venue"]];
   var kinds = { buy: "Achat", reward: "Recompense", gift: "Cadeau", ref: "Parrainage", welcome: "Bienvenue", adj: "Ajustement" };
   DB.clients.forEach(function (c) {
     c.hist.forEach(function (h) {
@@ -3703,6 +3825,8 @@ var ACTS = {
   "scrim": function (el, ev) { if (ev.target.classList.contains("scrim")) closeModal(); },
   "tab": function (el) {
     if (el.dataset.t !== S.tab) S.scroll = 0;
+    // Revenir sur « Encaisser », c'est vouloir servir le client suivant.
+    if (el.dataset.t === "till" && S.tab !== "till") { S.till = {}; S.tillQ = ""; }
     S.tab = el.dataset.t; S.q = ""; closeModal(); render();
   },
   "copy": function (el) {
@@ -3930,18 +4054,32 @@ var ACTS = {
   },
   "new-client": function () { newClientModal(); },
   "till-pick": function (el) {
-    S.till = { cid: el.dataset.id }; S.tillQ = ""; S.focusId = "amt"; go("admin", "till");
+    S.till = { cid: el.dataset.id }; S.tillQ = ""; go("admin", "till");
   },
   "till-clear": function () { S.till = {}; S.tillQ = ""; S.focusId = "tq"; render(); },
   "till-par": function (el) {
     S.tillPar = el.dataset.p === "nom" ? "nom" : "num";
     S.focusId = "tq"; S.scroll = window.scrollY; render();
   },
-  "add-w": function (el) {
-    var i = document.getElementById("w"); if (!i) return;
-    i.value = i.value ? i.value + ", " + el.dataset.w : el.dataset.w;
+  "pad": function (el) {
+    var k = el.dataset.k, a = String(S.till.amt || "");
+    if (k === "C") a = "";
+    else if (k === "<") a = a.slice(0, -1);
+    else if (a.length < 7) a = (a + k).replace(/^0+(?=\d)/, "");
+    S.till.amt = a;
+    payRefresh();
   },
-  "set-amt": function (el) { var i = document.getElementById("amt"); if (i) { i.value = el.dataset.v; i.focus(); } },
+  "pay-why": function (el) {
+    var r = el.dataset.r;
+    S.till.why = S.till.why === r ? "" : r;
+    // on ne repasse pas par render() : le pavé et le montant doivent rester
+    var l = document.querySelectorAll('.pay-why .chip');
+    for (var i = 0; i < l.length; i++) {
+      var on = l[i].dataset.r === S.till.why;
+      l[i].className = "chip" + (on ? " on" : "");
+      l[i].setAttribute("aria-pressed", on);
+    }
+  },
   "sort": function (el) { S.sort = el.value; render(); },
   "gift-bday": function (el) {
     var c = byId(el.dataset.id); if (!c || gotBdayGift(c)) return;
@@ -4121,7 +4259,7 @@ var FORMS = {
     // qu'il a sous les yeux, pas une autre fiche trouvée autrement
     var c = findClient(q) || tillMatch(q, tillPar()).list[0] || search(q)[0];
     if (!c) { toast("Aucun client pour « " + q + " ».", "bad"); return; }
-    S.till = { cid: c.id }; S.tillQ = ""; S.focusId = "amt"; render();
+    S.till = { cid: c.id }; S.tillQ = ""; render();
   },
   "till-save": tillSave,
   "my-save": function (f) {
@@ -4425,6 +4563,21 @@ document.addEventListener("input", function (ev) {
     clearTimeout(qt);
     qt = setTimeout(function () { S.q = el.value; S.focusId = "cq"; S.scroll = window.scrollY; render(); }, 220);
   }
+});
+/* Au comptoir sur un ordinateur ou une tablette à clavier, on tape les chiffres
+   directement : le pavé à l'écran et les touches doivent mener au même endroit. */
+document.addEventListener("keydown", function (ev) {
+  if (!S.admin || S.tab !== "till" || !(S.till && S.till.cid)) return;
+  if (ev.metaKey || ev.ctrlKey || ev.altKey) return;
+  var t = ev.target;
+  if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.tagName === "SELECT")) return;
+  var k = "";
+  if (/^[0-9]$/.test(ev.key)) k = ev.key;
+  else if (ev.key === "Backspace") k = "<";
+  else if (ev.key === "Escape" && payCents()) k = "C";
+  else return;
+  ev.preventDefault();
+  ACTS.pad({ dataset: { k: k } });
 });
 document.addEventListener("keydown", function (ev) {
   if (ev.key === "Escape") closeModal();
