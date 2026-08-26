@@ -136,27 +136,42 @@ code en ligne fait l'affaire à partir de l'adresse du site.
 
 ## 5 bis. Le logo
 
-**Par défaut, l'application porte la tête de vache de la Boucherie Vatuone**,
-redessinée en vectoriel : dans le bandeau de toutes les pages, à côté du nom
-sur chaque carte de fidélité, et en filigrane sur la carte. Elle est dessinée
-en code, pas en image : elle prend la couleur de son support, reste nette à
-n'importe quelle taille, et ne pèse rien au chargement.
+**Le logo de la Boucherie Vatuone est inscrit dans l'application** : dans le
+bandeau de toutes les pages, à côté du nom sur chaque carte de fidélité, et en
+filigrane sur la carte. Il n'y a rien à faire pour l'obtenir.
 
-Pour une autre boutique — ou pour remplacer ce dessin par le fichier
-d'origine — **Réglages → Logo → *Le logo de la boutique*.** Choisissez le
-fichier, il apparaît aussitôt. Puis **Enregistrer les réglages** en bas du panneau — tant
+Sur les cartes, il n'est pas posé mais **découpé au pochoir** : c'est sa
+silhouette qui est remplie de l'encre du style choisi — blanche sur la carte
+rouge, brune sur le papier kraft, claire sur l'ardoise. Un logo rouge posé tel
+quel sur une carte rouge ne se verrait pas ; découpé, il a toujours le bon
+contraste. Dans le bandeau, en revanche, il garde ses couleurs d'origine.
+
+Pour une autre boutique — ou pour remplacer ce logo par un autre fichier —
+**Réglages → Logo → *Le logo de la boutique*.** Choisissez le fichier, il
+apparaît aussitôt. Puis **Enregistrer les réglages** en bas du panneau — tant
 que ce n'est pas fait, il n'est posé que sur cet appareil.
 
-Une fois enregistré, il remplace la tête de vache dans le bandeau, sur toutes
+Une fois enregistré, il remplace le logo d'origine dans le bandeau, sur toutes
 les pages, pour le boucher **comme pour les clients**, et il vient sur les
-cartes de fidélité — posé sur une petite plaque, comme sur un emballage.
+cartes de fidélité — celui-là posé sur une petite plaque, comme sur un
+emballage, puisqu'on ne connaît pas ses couleurs.
 
 Ce que l'application fait du fichier, et pourquoi :
 
-- **Elle le redessine en PNG.** Un logo d'imprimeur pèse souvent plusieurs
-  mégaoctets ; il est ramené à 384 pixels de côté, ce qui suffit au plus grand
-  usage (la plaque de la carte sur un téléphone très fin). Sans cela, chaque
-  ouverture du site traînerait le poids du fichier d'origine.
+- **Elle retire la marge vide avant de réduire.** Un logo d'imprimeur arrive
+  presque toujours seul au milieu d'une page blanche : le fichier fourni pour
+  cette boutique était une page de 1414 × 2000 pixels dont le dessin
+  n'occupait que 9 %. Réduire d'abord aurait jeté la finesse du dessin pour ne
+  garder que du vide — c'est ce qui se passait, et le logo sortait à 87 pixels
+  de large. L'application cherche donc les bords du dessin **à pleine
+  résolution**, recadre dessus en gardant 2 % de marge, et ne réduit
+  qu'ensuite. Le nom du fichier affiché indique « marge retirée » quand c'est
+  le cas, avec la taille obtenue.
+- **Elle le redessine en PNG**, au plus 384 pixels de côté, ce qui suffit au
+  plus grand usage (le filigrane de la carte sur un téléphone très fin). Une
+  image plus petite que cela n'est jamais agrandie : on n'invente pas du
+  détail. Sans cette réduction, chaque ouverture du site traînerait le poids du
+  fichier d'origine.
 - **Elle ne garde jamais le fichier tel quel.** Un SVG n'est pas une image,
   c'est du code, et ce code finirait dans la page. Redessiné, il n'en reste
   qu'une image : ce qu'un SVG pourrait contenir de malveillant ne survit pas
@@ -171,8 +186,14 @@ couleurs claires »** : l'application lui pose une plaque foncée dessous,
 partout. Les deux aperçus juste au-dessus de la case, l'un sur fond clair et
 l'autre sur fond sombre, montrent tout de suite ce qu'il en est.
 
-**Pour retirer le logo** : bouton *Retirer le logo*, puis **Enregistrer**. Tout
-revient à la tête de vache dessinée.
+**Pour retirer le logo déposé** : bouton *Retirer le logo*, puis
+**Enregistrer**. Tout revient au logo inscrit dans l'application.
+
+> Une note pour la revente : le logo d'origine est celui de la Boucherie
+> Vatuone. Une autre boutique qui reprendrait l'application le verrait jusqu'à
+> ce qu'elle dépose le sien — ce qui prend un appui. Pour livrer un modèle
+> neutre, remplacez `assets/logo/vatuone.png` et la constante `LOGO_DEFAUT`
+> dans `index.html`.
 
 ## 6. Trouver le bon client
 

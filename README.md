@@ -40,7 +40,7 @@ session côté navigateur — ce n'est pas qu'un rideau devant l'écran.
 | **Clients** | Fichier complet, recherche instantanée, tris, statut d'activité. Fiche détaillée : historique, encaissement, utilisation d'une récompense, ajout/retrait manuel de points avec motif, modification, suppression. Création de carte au comptoir. Cases à cocher devant chaque nom : la sélection ouvre **Écrire à ces clients** (le filtre du consentement s'applique aux offres commerciales), **Exporter (CSV)** et **Exporter pour Brevo** — format d'import Brevo, téléphones en `33…`, consentants seulement. |
 | **Anniversaires** | Ceux du mois (avec repérage du jour même) et ceux du mois suivant, pour anticiper. Cadeau limité à une fois par an et par client. |
 | **Parrainage** | Qui a parrainé qui, chiffre d'affaires apporté par les filleuls, points distribués. |
-| **Réglages** | Nom / ville / accroche de la boutique, barème (points par euro, bienvenue, anniversaire, parrain, filleul), verrouillage automatique, éditeur de récompenses, compte d'accès, export CSV clients et achats, sauvegarde et restauration JSON. **Logo** : la tête de vache de la boutique, redessinée en vectoriel (masque SVG, donc elle prend la couleur de son support et reste nette à toute taille), sert par défaut dans le bandeau, à côté du nom sur les cartes et en filigrane ; un fichier déposé la remplace, réencodé en PNG 384 px (un SVG est du code, redessiné il n'en reste qu'une image), essayé sur fond clair et sombre, option « logo clair » qui lui pose une plaque foncée. |
+| **Réglages** | Nom / ville / accroche de la boutique, barème (points par euro, bienvenue, anniversaire, parrain, filleul), verrouillage automatique, éditeur de récompenses, compte d'accès, export CSV clients et achats, sauvegarde et restauration JSON. **Logo** : celui de la boutique est inscrit dans le fichier (`assets/logo/vatuone.png`, 11 Ko en data URI) et sert par défaut — en couleurs dans le bandeau, découpé au pochoir CSS sur les cartes, où il prend l'encre du style ; un fichier déposé le remplace, réencodé en PNG 384 px (un SVG est du code, redessiné il n'en reste qu'une image), recadré sur son dessin à pleine résolution avant réduction (un logo d'imprimeur est souvent seul au milieu d'une page blanche), essayé sur fond clair et sombre, option « logo clair » qui lui pose une plaque foncée. |
 | **Données personnelles** | Identité légale de la boutique (alimente les mentions légales et la politique de confidentialité), durée de conservation, signalement et purge des fiches trop anciennes, contrôle de l'installation. |
 
 ## Barème par défaut
@@ -154,6 +154,7 @@ démo publiée le fait automatiquement.
 - `vercel.json` + `scripts/build-site.mjs` — publication : `index.html`,
   `scanner.js` et le dossier `police/`, avec les en-têtes de sécurité (CSP
   restreinte au seul projet Supabase, testée avec l'application complète).
+- `assets/logo/vatuone.png` — le logo de la boutique, recadré sur son dessin. Il est aussi inscrit en data URI dans `index.html` (constante `LOGO_DEFAUT`) : le fichier livré doit rester unique et fonctionner hors ligne.
 - `assets/police/` — les six fichiers de la police Zen Kaku Gothic New
   (sous-ensembles latin et latin-ext, graisses 400/500/700, 33 Ko en tout,
   licence SIL OFL). Ils sont hébergés avec le site : aucune requête ne part
