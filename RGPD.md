@@ -58,7 +58,11 @@ Personne ne peut le faire à sa place.
    l'adresse IP de chaque visiteur à un tiers, hors Union européenne et sans
    son accord — ce que la CNIL et les tribunaux ont déjà sanctionné. Ne pas
    réintroduire de lien vers `fonts.googleapis.com`.
-8. **Répondre aux demandes** — le client a un mois pour obtenir une réponse.
+8. **Signer le contrat de sous-traitance de Brevo** — si vous activez l'envoi
+   automatique. Brevo met à disposition un accord de traitement des données
+   (DPA) dans les paramètres du compte : il faut l'accepter, et le conserver.
+   Sans envoi automatique, ce point ne vous concerne pas.
+9. **Répondre aux demandes** — le client a un mois pour obtenir une réponse.
    L'application couvre déjà les cas courants en libre-service ; pour le reste,
    l'export CSV et la fiche client permettent de répondre.
 
@@ -76,8 +80,8 @@ Personne ne peut le faire à sa place.
 | **Personnes concernées** | Clients de la boutique ayant adhéré au programme |
 | **Catégories de données** | Identité : nom et prénom. Coordonnées : téléphone, e-mail (facultatif). Vie personnelle : jour et mois de naissance. Données d'achat : date, montant, nature des achats, points, récompenses. Parrainage : lien entre clients. Preuve du consentement : case cochée, horodatage, signature manuscrite. |
 | **Données sensibles** | Aucune. La signature est conservée comme simple preuve d'accord (art. 7.1) : elle n'est ni analysée, ni comparée, ni utilisée pour identifier qui que ce soit. Elle ne constitue donc pas une donnée biométrique au sens de l'article 9. |
-| **Destinataires** | Le gérant et le personnel habilité de la boutique. Pour les envois groupés, l'opérateur téléphonique ou le fournisseur de messagerie du gérant, qui achemine le message depuis son propre téléphone — l'application ne dispose d'aucun service d'envoi et ne transmet aucune donnée à un tiers. |
-| **Sous-traitants** | Supabase (hébergement de la base, région [région]) ; Vercel (hébergement de la page) |
+| **Destinataires** | Le gérant et le personnel habilité de la boutique. Pour les envois groupés : soit l'opérateur téléphonique ou le fournisseur de messagerie du gérant, qui achemine le message depuis son propre téléphone ; soit Brevo si l'envoi automatique est activé, qui reçoit alors le nom et l'adresse ou le téléphone des seuls destinataires de l'envoi. |
+| **Sous-traitants** | Supabase (hébergement de la base, région [région]) ; Vercel (hébergement de la page) ; Brevo (acheminement des courriels et SMS, société française, données en Union européenne) — seulement si l'envoi automatique est activé |
 | **Transferts hors UE** | Aucun — base hébergée en Union européenne |
 | **Durée de conservation** | 3 ans à compter du dernier passage en boutique, puis suppression de la fiche et de son historique |
 | **Mesures de sécurité** | Accès par compte nominatif et mot de passe ; chiffrement des échanges (HTTPS) ; tables inaccessibles sans authentification ; liste explicite du personnel autorisé ; calcul des points côté serveur ; journal des opérations ; sauvegardes |

@@ -138,6 +138,12 @@ démo publiée le fait automatiquement.
 - `DEPLOIEMENT.md` — mise en ligne pas à pas.
 - `dist/artifact.html` — la même application sans l'enveloppe `<html>/<head>/<body>`, format attendu par l'hébergement en ligne. Généré, ne pas modifier à la main.
 - `scripts/seed.mjs` — générateur du jeu de démonstration.
+- `supabase/functions/envoyer/index.ts` — fonction Deno qui envoie les messages
+  par Brevo. Elle existe pour une seule raison : la clé d'API ne peut pas vivre
+  dans une page web, lisible par tous. Elle vérifie que l'appelant est du
+  personnel, relit les destinataires en base plutôt que de croire le navigateur,
+  refait le tri du consentement, et joint le lien de désinscription. Déploiement
+  dans `DEPLOIEMENT.md`.
 - `scripts/build-essai.mjs` — produit `dist/carte-essai.html` : l'application
   entière dans un fichier unique, lecteur de QR compris, sans base branchée.
   Sert à essayer la caméra sur un vrai téléphone avant la mise en ligne — la

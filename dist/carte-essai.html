@@ -2364,6 +2364,11 @@ function vPrivacy() {
       'Vous pouvez aussi supprimer votre carte vous-même, immédiatement, depuis la rubrique « Mes données ».</p>') +
 
     sec("Qui y a accès", '<p class="small">' + esc(controller()) + ' et son personnel, pour la seule gestion du programme. ' +
+      (DB.shop.envoi && (DB.shop.envoi.from_email || DB.shop.envoi.sms_sender)
+        ? 'Les messages qui vous sont adressés sont acheminés par <b>Brevo</b> (société française, ' +
+          'données hébergées dans l\'Union européenne), qui reçoit à cette seule fin votre nom et ' +
+          'votre adresse ou votre téléphone. '
+        : "") +
       'Les données sont stockées chez <b>Supabase</b> (base de données, hébergement européen) et la page est distribuée par ' +
       '<b>Vercel</b>, tous deux liés par contrat de sous-traitance.<br><br>' +
       'Vos données ne sont ni vendues, ni louées, ni transmises à des annonceurs. ' +
@@ -2916,18 +2921,84 @@ function msgBody() {
     '<div class="fact"><span class="k">Par e-mail</span><span class="v">' + nb(sp.mail.length) + ' ont une adresse</span></div>' +
     '</div>' +
 
-    '<div class="btn-row">' +
-    '<button class="btn btn-primary" data-act="msg-sms"' + (sp.tel.length && msgText() ? "" : " disabled") + '>' +
-    'Ouvrir les SMS (' + nb(sp.tel.length) + ')</button>' +
-    '<button class="btn" data-act="msg-mail"' + (sp.mail.length && msgText() ? "" : " disabled") + '>' +
-    'Ouvrir l\'e-mail (' + nb(sp.mail.length) + ')</button>' +
-    '<button class="btn" data-act="msg-copy"' + (sp.tel.length ? "" : " disabled") + '>' +
-    'Copier les numéros</button>' +
-    '</div>' +
-    '<p class="small muted">L\'application n\'envoie rien elle-même : elle ouvre votre application ' +
-    'de messages avec les destinataires et le texte déjà remplis. Vous relisez, vous envoyez. ' +
-    'Au-delà d\'une vingtaine de numéros, certains téléphones refusent : envoyez en deux fois.</p>' +
+    (brevoPret()
+      ? '<div class="field"><label for="msg-s">Objet du courriel</label>' +
+        '<input id="msg-s" data-act="msg-sujet" value="' + esc(S.msgSujet || DB.shop.name) + '"></div>' +
+        '<div class="btn-row">' +
+        '<button class="btn btn-primary" data-act="brevo-mail"' +
+        (sp.mail.length && msgText() ? "" : " disabled") + '>' +
+        'Envoyer les courriels (' + nb(sp.mail.length) + ')</button>' +
+        '<button class="btn btn-ink" data-act="brevo-sms"' +
+        (sp.tel.length && msgText() ? "" : " disabled") + '>' +
+        'Envoyer les SMS (' + nb(sp.tel.length) + ')</button>' +
+        '</div>' +
+        '<div id="msg-out"></div>' +
+        '<p class="small muted">Les messages partent par <b>Brevo</b>, au nom de la boutique. ' +
+        'Les courriels sont compris dans l\'offre gratuite (300 par jour) ; ' +
+        '<b>les SMS sont facturés à l\'unité</b> par Brevo. Le décompte de crédits ' +
+        'restants s\'affiche après l\'envoi.</p>' +
+        '<hr class="divide">' +
+        '<p class="small muted">Ou faites-le à la main, depuis votre téléphone :</p>' +
+        '<div class="btn-row">' +
+        '<button class="btn btn-sm" data-act="msg-sms"' + (sp.tel.length && msgText() ? "" : " disabled") + '>' +
+        'Ouvrir les SMS</button>' +
+        '<button class="btn btn-sm" data-act="msg-mail"' + (sp.mail.length && msgText() ? "" : " disabled") + '>' +
+        'Ouvrir l\'e-mail</button>' +
+        '<button class="btn btn-sm" data-act="msg-copy"' + (sp.tel.length ? "" : " disabled") + '>' +
+        'Copier les numéros</button></div>'
+      : '<div class="btn-row">' +
+        '<button class="btn btn-primary" data-act="msg-sms"' + (sp.tel.length && msgText() ? "" : " disabled") + '>' +
+        'Ouvrir les SMS (' + nb(sp.tel.length) + ')</button>' +
+        '<button class="btn" data-act="msg-mail"' + (sp.mail.length && msgText() ? "" : " disabled") + '>' +
+        'Ouvrir l\'e-mail (' + nb(sp.mail.length) + ')</button>' +
+        '<button class="btn" data-act="msg-copy"' + (sp.tel.length ? "" : " disabled") + '>' +
+        'Copier les numéros</button>' +
+        '</div>' +
+        '<div id="msg-out"></div>' +
+        '<p class="small muted">L\'application n\'envoie rien elle-même : elle ouvre votre application ' +
+        'de messages avec les destinataires et le texte déjà remplis. Vous relisez, vous envoyez. ' +
+        'Au-delà d\'une vingtaine de numéros, certains téléphones refusent : envoyez en deux fois. ' +
+        'Pour un envoi direct au nom de la boutique, voyez Réglages → Envoi automatique.</p>') +
     '</div>';
+}
+
+/* L'envoi par Brevo. Le navigateur n'envoie que des numéros de carte : c'est
+   la fonction serveur qui relit les fiches, refait le tri du consentement et
+   parle à Brevo. */
+function brevoEnvoi(canal) {
+  var sp = msgSplit(), txt = msgFinal();
+  var cibles = canal === "sms" ? sp.tel : sp.mail;
+  var out = document.getElementById("msg-out");
+  if (!cibles.length || !txt) return;
+  if (out) out.innerHTML = '<p class="small muted">Envoi en cours…</p>';
+  var boutons = document.querySelectorAll('[data-act="brevo-mail"], [data-act="brevo-sms"]');
+  for (var i = 0; i < boutons.length; i++) boutons[i].disabled = true;
+
+  envoiAppel({
+    canal: canal, nature: msgKind(),
+    ids: cibles.map(function (c) { return c.id; }),
+    sujet: S.msgSujet || DB.shop.name,
+    texte: txt
+  }).then(function (r) {
+    var l = '<div class="banner"><span class="ico" aria-hidden="true">✓</span><span class="grow">' +
+      '<b>' + nb(r.envoyes) + ' message' + (r.envoyes > 1 ? "s" : "") + ' parti' +
+      (r.envoyes > 1 ? "s" : "") + '.</b>' +
+      (r.ecartes ? ' ' + nb(r.ecartes) + ' écarté(s) faute d\'accord.' : "") +
+      (r.injoignables ? ' ' + nb(r.injoignables) + ' sans ' +
+        (canal === "sms" ? "téléphone utilisable" : "adresse e-mail") + '.' : "") +
+      (r.echecs && r.echecs.length
+        ? ' <b>' + r.echecs.length + ' en échec</b> : ' + esc(r.echecs[0].raison)
+        : "") +
+      (typeof r.credits === "number" ? ' Crédits SMS restants : ' + nb(r.credits) + '.' : "") +
+      '</span></div>';
+    if (out) out.innerHTML = l;
+    toast(r.envoyes + " message(s) envoyé(s).", "ok");
+    if (Store.mode === "supabase") sbLoadAll()["catch"](function () {});
+  })["catch"](function (e) {
+    if (out) out.innerHTML = '<p class="err">' + esc(String(e.message || e)) + '</p>';
+    var b2 = document.querySelectorAll('[data-act="brevo-mail"], [data-act="brevo-sms"]');
+    for (var j = 0; j < b2.length; j++) b2[j].disabled = false;
+  });
 }
 
 /* Rafraîchit la fenêtre sans la refermer — le texte tapé est conservé. */
@@ -3112,7 +3183,7 @@ function vSet() {
         '<span class="hint">4 chiffres minimum. Notez-le : il n\'y a pas de récupération.</span></div>' +
         '<div id="pin-err"></div>' +
         '<button class="btn btn-ink btn-full" type="submit">Changer le code</button></form>') +
-    sbPanel() + rgpdPanel() +
+    sbPanel() + envoiPanel() + rgpdPanel() +
 
     '<section class="panel panel-pad stack">' +
     '<div class="sect-head"><h2>Données</h2></div>' +
@@ -3194,6 +3265,102 @@ function modeText() {
   if (Store.mode === "cloud")
     return "Base partagée : chaque validation publie une nouvelle version de la page. Tous les appareils ouverts se mettent à jour.";
   return "Mode local : les données vivent dans le navigateur de cet appareil. Faites une sauvegarde JSON régulièrement.";
+}
+
+/* ── envoi automatique par Brevo ──
+   La clé n'apparaît jamais ici : elle vit dans les secrets Supabase, lue par
+   la fonction « envoyer » et par elle seule. Ce panneau ne règle que ce qui
+   n'est pas secret : qui signe les messages, et sous quel nom. */
+function envoiPanel() {
+  var e = (DB.shop && DB.shop.envoi) || {};
+  var actif = brevoPret();
+  if (Store.mode !== "supabase") {
+    return '<section class="panel panel-pad stack">' +
+      '<div class="sect-head"><h2>Envoi automatique</h2></div>' +
+      '<div class="banner"><span class="ico" aria-hidden="true">i</span><span class="grow">' +
+      'L\'envoi par Brevo demande une base en ligne : c\'est elle qui garde la clé ' +
+      'à l\'abri. Reliez d\'abord l\'application à Supabase, juste au-dessus.</span></div></section>';
+  }
+  return '<form class="panel panel-pad stack" data-act="save-envoi">' +
+    '<div class="sect-head"><h2>Envoi automatique</h2><span class="sp"></span>' +
+    '<span class="pill' + (actif ? " good" : "") + '"><i></i>' + (actif ? "prêt" : "à configurer") + '</span></div>' +
+    '<p class="small muted">Sans cela, l\'application ouvre votre application de messages avec tout ' +
+    'déjà rempli, et vous appuyez sur envoyer. Avec Brevo, elle envoie elle-même, ' +
+    'depuis le nom de la boutique.</p>' +
+    '<div class="banner"><span class="ico" aria-hidden="true">i</span><span class="grow">' +
+    '<b>La clé Brevo ne se saisit pas ici.</b> Une page web est lisible par tous : ' +
+    'une clé posée dedans est une clé publiée. Elle se range dans Supabase → ' +
+    'Edge Functions → Secrets, sous le nom <span class="num">BREVO_KEY</span>. ' +
+    'La marche à suivre est dans DEPLOIEMENT.md.</span></div>' +
+    '<div class="grid-2">' +
+    '<div class="field"><label for="e-from">Adresse d\'expédition</label>' +
+    '<input id="e-from" name="from_email" type="email" value="' + esc(e.from_email || "") + '" ' +
+    'placeholder="contact@laboucherie.fr">' +
+    '<span class="hint">Elle doit être vérifiée dans Brevo, sinon les courriels partent en indésirables.</span></div>' +
+    '<div class="field"><label for="e-name">Nom affiché</label>' +
+    '<input id="e-name" name="from_name" value="' + esc(e.from_name || "") + '" placeholder="' + esc(DB.shop.name) + '"></div>' +
+    '</div>' +
+    '<div class="grid-2">' +
+    '<div class="field"><label for="e-sms">Nom court pour les SMS</label>' +
+    '<input id="e-sms" name="sms_sender" maxlength="11" value="' + esc(e.sms_sender || "") + '" placeholder="BOUCHERIE">' +
+    '<span class="hint">11 caractères au plus, sans espace. À déclarer dans Brevo pour la France.</span></div>' +
+    '<div class="field"><label for="e-site">Adresse du site</label>' +
+    '<input id="e-site" name="site_url" value="' + esc(e.site_url || "") + '" placeholder="https://carte.laboucherie.fr">' +
+    '<span class="hint">Sert au lien de désinscription, obligatoire sur les offres.</span></div>' +
+    '</div>' +
+    '<div id="envoi-err"></div>' +
+    '<div class="btn-row">' +
+    '<button class="btn btn-ink" type="submit">Enregistrer</button>' +
+    '<button class="btn" type="button" data-act="envoi-test">Vérifier la connexion</button>' +
+    '</div></form>';
+}
+
+/* Prête à envoyer ? La clé est chez Supabase, on ne peut que constater que le
+   reste est renseigné — la fonction dira le contraire si la clé manque. */
+function brevoPret() {
+  var e = (DB.shop && DB.shop.envoi) || {};
+  return Store.mode === "supabase" && !!(e.from_email || e.sms_sender);
+}
+
+/* Appelle la fonction « envoyer » avec le jeton du boucher. */
+function envoiAppel(corps) {
+  if (!SB.url) return Promise.reject(new Error("Base en ligne non configurée."));
+  // Sans session ouverte, la passerelle Supabase rejette l'appel avant même
+  // d'atteindre la fonction : autant le dire clairement.
+  if (!SB.token) return Promise.reject(new Error("Session expirée. Reconnectez-vous."));
+  return fetch(SB.url.replace(/\/+$/, "") + "/functions/v1/envoyer", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      apikey: SB.key,
+      Authorization: "Bearer " + SB.token
+    },
+    body: JSON.stringify(corps)
+  }).then(function (r) {
+    return r.text().then(function (t) {
+      var d = null;
+      try { d = t ? JSON.parse(t) : null; } catch (e) { d = { erreur: t }; }
+      if (!r.ok) throw new Error(envoiErr((d && d.erreur) || ("HTTP " + r.status), d));
+      return d;
+    });
+  });
+}
+
+var ENVOI_ERRS = {
+  brevo_non_configure: "La clé BREVO_KEY n'est pas posée dans les secrets Supabase.",
+  non_authentifie: "Session expirée. Reconnectez-vous.",
+  reserve_au_personnel: "Ce compte n'est pas dans la liste du personnel.",
+  expediteur_manquant: "Renseignez l'adresse d'expédition ci-dessus.",
+  nom_court_manquant: "Renseignez le nom court pour les SMS ci-dessus.",
+  aucun_destinataire: "Aucun destinataire.",
+  texte_vide: "Le message est vide.",
+  sujet_vide: "Indiquez un objet pour le courriel.",
+  boutique_introuvable: "La fiche boutique est introuvable en base.",
+  lecture_impossible: "Lecture des fiches refusée par la base."
+};
+function envoiErr(code, d) {
+  if (code === "trop_de_sms") return "Trop de SMS d'un coup (" + d.demandes + "). Maximum " + d.limite + " : faites deux envois.";
+  return ENVOI_ERRS[code] || String(code);
 }
 
 function sbPanel() {
@@ -3600,6 +3767,20 @@ var ACTS = {
     msgTrace(sp, "e-mail");
     location.href = url;
   },
+  "brevo-mail": function () { brevoEnvoi("email"); },
+  "brevo-sms": function () {
+    var sp = msgSplit();
+    modal("Confirmer l'envoi des SMS",
+      '<p>Vous allez envoyer <b>' + nb(sp.tel.length) + ' SMS</b> par Brevo. ' +
+      'Chaque SMS est facturé par Brevo, et un message de plus de 160 caractères ' +
+      'en compte deux.</p>' +
+      '<p class="small muted">Votre message : « ' + esc(msgFinal().slice(0, 140)) +
+      (msgFinal().length > 140 ? "…" : "") + ' »</p>' +
+      '<div class="btn-row"><button class="btn btn-primary" data-act="brevo-sms-go">' +
+      'Envoyer les ' + nb(sp.tel.length) + ' SMS</button>' +
+      '<button class="btn" data-act="close">Annuler</button></div>');
+  },
+  "brevo-sms-go": function () { closeModal(); msgModal(); brevoEnvoi("sms"); },
   "msg-copy": function () {
     var sp = msgSplit();
     var t = sp.tel.map(function (c) { return normPhone(c.phone); }).join(", ");
@@ -3611,6 +3792,23 @@ var ACTS = {
     }
   },
 
+  "envoi-test": function (el) {
+    var box = document.getElementById("envoi-err");
+    box.innerHTML = '<p class="small muted">Vérification…</p>';
+    // Un envoi à zéro destinataire : la fonction déroule tous ses contrôles —
+    // personnel, clé, expéditeur — sans qu'un seul message ne parte.
+    envoiAppel({ canal: "email", nature: "service", ids: [], sujet: "essai", texte: "essai" })
+      .then(function () { box.innerHTML = '<p class="small" style="color:var(--good)">Tout est en place.</p>'; })
+      ["catch"](function (err) {
+        var m = String(err.message || err);
+        if (m === "Aucun destinataire.") {
+          box.innerHTML = '<p class="small" style="color:var(--good)">Tout est en place : ' +
+            'la fonction répond, la clé est là, l\'expéditeur est accepté.</p>';
+        } else {
+          box.innerHTML = '<p class="err">' + esc(m) + '</p>';
+        }
+      });
+  },
   "new-client": function () { newClientModal(); },
   "till-pick": function (el) { S.till = { cid: el.dataset.id }; S.focusId = "amt"; go("admin", "till"); },
   "till-clear": function () { S.till = {}; render(); },
@@ -3843,6 +4041,25 @@ var FORMS = {
     logIt("Signature recueillie pour la fiche n° " + c.id, c.id);
     closeModal(); persist("Signature enregistrée.");
   },
+  "save-envoi": function (f) {
+    var box = document.getElementById("envoi-err");
+    var e = {
+      from_email: f.from_email.value.trim(),
+      from_name: f.from_name.value.trim(),
+      sms_sender: f.sms_sender.value.trim().toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 11),
+      site_url: f.site_url.value.trim().replace(/\/+$/, "")
+    };
+    if (e.from_email && e.from_email.indexOf("@") < 1) {
+      box.innerHTML = '<p class="err">Adresse d\'expédition invalide.</p>'; return;
+    }
+    if (e.site_url && !/^https?:\/\//.test(e.site_url)) {
+      box.innerHTML = '<p class="err">L\'adresse du site doit commencer par https://.</p>'; return;
+    }
+    DB.shop.envoi = e;
+    return remote(sbFetch("/rest/v1/shop?id=eq.1", {
+      method: "PATCH", prefer: "return=minimal", body: { data: DB.shop }
+    }, true), "Envoi automatique enregistré.");
+  },
   "save-client": function (f, el) {
     var c = byId(el.dataset.id);
     if (Store.mode === "supabase")
@@ -4032,11 +4249,14 @@ document.addEventListener("change", function (ev) {
    compte des destinataires) : le texte doit survivre à chaque redessin. */
 document.addEventListener("input", function (ev) {
   var el = ev.target;
-  if (!el || !el.dataset || el.dataset.act !== "msg-type") return;
+  if (!el || !el.dataset) return;
+  if (el.dataset.act === "msg-sujet") { S.msgSujet = el.value; return; }
+  if (el.dataset.act !== "msg-type") return;
   S.msgText = el.value;
   var hint = el.parentNode ? el.parentNode.querySelector(".hint .num") : null;
   if (hint) hint.textContent = String(el.value.length);
-  var send = document.querySelectorAll('[data-act="msg-sms"], [data-act="msg-mail"]');
+  var send = document.querySelectorAll('[data-act="msg-sms"], [data-act="msg-mail"], ' +
+    '[data-act="brevo-mail"], [data-act="brevo-sms"]');
   for (var i = 0; i < send.length; i++) send[i].disabled = !el.value;
 });
 var qt = null;

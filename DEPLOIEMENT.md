@@ -221,6 +221,84 @@ l'opérateur facture deux SMS. Le compteur de caractères le rappelle.
 Chaque envoi laisse une ligne dans le journal : la nature, la voie, le nombre
 de destinataires et le nombre d'écartés. Ni les noms, ni le texte.
 
+## 4 quinquies. Envoyer vraiment, par Brevo (facultatif)
+
+Par défaut, l'application prépare le message et ouvre votre application de
+messages : c'est vous qui appuyez sur envoyer. Avec **Brevo**, elle envoie
+elle-même, au nom de la boutique, sans passer par votre téléphone.
+
+### Pourquoi ce n'est pas un simple champ à remplir
+
+La clé d'API Brevo donne le droit d'envoyer des courriels et des SMS **depuis
+votre compte, à vos frais**. Une page web est lisible par n'importe qui : le
+menu « afficher le code source » suffit. Y coller la clé reviendrait à la
+publier, et n'importe quel visiteur pourrait vider votre crédit SMS.
+
+La clé reste donc sur un serveur — une **fonction Supabase**, qui reçoit la
+demande du boucher, vérifie qu'il est bien du personnel, relit les fiches en
+base, refait le tri du consentement, et seule appelle Brevo.
+
+### Ce qu'il faut faire, une fois
+
+**1. Créer un compte Brevo** sur [brevo.com](https://www.brevo.com) et récupérer
+la clé d'API : Paramètres → **SMTP & API** → onglet **Clés d'API** → *Générer
+une nouvelle clé*. Elle commence par `xkeysib-`.
+
+**2. Vérifier l'adresse d'expédition** dans Brevo (Expéditeurs, domaines &
+adresses IP). Sans cela les courriels partent en indésirables. Pour les SMS,
+déclarer un **nom d'expéditeur** de 11 caractères maximum — en France c'est
+obligatoire.
+
+**3. Installer les outils Supabase** sur votre ordinateur :
+
+```bash
+npm install -g supabase
+supabase login
+supabase link --project-ref edgivtkpqyziucjyzffs
+```
+
+**4. Poser la clé en secret** — elle ne quitte jamais Supabase :
+
+```bash
+supabase secrets set BREVO_KEY=xkeysib-votre-cle-ici
+```
+
+**5. Publier la fonction** :
+
+```bash
+supabase functions deploy envoyer
+```
+
+**6. Dans l'application**, Réglages → **Envoi automatique** : l'adresse
+d'expédition, le nom affiché, le nom court des SMS, et l'adresse du site
+(elle sert au lien de désinscription). Puis **Vérifier la connexion** : si tout
+est en place, l'application le dit. Sinon elle nomme ce qui manque.
+
+### Ce que la fonction refuse de faire
+
+- Envoyer si l'appelant n'est pas dans la table `staff` — même avec une clé
+  valide, même en trafiquant la page.
+- Faire confiance à la liste d'adresses envoyée par le navigateur : elle ne
+  reçoit que des **numéros de carte** et relit tout en base.
+- Envoyer une offre commerciale à qui ne l'a pas acceptée. Le tri existe déjà
+  dans la page ; il est **refait sur le serveur**, parce qu'un filtre côté
+  navigateur ne protège personne.
+- Partir sans lien de désinscription sur une offre : chaque courriel porte le
+  lien de la carte de **son** destinataire.
+- Dépasser 300 destinataires, ou 100 SMS, en un seul envoi.
+
+### Ce que ça coûte
+
+Les courriels sont compris dans l'offre gratuite de Brevo — **300 par jour**.
+Les **SMS sont facturés à l'unité** (de l'ordre de 4 à 5 centimes en France,
+et un message de plus de 160 caractères en compte deux). L'application demande
+confirmation avant tout envoi de SMS et affiche le crédit restant après coup.
+
+### Si vous n'installez rien
+
+Tout continue de fonctionner : l'application ouvre votre application de
+messages avec les destinataires et le texte remplis. Brevo n'est qu'un confort.
+
 ## 5. Se mettre en règle (RGPD)
 
 Une fois le site en ligne, ouvrir **Réglages → Données personnelles** et
