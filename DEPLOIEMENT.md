@@ -27,6 +27,13 @@ Supabase + Vercel), 10 à 15 € par an si vous voulez un nom de domaine à vous
    (e-mail + mot de passe), et cocher **Auto Confirm User**.
    Ce tout premier compte est **automatiquement** reconnu comme personnel :
    rien à recopier. Les comptes créés ensuite ne le sont pas.
+
+   > **L'ordre n'a pas d'importance.** Si le compte a été créé *avant*
+   > l'installation du schéma, l'inscription automatique n'existait pas encore
+   > pour lui : il se connecte alors sans rien voir, ni clients ni
+   > encaissement. Rejouer `schema.sql` suffit — il rattrape le compte le plus
+   > ancien du projet. L'application le détecte de son côté et affiche l'écran
+   > *« Ce compte n'a pas encore les droits »*, avec la ligne à coller.
 4. Dans **Authentication → Providers → Email**, désactiver
    **Enable sign-ups**. Personne ne peut plus créer de compte de son côté.
 

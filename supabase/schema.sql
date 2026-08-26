@@ -166,6 +166,40 @@ exception when others then
   raise notice 'Inscription automatique du personnel indisponible sur ce projet. Ajoutez le compte à la main : insert into public.staff (user_id, name) select id, ''Le boucher'' from auth.users where email = ''...'';';
 end $$;
 
+-- Le déclencheur ci-dessus ne vaut que pour l'avenir. Or l'ordre naturel des
+-- choses, quand on installe, est de créer son compte d'abord et de jouer ce
+-- fichier ensuite : le compte existe alors déjà, aucun déclencheur ne s'est
+-- exécuté pour lui, et le boucher se connecte pour découvrir une boutique
+-- vide — sans message, puisque tout a « marché ». On rattrape ici : si
+-- personne n'est encore inscrit comme personnel, le plus ancien compte du
+-- projet l'est. Rejouer ce fichier suffit donc à réparer.
+-- Enveloppé : ce fichier se joue d'un bloc dans l'éditeur SQL de Supabase.
+-- Une erreur ici — une colonne absente, un droit refusé sur le schéma auth —
+-- ferait échouer l'installation entière pour un simple confort.
+do $$
+begin
+  execute $q$
+    insert into public.staff (user_id, name)
+    select u.id, coalesce(u.email, 'Compte principal')
+    from auth.users u
+    where not exists (select 1 from public.staff)
+    order by u.created_at asc
+    limit 1
+    on conflict do nothing
+  $q$;
+exception when others then
+  raise notice 'Rattrapage du personnel impossible (%). Ajoutez le compte à la main : insert into public.staff (user_id, name) select id, ''Le boucher'' from auth.users where email = ''...'';', sqlerrm;
+end $$;
+
+do $$
+begin
+  if not exists (select 1 from public.staff) then
+    raise notice 'Aucun compte dans ce projet : créez-le dans Authentication → Users (en cochant Auto Confirm User), il sera inscrit comme personnel automatiquement.';
+  else
+    raise notice 'Personnel de la boutique : % compte(s).', (select count(*) from public.staff);
+  end if;
+end $$;
+
 -- ── 4. Ce que le public peut faire ─────────────────────────────────────
 
 -- Retire les accents sans dépendre de l'extension unaccent.

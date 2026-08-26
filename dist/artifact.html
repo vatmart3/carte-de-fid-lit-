@@ -1237,6 +1237,14 @@ function majTexte() {
   return "il y a " + Math.round(s / 3600) + " h";
 }
 
+/* Contrôlé une fois par ouverture de session : c'est un aller-retour de plus,
+   mais il évite de laisser le boucher devant une boutique vide sans raison. */
+function verifStaff() {
+  return rpc("is_staff", {}, true).then(function (r) {
+    S.pasStaff = !r; saveSession(); return r;
+  })["catch"](function () { S.pasStaff = false; return true; });
+}
+
 function sbLoadAll() {
   var since = new Date(new Date(today()).getTime() - 62 * 864e5).toISOString().slice(0, 10);
   var yearStart = today().slice(0, 4) + "-01-01";
@@ -4025,7 +4033,42 @@ function restoreModal() {
 var TABS = [["dash", "Tableau de bord"], ["till", "Encaisser"], ["clients", "Clients"],
   ["bday", "Anniversaires"], ["ref", "Parrainage"], ["set", "Réglages"]];
 
+/* Un compte accepté par Supabase mais absent de la table « staff » ouvre
+   l'espace boucher sur une boutique vide : zéro client, zéro passage, aucune
+   erreur. C'est la panne la plus déroutante de l'installation — tout a l'air
+   de marcher, et rien ne marche. Il faut la nommer. */
+function vPasStaff() {
+  return '<main class="admin-wrap">' +
+    '<section class="panel panel-pad stack">' +
+    '<div class="sect-head"><h2>Ce compte n\'a pas encore les droits</h2></div>' +
+    '<div class="banner warn"><span aria-hidden="true">!</span><span>' +
+    'La connexion a réussi : <b>' + esc(SB.email || "") + '</b> est bien un compte de ce ' +
+    'projet. Mais il n\'est pas inscrit comme <b>personnel de la boutique</b>, et la base ' +
+    'ne lui montre donc rien : ni clients, ni encaissement, ni réglages.' +
+    '</span></div>' +
+    '<p class="small">C\'est ce qui arrive quand le compte a été créé <b>avant</b> ' +
+    'l\'installation du schéma : l\'inscription automatique n\'existait pas encore ' +
+    'à ce moment-là.</p>' +
+    '<p class="small"><b>Deux façons de le réparer, une seule suffit.</b></p>' +
+    '<p class="small"><b>1.</b> Rejouer <code>supabase/schema.sql</code> dans Supabase → ' +
+    'SQL Editor. Il rattrape désormais les comptes déjà créés.</p>' +
+    '<p class="small"><b>2.</b> Ou coller cette seule ligne dans le SQL Editor :</p>' +
+    '<textarea rows="4" readonly style="font-family:var(--mono);font-size:12px">' +
+    esc("insert into public.staff (user_id, name)\nselect id, 'Le boucher' from auth.users\nwhere email = '" +
+        (SB.email || "votre@adresse.fr") + "'\non conflict do nothing;") + '</textarea>' +
+    '<button class="btn btn-primary btn-full" data-act="copy" data-val="' +
+    esc("insert into public.staff (user_id, name) select id, 'Le boucher' from auth.users where email = '" +
+        (SB.email || "votre@adresse.fr") + "' on conflict do nothing;") +
+    '">Copier la ligne</button>' +
+    '<p class="small muted">Puis revenez ici et rechargez la page.</p>' +
+    '<div class="btn-row"><button class="btn" data-act="reload">Recharger</button>' +
+    '<button class="btn" data-act="sb-check">Vérifier l\'installation</button>' +
+    '<button class="btn btn-ghost" data-act="leave-admin">Se déconnecter</button></div>' +
+    '</section></main>';
+}
+
 function vAdmin() {
+  if (S.pasStaff) return vPasStaff();
   var body = S.tab === "till" ? vTill() : S.tab === "clients" ? vClients() :
     S.tab === "bday" ? vBday() : S.tab === "ref" ? vRef() : S.tab === "set" ? vSet() : vDash();
   var tabs = TABS.map(function (t) {
@@ -4625,10 +4668,12 @@ var FORMS = {
       var entre = false;
       sbLogin(f.mail.value.trim(), f.pin.value)
         .then(function () { entre = true; return sbLoadAll(); })
+        .then(function () { return verifStaff(); })
         .then(function () {
           S.admin = true; S.lockEmail = ""; S.tab = "dash"; touchLock();
           if (S.pendingTill) { S.till = { cid: S.pendingTill }; S.tab = "till"; S.pendingTill = ""; }
-          render(); toast("Bonjour.", "ok");
+          render();
+          if (!S.pasStaff) toast("Bonjour.", "ok");
         })
         ["catch"](function (e) {
           // Deux pannes très différentes se ressemblaient à l'écran : le compte
@@ -5027,7 +5072,7 @@ function bootRemote() {
     if (lockExpired()) { S.admin = false; S.lockEmail = SB.email; sbLogout(); ok = false; }
     if (!ok) { S.admin = false; if (till) applyTill(till); render(); return; }
     if (!S.admin) { if (till) applyTill(till); render(); return; }
-    return sbLoadAll().then(function () {
+    return sbLoadAll().then(function () { return verifStaff(); }).then(function () {
       S.tab = S.tab || "dash";
       if (till) applyTill(till);
       render();
