@@ -501,12 +501,38 @@ input:-webkit-autofill,input:-webkit-autofill:focus{
 .filter-row #cq{flex:1 1 200px;min-width:0}
 .filter-row select{width:auto;min-width:0}
 .till-find{display:flex;gap:10px;flex-wrap:wrap}
+.till-box{display:flex;flex-direction:column;gap:11px}
 .till-find input[name="q"]{flex:1 1 220px;min-width:0}
 .till-found{display:flex;align-items:center;gap:15px;padding:18px;border-radius:var(--r-sm);
   background:var(--surface-2);border:1px solid var(--hair)}
 .till-found .who{flex:1 1 auto;min-width:0}
 .till-found .av{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;
   font-weight:700;font-size:17px;flex:none;background:var(--rouge-fill);color:var(--rouge-on)}
+/* Le choix « par numéro / par nom » : deux moitiés d'une même touche. */
+.seg{display:inline-flex;padding:3px;gap:3px;border-radius:99px;background:var(--surface-3);
+  border:1px solid var(--hair-2);align-self:flex-start;max-width:100%}
+.seg-b{flex:1 1 auto;padding:9px 20px;border-radius:99px;border:0;background:transparent;
+  font-size:14.5px;font-weight:600;color:var(--muted);white-space:nowrap;
+  transition:background .12s,color .12s,box-shadow .12s}
+.seg-b:hover{color:var(--ink)}
+.seg-b.on{background:var(--surface-1);color:var(--ink);font-weight:700;box-shadow:var(--lift)}
+
+/* Les propositions qui s'affichent dès les premiers caractères. */
+.sugg{display:flex;flex-direction:column;gap:6px}
+.sugg:empty{display:none}
+.sugg-i{display:flex;align-items:center;gap:13px;width:100%;text-align:left;padding:11px 13px;
+  border-radius:var(--r-sm);border:1px solid var(--hair);background:var(--surface-1);
+  transition:background .12s,border-color .12s}
+.sugg-i:hover{background:var(--surface-2);border-color:var(--hair-2)}
+.sugg-i:focus-visible{background:var(--surface-2);border-color:var(--rouge)}
+.sugg-i .av{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;flex:none;
+  font-weight:700;font-size:14px;background:var(--surface-3);color:var(--ink-2)}
+.sugg-i .who{flex:1 1 auto;min-width:0;display:block}
+.sugg-i .who b{display:block;font-size:15.5px;font-weight:600}
+.sugg-i .who .small{display:block}
+.sugg-i mark{background:var(--ambre-soft);color:inherit;font-weight:800;border-radius:3px;padding:0 1px}
+.sugg-hint{font-size:13.5px;color:var(--muted);padding:4px 2px}
+.sugg-plus{font-size:13px;color:var(--muted);padding:2px 2px 0}
 .chips{display:flex;flex-wrap:wrap;gap:9px}
 .chip{padding:11px 17px;border-radius:99px;border:1px solid var(--hair-2);background:var(--surface-1);
   font-size:15px;font-weight:500;transition:background .12s,border-color .12s,color .12s}
@@ -2544,19 +2570,116 @@ function vDash() {
 
 /* ══════════════════════════ 6. Encaisser ══════════════════════════ */
 
+/* On cherche soit par numéro (carte ou téléphone), soit par nom. Le choix
+   change le clavier du téléphone : chiffres d'un côté, lettres de l'autre. */
+function tillPar() { return S.tillPar === "nom" ? "nom" : "num"; }
+
+/* « Thérèse » doit se trouver en tapant « therese ». On retire les accents
+   sans changer la longueur du texte, pour pouvoir surligner au bon endroit. */
+function sansAccent(t) {
+  return String(t == null ? "" : t).replace(/[^\u0000-\u007f]/g, function (ch) {
+    var d = ch.normalize ? ch.normalize("NFD") : ch;
+    return d.charCodeAt(0) < 128 ? d.charAt(0) : ch;
+  });
+}
+
+/* Les clients à proposer pendant la frappe. Six au plus : au-delà, une liste
+   qui déroule cache le clavier au lieu d'aider. */
+function tillMatch(q, par) {
+  q = sansAccent(String(q || "").trim()).toLowerCase();
+  var rien = { list: [], total: 0 };
+  if (!q) return rien;
+  var out;
+  if (par === "nom") {
+    if (q.length < 2) return rien;
+    out = DB.clients.filter(function (c) {
+      return sansAccent(c.name).toLowerCase().indexOf(q) >= 0;
+    }).sort(function (a, b) {
+      // ceux dont un mot du nom commence par ce qu'on tape passent devant
+      var A = sansAccent(a.name).toLowerCase(), B = sansAccent(b.name).toLowerCase();
+      var da = (A.indexOf(q) === 0 || A.indexOf(" " + q) >= 0) ? 0 : 1;
+      var db = (B.indexOf(q) === 0 || B.indexOf(" " + q) >= 0) ? 0 : 1;
+      return da - db || a.name.localeCompare(b.name, "fr");
+    });
+  } else {
+    var ph = normPhone(q);
+    out = DB.clients.filter(function (c) {
+      // le numéro de carte dès le premier chiffre ; le téléphone à partir de
+      // quatre, sinon « 06 » proposerait toute la clientèle
+      return c.id.indexOf(q) === 0 ||
+        (ph.length >= 4 && normPhone(c.phone).indexOf(ph) >= 0) ||
+        (c.code || "").toLowerCase().indexOf(q) === 0;
+    }).sort(function (a, b) { return a.id.localeCompare(b.id); });
+  }
+  return { list: out.slice(0, 6), total: out.length };
+}
+
+/* Le morceau qui correspond à ce qui est tapé, mis en évidence. */
+function surligne(txt, q, par) {
+  var brut = String(txt || "");
+  q = sansAccent(String(q || "").trim()).toLowerCase();
+  if (!q) return esc(brut);
+  var i = sansAccent(brut).toLowerCase().indexOf(par === "nom" ? q : normPhone(q));
+  if (i < 0 || !q) return esc(brut);
+  var n = (par === "nom" ? q : normPhone(q)).length;
+  return esc(brut.slice(0, i)) + "<mark>" + esc(brut.slice(i, i + n)) + "</mark>" +
+    esc(brut.slice(i + n));
+}
+
+function suggHtml(q, par) {
+  var qq = String(q || "").trim();
+  if (!qq) return "";
+  var r = tillMatch(qq, par);
+  if (!r.list.length) {
+    if (par === "nom" && sansAccent(qq).length < 2)
+      return '<p class="sugg-hint">Encore une lettre et les noms s\'affichent.</p>';
+    return '<p class="sugg-hint">Aucun client ne correspond à « ' + esc(qq) + ' ».</p>';
+  }
+  return r.list.map(function (c) {
+    return '<button class="sugg-i" type="button" role="option" aria-selected="false" ' +
+      'data-act="till-pick" data-id="' + c.id + '">' +
+      '<span class="av" aria-hidden="true">' + esc(initials(c.name)) + '</span>' +
+      '<span class="who"><b>' + (par === "nom" ? surligne(c.name, qq, par) : esc(c.name)) + '</b>' +
+      '<span class="small muted num">n° ' + c.id + ' · ' + esc(prettyPhone(c.phone)) +
+      ' · ' + nb(c.points) + ' points</span></span></button>';
+  }).join("") +
+    (r.total > r.list.length
+      ? '<p class="sugg-plus">et ' + nb(r.total - r.list.length) + ' autre' +
+        (r.total - r.list.length > 1 ? "s" : "") + ' — précisez votre recherche.</p>'
+      : "");
+}
+
 function vTill() {
   var c = S.till && S.till.cid ? byId(S.till.cid) : null;
   var sh = DB.shop;
+  var par = tillPar(), q = S.tillQ || "";
   var head = '<section class="panel panel-pad stack">' +
     '<div class="sect-head"><h2>Encaisser un achat</h2><span class="sp"></span>' +
-    '<span class="small muted">Saisissez le numéro de carte du client</span></div>' +
-    '<form class="till-find" data-act="till-find">' +
-    '<input name="q" type="text" inputmode="numeric" autocomplete="off" ' +
-    'placeholder="N° de carte, téléphone ou nom" value="">' +
+    '<span class="small muted">' +
+    (par === "nom" ? "Tapez les premières lettres du nom"
+      : "Tapez le début du n° de carte ou du téléphone") +
+    '</span></div>' +
+    '<div class="till-box">' +
+    '<div class="seg" role="group" aria-label="Rechercher par">' +
+    '<button class="seg-b' + (par === "num" ? " on" : "") + '" type="button" data-act="till-par" ' +
+    'data-p="num" aria-pressed="' + (par === "num") + '">Numéro</button>' +
+    '<button class="seg-b' + (par === "nom" ? " on" : "") + '" type="button" data-act="till-par" ' +
+    'data-p="nom" aria-pressed="' + (par === "nom") + '">Nom</button>' +
+    '</div>' +
+    '<form class="till-find" data-act="till-find" autocomplete="off">' +
+    '<input id="tq" name="q" type="text" data-act="till-live" role="combobox" ' +
+    'inputmode="' + (par === "nom" ? "text" : "numeric") + '" autocomplete="off" ' +
+    'aria-autocomplete="list" aria-controls="tsugg" aria-expanded="true" ' +
+    'aria-label="' + (par === "nom" ? "Nom du client" : "Numéro de carte ou téléphone") + '" ' +
+    'placeholder="' + (par === "nom" ? "Marie Lefevre" : "1001 ou 06 12 48 03 77") + '" ' +
+    'value="' + esc(q) + '">' +
     '<button class="btn" type="button" data-act="scan">Scanner</button>' +
     '<button class="btn ' + (c ? "" : "btn-ink ") + '" type="submit">Rechercher</button>' +
     (c ? '<button class="btn btn-ghost" type="button" data-act="till-clear">Changer</button>' : "") +
-    '</form>';
+    '</form>' +
+    '<div id="tsugg" class="sugg" role="listbox" aria-label="Clients proposés">' +
+    suggHtml(q, par) + '</div>' +
+    '</div>';
 
   if (!c) {
     var recent = DB.clients.slice().sort(function (a, b) {
@@ -2650,7 +2773,8 @@ function selBar(list) {
     '<span class="cnt"><b>' + nb(n) + '</b> client' + (n > 1 ? "s" : "") + ' sélectionné' + (n > 1 ? "s" : "") + '</span>' +
     '<span class="sp"></span>' +
     '<button class="btn btn-sm btn-ink" data-act="msg-open">Écrire à ces clients</button>' +
-    '<button class="btn btn-sm" data-act="sel-export">Exporter</button>' +
+    '<button class="btn btn-sm" data-act="sel-export">Exporter (CSV)</button>' +
+    '<button class="btn btn-sm" data-act="sel-brevo">Exporter pour Brevo</button>' +
     '<button class="btn btn-sm btn-ghost" data-act="sel-none">Tout décocher</button>' +
     '</div>';
 }
@@ -2951,7 +3075,15 @@ function msgBody() {
         'Ouvrir l\'e-mail</button>' +
         '<button class="btn btn-sm" data-act="msg-copy"' + (sp.tel.length ? "" : " disabled") + '>' +
         'Copier les numéros</button></div>'
-      : '<div class="btn-row">' +
+      : '<div class="banner"><span class="ico" aria-hidden="true">i</span><span class="grow">' +
+        '<b>L\'envoi depuis le site n\'est pas encore activé.</b> Pour l\'instant, ' +
+        'l\'application ouvre l\'application de messages de votre téléphone. ' +
+        'Une fois Brevo branché, les messages partent d\'ici, au nom de la boutique.' +
+        '</span>' +
+        (Store.mode === "supabase"
+          ? '<button class="btn btn-sm btn-ink" data-act="go-envoi">Activer</button>'
+          : "") + '</div>' +
+        '<div class="btn-row">' +
         '<button class="btn btn-primary" data-act="msg-sms"' + (sp.tel.length && msgText() ? "" : " disabled") + '>' +
         'Ouvrir les SMS (' + nb(sp.tel.length) + ')</button>' +
         '<button class="btn" data-act="msg-mail"' + (sp.mail.length && msgText() ? "" : " disabled") + '>' +
@@ -3435,6 +3567,35 @@ function csv(rows) {
     }).join(";");
   }).join("\r\n");
 }
+/* Le format d'import de Brevo : une colonne EMAIL, une colonne SMS au format
+   international, le reste en attributs. On n'y met que les clients qui ont
+   accepté les offres — une fois dans Brevo, plus personne ne refait ce tri. */
+function csvBrevo(garde) {
+  var rows = [["EMAIL", "SMS", "PRENOM", "NOM", "NUM_CARTE", "POINTS", "ANNIVERSAIRE"]];
+  var n = 0;
+  DB.clients.filter(garde || function () { return true; }).forEach(function (c) {
+    if (!c.marketing) return;
+    var tel = telInter(c.phone);
+    if (!(c.email || "").length && !tel) return;
+    var bout = String(c.name || "").trim().split(/\s+/);
+    var prenom = bout.shift() || "";
+    rows.push([c.email || "", tel || "", prenom, bout.join(" "), c.id, c.points, bdayLabel(c)]);
+    n++;
+  });
+  return { csv: "﻿" + csv(rows), n: n };
+}
+
+/* Brevo veut l'indicatif du pays, sans « + » ni espaces. Les fiches sont
+   saisies au format français : on complète le 33. Même règle que la fonction
+   serveur, pour que l'un ne parte pas sans l'autre. */
+function telInter(tel) {
+  var t = String(tel || "").replace(/[^0-9+]/g, "").replace(/^00/, "+");
+  if (/^\+?33[1-9]\d{8}$/.test(t)) return t.replace(/^\+/, "");
+  if (/^0[1-9]\d{8}$/.test(t)) return "33" + t.slice(1);
+  if (/^\+?[1-9]\d{9,14}$/.test(t)) return t.replace(/^\+/, "");
+  return "";
+}
+
 function csvClients(garde) {
   var rows = [["Numero", "Nom", "Telephone", "Email", "Anniversaire", "Inscription", "Points", "Points cumules",
     "Total depense", "Passages", "Dernier passage", "Statut", "Code parrain", "Parraine par",
@@ -3747,6 +3908,23 @@ var ACTS = {
   },
 
   /* ── écrire aux clients cochés ── */
+  "go-envoi": function () {
+    closeModal();
+    S.tab = "set"; S.scroll = 0; render();
+    setTimeout(function () {
+      var f = document.querySelector('form[data-act="save-envoi"]');
+      if (f) f.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 60);
+  },
+  "sel-brevo": function () {
+    var ids = {}; selIds().forEach(function (i) { ids[i] = true; });
+    if (!selIds().length) return;
+    var r = csvBrevo(function (c) { return ids[c.id]; });
+    if (!r.n) { toast("Aucun des clients cochés n'a accepté les offres.", "bad"); return; }
+    offerFile("brevo-" + r.n + "-contacts.csv", r.csv);
+    var hors = selIds().length - r.n;
+    toast(r.n + " contact(s) exporté(s)" + (hors ? " · " + hors + " écarté(s)" : "") + ".", "ok");
+  },
   "msg-open": function () { msgModal(); },
   "msg-kind": function (el) { S.msgKind = el.dataset.k; msgRefresh(); },
   "msg-modele": function (el) { S.msgText = el.dataset.t; msgRefresh(); },
@@ -3815,8 +3993,14 @@ var ACTS = {
       });
   },
   "new-client": function () { newClientModal(); },
-  "till-pick": function (el) { S.till = { cid: el.dataset.id }; S.focusId = "amt"; go("admin", "till"); },
-  "till-clear": function () { S.till = {}; render(); },
+  "till-pick": function (el) {
+    S.till = { cid: el.dataset.id }; S.tillQ = ""; S.focusId = "amt"; go("admin", "till");
+  },
+  "till-clear": function () { S.till = {}; S.tillQ = ""; S.focusId = "tq"; render(); },
+  "till-par": function (el) {
+    S.tillPar = el.dataset.p === "nom" ? "nom" : "num";
+    S.focusId = "tq"; S.scroll = window.scrollY; render();
+  },
   "add-w": function (el) {
     var i = document.getElementById("w"); if (!i) return;
     i.value = i.value ? i.value + ", " + el.dataset.w : el.dataset.w;
@@ -3994,9 +4178,14 @@ var FORMS = {
     else box.innerHTML = '<p class="err">Code incorrect.</p>';
   },
   "till-find": function (f) {
-    var q = f.q.value, c = findClient(q) || search(q)[0];
+    var q = f.q.value.trim();
+    if (!q) return;
+    S.tillQ = q;
+    // ce qui est proposé à l'écran passe d'abord : le boucher voit le nom
+    // qu'il a sous les yeux, pas une autre fiche trouvée autrement
+    var c = findClient(q) || tillMatch(q, tillPar()).list[0] || search(q)[0];
     if (!c) { toast("Aucun client pour « " + q + " ».", "bad"); return; }
-    S.till = { cid: c.id }; S.focusId = "amt"; render();
+    S.till = { cid: c.id }; S.tillQ = ""; S.focusId = "amt"; render();
   },
   "till-save": tillSave,
   "my-save": function (f) {
@@ -4263,6 +4452,35 @@ document.addEventListener("input", function (ev) {
   var send = document.querySelectorAll('[data-act="msg-sms"], [data-act="msg-mail"], ' +
     '[data-act="brevo-mail"], [data-act="brevo-sms"]');
   for (var i = 0; i < send.length; i++) send[i].disabled = !el.value;
+});
+/* La caisse propose des noms au fur et à mesure. On ne redessine que la
+   liste : un render() complet reprendrait le champ et le clavier se
+   refermerait à chaque lettre tapée. */
+var tt = null;
+document.addEventListener("input", function (ev) {
+  var el = ev.target;
+  if (!el.dataset || el.dataset.act !== "till-live") return;
+  S.tillQ = el.value;
+  clearTimeout(tt);
+  tt = setTimeout(function () {
+    var box = document.getElementById("tsugg");
+    if (box) box.innerHTML = suggHtml(S.tillQ, tillPar());
+  }, 80);
+});
+document.addEventListener("keydown", function (ev) {
+  var champ = ev.target.dataset && ev.target.dataset.act === "till-live";
+  var prop = ev.target.classList && ev.target.classList.contains("sugg-i");
+  if (!champ && !prop) return;
+  if (ev.key !== "ArrowDown" && ev.key !== "ArrowUp") return;
+  var box = document.getElementById("tsugg");
+  if (!box) return;
+  var l = [].slice.call(box.querySelectorAll(".sugg-i"));
+  if (!l.length) return;
+  ev.preventDefault();
+  var i = l.indexOf(ev.target);
+  if (ev.key === "ArrowDown") (l[i + 1] || l[0]).focus();
+  else if (i <= 0) { var ch = document.getElementById("tq"); if (ch) ch.focus(); }
+  else l[i - 1].focus();
 });
 var qt = null;
 document.addEventListener("input", function (ev) {

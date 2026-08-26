@@ -54,7 +54,8 @@ function echappe(s: string) {
 /* Le téléphone tel que Brevo l'attend : indicatif pays, sans « + » ni espaces.
    Les fiches sont saisies au format français, on complète donc le 33. */
 function international(tel: string): string | null {
-  const n = String(tel || "").replace(/[^0-9+]/g, "");
+  // « 0033… » est un « +33… » écrit à l'ancienne : on le ramène au même format.
+  const n = String(tel || "").replace(/[^0-9+]/g, "").replace(/^00/, "+");
   if (/^\+?33[1-9]\d{8}$/.test(n)) return n.replace(/^\+/, "");
   if (/^0[1-9]\d{8}$/.test(n)) return "33" + n.slice(1);
   if (/^\+?[1-9]\d{9,14}$/.test(n)) return n.replace(/^\+/, "");

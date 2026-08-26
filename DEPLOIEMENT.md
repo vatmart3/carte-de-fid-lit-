@@ -121,8 +121,10 @@ les parrainages et les numéros de carte sont conservés.
 ## 5. Au comptoir
 
 - **Le boucher** ouvre le site, Espace boucher, se connecte une fois : sa
-  tablette reste connectée. Onglet **Encaisser**, il saisit le numéro de carte
-  et le montant.
+  tablette reste connectée. Onglet **Encaisser**, il choisit **Numéro** ou
+  **Nom**, tape les premiers caractères, et le client apparaît dans une liste
+  de propositions — nom, numéro de carte, téléphone et points. Un doigt dessus
+  ouvre l'encaissement, il ne reste que le montant.
 - **Le client** reçoit un lien personnel à la création de sa carte
   (`…/?c=xxxx`). À ajouter en favori ou sur l'écran d'accueil du téléphone.
   S'il le perd : bouton **J'ai déjà une carte**, téléphone + date de naissance.
@@ -133,7 +135,42 @@ code en ligne fait l'affaire à partir de l'adresse du site.
 
 ---
 
-## 4 bis. Le scanner
+## 4 bis. Trouver le bon client
+
+Au comptoir, la file attend : chercher un client ne doit pas prendre plus de
+deux secondes. L'onglet **Encaisser** offre trois voies, dans cet ordre de
+rapidité.
+
+**Le scanner** — le client montre le code de sa carte, la caméra le lit, la
+fiche s'ouvre. C'est le plus rapide quand le client a son téléphone en main
+(voir la section suivante).
+
+**Par numéro** — le choix par défaut. Le téléphone ouvre son **clavier
+chiffres**. Dès le premier chiffre, les cartes qui commencent par ce chiffre
+sont proposées ; à partir de quatre chiffres, les téléphones qui les
+contiennent aussi. Utile quand le client dit « c'est le 1006 » ou donne la fin
+de son numéro de portable.
+
+**Par nom** — un appui sur **Nom** fait basculer le champ en **clavier
+lettres**. À partir de deux lettres, les noms correspondants s'affichent, la
+partie tapée surlignée. Le prénom et le nom de famille comptent autant l'un que
+l'autre : « duclos » trouve Antoine Duclos. Les accents n'ont pas à être
+tapés — « therese » trouve Thérèse Aubry.
+
+Chaque proposition porte le **nom**, le **numéro de carte**, le **téléphone**
+et les **points** : de quoi lever un doute entre deux homonymes sans ouvrir la
+fiche. Six propositions au plus, sinon la liste cacherait le clavier ; s'il y
+en a davantage, l'application le dit et invite à préciser.
+
+Au clavier, la **flèche bas** descend dans les propositions et **Entrée**
+choisit. Sans toucher aux flèches, **Entrée** dans le champ prend la première
+proposition affichée — celle que le boucher a sous les yeux.
+
+Côté client, la page « J'ai déjà une carte » ne propose **aucun nom** : ce
+serait donner la liste des clients de la boutique au premier venu. Les
+propositions n'existent que derrière le mot de passe du boucher.
+
+## 4 ter. Le scanner
 
 Le bouton **Scanner** de l'écran d'encaissement ouvre l'appareil photo du
 boucher. Trois conditions :
@@ -174,7 +211,7 @@ connaît pas votre base Supabase.
 Une fois le site publié sur Vercel (partie 3), la question ne se pose plus : la
 page est en pleine fenêtre, en HTTPS, et la caméra s'ouvre au premier appui.
 
-## 4 ter. La signature du client
+## 4 quater. La signature du client
 
 Depuis l'inscription, le client **signe du doigt dans une case blanche**, que la
 carte soit créée par lui-même sur son téléphone ou par le boucher au comptoir.
@@ -191,7 +228,7 @@ Données personnelles indique combien il en reste ; ouvrez la fiche du client à
 son prochain passage et utilisez **Faire signer**. Le client peut aussi le faire
 lui-même depuis sa carte.
 
-## 4 quater. Écrire à une partie des clients
+## 4 quinquies. Écrire à une partie des clients
 
 Dans **Clients**, un carré à cocher précède chaque nom. Cochez qui vous voulez —
 ou **Tout cocher**, qui ne prend que les fiches actuellement affichées : tapez
@@ -221,7 +258,7 @@ l'opérateur facture deux SMS. Le compteur de caractères le rappelle.
 Chaque envoi laisse une ligne dans le journal : la nature, la voie, le nombre
 de destinataires et le nombre d'écartés. Ni les noms, ni le texte.
 
-## 4 quinquies. Envoyer vraiment, par Brevo (facultatif)
+## 4 sexies. Envoyer vraiment, par Brevo (facultatif)
 
 Par défaut, l'application prépare le message et ouvre votre application de
 messages : c'est vous qui appuyez sur envoyer. Avec **Brevo**, elle envoie
@@ -265,9 +302,64 @@ n'importe qui.
 C'est pour cette seule raison que l'envoi passe par une fonction serveur.
 Ce n'est pas de la prudence excessive, c'est la seule façon.
 
+### Faut-il transférer les clients dans Brevo ? Non.
+
+C'est la question qui vient d'abord, et la réponse est *non*. La fonction
+d'envoi lit les fiches **dans votre base Supabase** au moment de l'envoi et
+donne à Brevo, pour ce message-là, les seules adresses et numéros concernés.
+Brevo sert de facteur, pas d'annuaire. Rien n'est à téléverser, rien n'est à
+tenir à jour en double, et un client effacé de la carte de fidélité disparaît
+du même coup des envois.
+
+Il reste **un** cas où l'on exporte : si vous voulez faire vos campagnes depuis
+l'interface de Brevo, avec ses modèles et ses statistiques. Dans **Clients**,
+cochez qui vous voulez et prenez **Exporter pour Brevo**. Le fichier est au
+format d'import de Brevo (colonnes `EMAIL`, `SMS`, `PRENOM`, `NOM`,
+`NUM_CARTE`, `POINTS`, `ANNIVERSAIRE`), les téléphones y sont déjà convertis au
+format international (`33…`) que Brevo exige, et **seuls les clients qui ont
+accepté les offres y figurent** — l'application vous dit combien elle a écartés.
+
+Sachez ce que vous perdez en faisant cela : une fois les contacts dans Brevo,
+c'est Brevo qui décide qui reçoit quoi. Le filtre du consentement ne se refait
+plus, le lien de désinscription vers la carte n'est plus ajouté, et un client
+qui décoche la case chez vous **reste dans la liste Brevo**. À vous de l'y
+retirer. C'est pour cela que l'envoi depuis le site est la voie recommandée.
+
 ### Ce qu'il faut faire, une fois
 
-**Le plus simple** — une commande, depuis le dossier du projet :
+**Sans rien installer**, depuis le navigateur — c'est la voie à conseiller au
+boucher, elle ne demande aucun terminal :
+
+**1. Créer un compte Brevo** sur [brevo.com](https://www.brevo.com), puis
+Paramètres → **SMTP & API** → onglet **Clés d'API** → *Générer une nouvelle
+clé*. Elle commence par `xkeysib-`. Copiez-la, elle ne sera plus jamais
+affichée.
+
+**2. Vérifier l'expéditeur** dans Brevo (Expéditeurs, domaines & adresses IP) :
+l'adresse d'envoi des courriels, et un **nom d'expéditeur** de 11 caractères
+maximum pour les SMS — obligatoire en France.
+
+**3. Poser la clé dans Supabase** : [supabase.com](https://supabase.com) →
+votre projet → **Edge Functions** → **Secrets** → *Add new secret*.
+Nom : `BREVO_KEY`. Valeur : la clé. **Save**. Elle est désormais rangée du côté
+serveur ; ni la page, ni le navigateur, ni personne d'autre n'y a accès.
+
+**4. Publier la fonction** : toujours dans **Edge Functions**, *Deploy a new
+function* → *Via Editor*. Nom de la fonction : `envoyer`, exactement.
+Effacez l'exemple, collez tout le contenu du fichier
+`supabase/functions/envoyer/index.ts` de ce dépôt, puis **Deploy**.
+
+**5. Dans l'application**, Réglages → **Envoi automatique** : l'adresse
+d'expédition, le nom affiché, le nom court des SMS et l'adresse du site (elle
+sert au lien de désinscription). Puis **Vérifier la connexion** : l'application
+dit si tout est en place, ou nomme ce qui manque.
+
+Ces cinq étapes ne se font qu'une fois. Ensuite, dans la fenêtre d'écriture,
+les boutons **Envoyer les courriels** et **Envoyer les SMS** partent d'ici, au
+nom de la boutique. Tant que ce n'est pas fait, la fenêtre l'annonce et propose
+un bouton **Activer** qui mène droit au bon réglage.
+
+**Avec un terminal** — une seule commande, depuis le dossier du projet :
 
 ```bash
 sh scripts/brevo.sh
@@ -277,16 +369,9 @@ Elle installe tout : connexion, rattachement du projet, saisie de la clé (à
 l'aveugle, elle n'est ni affichée, ni écrite sur le disque, ni conservée dans
 l'historique du terminal), et publication de la fonction.
 
-**Ou à la main**, si vous préférez voir chaque étape :
-
-**1. Créer un compte Brevo** sur [brevo.com](https://www.brevo.com) et récupérer
-la clé d'API : Paramètres → **SMTP & API** → onglet **Clés d'API** → *Générer
-une nouvelle clé*. Elle commence par `xkeysib-`.
-
-**2. Vérifier l'adresse d'expédition** dans Brevo (Expéditeurs, domaines &
-adresses IP). Sans cela les courriels partent en indésirables. Pour les SMS,
-déclarer un **nom d'expéditeur** de 11 caractères maximum — en France c'est
-obligatoire.
+**Ou étape par étape en ligne de commande**, si vous préférez tout voir passer
+(les étapes 1 et 2 ci-dessus — compte Brevo et expéditeur vérifié — restent à
+faire d'abord) :
 
 **3. Installer les outils Supabase** sur votre ordinateur :
 
@@ -308,10 +393,8 @@ supabase secrets set BREVO_KEY=xkeysib-votre-cle-ici
 supabase functions deploy envoyer
 ```
 
-**6. Dans l'application**, Réglages → **Envoi automatique** : l'adresse
-d'expédition, le nom affiché, le nom court des SMS, et l'adresse du site
-(elle sert au lien de désinscription). Puis **Vérifier la connexion** : si tout
-est en place, l'application le dit. Sinon elle nomme ce qui manque.
+**6. Dans l'application**, Réglages → **Envoi automatique**, comme à l'étape 5
+plus haut.
 
 ### Ce que la fonction refuse de faire
 
@@ -338,7 +421,7 @@ confirmation avant tout envoi de SMS et affiche le crédit restant après coup.
 Tout continue de fonctionner : l'application ouvre votre application de
 messages avec les destinataires et le texte remplis. Brevo n'est qu'un confort.
 
-## 5. Se mettre en règle (RGPD)
+## 6. Se mettre en règle (RGPD)
 
 Une fois le site en ligne, ouvrir **Réglages → Données personnelles** et
 compléter raison sociale, adresse, SIRET, directeur de la publication et
