@@ -74,14 +74,39 @@ Le dépôt est prêt pour Vercel : `vercel.json` et `scripts/build-site.mjs`
 publient **uniquement** `index.html`. Le schéma, les scripts, la démo et la
 documentation restent dans le dépôt, hors de l'hébergement public.
 
-1. Aller sur https://vercel.com/new
-2. **Import Git Repository** → connecter GitHub → choisir `carte-de-fid-lit-`
-3. Ne rien changer : la configuration est lue dans `vercel.json`
-   (aucune dépendance, aucun framework, dossier publié `public/`)
-4. **Deploy**. L'adresse arrive en une minute, du type
-   `carte-de-fid-lit.vercel.app` — modifiable dans **Settings → Domains**.
+**1. Créer le compte Vercel avec GitHub.** https://vercel.com → *Sign Up* →
+**Continue with GitHub**. S'inscrire ainsi fait la liaison des deux comptes du
+même geste, il n'y a rien à relier ensuite. Choisir le plan **Hobby**, gratuit,
+et déclarer un usage personnel.
 
-Chaque `git push` redéploie ensuite le site automatiquement.
+**2. Donner accès au dépôt.** GitHub demande d'autoriser Vercel, puis *sur
+quels dépôts*. Prendre **Only select repositories** → `carte-de-fid-lit-` →
+*Install*. Plus prudent que « tous les dépôts » : Vercel ne voit que celui-ci.
+
+**3. Importer.** https://vercel.com/new → le dépôt apparaît dans la liste →
+**Import**.
+
+**4. Ne rien changer.** L'écran de configuration se remplit tout seul depuis
+`vercel.json` : *Framework Preset* sur **Other**, la commande de construction
+et le dossier publié déjà écrits. **Aucune variable d'environnement à saisir** :
+l'adresse de la base et sa clé publique sont dans le fichier lui-même, et la
+clé Brevo vit chez Supabase, pas ici.
+
+**5. Deploy.** Une minute. L'adresse arrive, du type
+`carte-de-fid-lit.vercel.app` — modifiable dans **Settings → Domains**.
+
+**6. Vérifier.** Ouvrir l'adresse : la page d'accueil doit s'afficher. Puis
+Espace boucher → se connecter → Réglages → **Vérifier l'installation**.
+
+Le dépôt ne contient qu'**une seule branche**, et c'est la branche par défaut :
+Vercel la prend comme branche de production sans rien demander. Chaque `git
+push` redéploie ensuite le site automatiquement, en une minute environ.
+
+#### Si le dépôt n'apparaît pas dans la liste
+
+L'application GitHub de Vercel n'y a pas accès. Deux chemins vers le même
+réglage : Vercel → *Settings → Git → Manage GitHub App*, ou GitHub →
+*Settings → Applications → Vercel → Configure* → ajouter le dépôt.
 
 Sans passer par GitHub, depuis le dossier du projet :
 
