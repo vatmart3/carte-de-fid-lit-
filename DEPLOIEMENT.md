@@ -109,6 +109,20 @@ Le dépôt ne contient qu'**une seule branche**, et c'est la branche par défaut
 Vercel la prend comme branche de production sans rien demander. Chaque `git
 push` redéploie ensuite le site automatiquement, en une minute environ.
 
+#### Savoir ce qui est réellement en ligne
+
+**Espace boucher → Réglages**, tout en bas : *Version en ligne*, avec la date de
+publication et le numéro du commit. C'est la seule façon de répondre sans
+doute à « est-ce que ma modification est arrivée ? » — sinon on recharge à
+l'aveugle et on suppose.
+
+Si cette date ne bouge pas après un `git push`, ce n'est pas le navigateur, la
+publication n'a pas eu lieu : Vercel → votre projet → onglet **Deployments**.
+Le dernier déploiement porte le message du commit. En rouge, ouvrez-le, le
+journal dit à quelle ligne la construction a échoué. Absent, c'est que Vercel
+ne suit pas cette branche : **Settings → Git → Production Branch**, à régler
+sur `claude/loyalty-program-site-1u5am8`.
+
 #### Si le dépôt n'apparaît pas dans la liste
 
 L'application GitHub de Vercel n'y a pas accès. Deux chemins vers le même

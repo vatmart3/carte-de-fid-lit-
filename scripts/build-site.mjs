@@ -2,9 +2,23 @@
 // Le reste du dépôt (schéma, scripts, démo, documentation) n'a rien à faire
 // sur l'hébergement public.
 import fs from "node:fs";
+import { execSync } from "node:child_process";
 fs.rmSync("public", { recursive: true, force: true });
 fs.mkdirSync("public", { recursive: true });
-fs.copyFileSync("index.html", "public/index.html");
+// L'estampille : la date de publication et le commit exact. C'est ce qui
+// permet de répondre à « est-ce que c'est en ligne ? » en regardant l'écran
+// plutôt qu'en rechargeant à l'aveugle.
+const commit = (process.env.VERCEL_GIT_COMMIT_SHA || "").slice(0, 7) ||
+  (() => { try { return execSync("git rev-parse --short HEAD").toString().trim(); }
+           catch { return "inconnu"; } })();
+const quand = new Date().toLocaleDateString("fr-FR",
+  { day: "numeric", month: "long", hour: "2-digit", minute: "2-digit", timeZone: "Europe/Paris" });
+const page = fs.readFileSync("index.html", "utf8")
+  .replace('var VERSION = "atelier";', 'var VERSION = ' + JSON.stringify(quand + " · " + commit) + ";");
+if (page.indexOf('var VERSION = "atelier"') >= 0) {
+  console.error("\n  ⚠  Estampille non posée : le marqueur VERSION a changé de forme.\n");
+}
+fs.writeFileSync("public/index.html", page);
 // Les polices voyagent avec le site : rien n'est demandé à un serveur tiers,
 // et le texte est déjà à sa place au premier affichage.
 fs.mkdirSync("public/police", { recursive: true });

@@ -996,6 +996,12 @@ var migrated = false;   // une base d'un format antérieur a été mise à nivea
 var S = null;           // état d'écran (non persisté en base)
 var busy = false;
 
+/* Estampille de publication. « scripts/build-site.mjs » la remplace au moment
+   de fabriquer le dossier publié. Sans elle, la question « est-ce que ma
+   modification est en ligne ? » n'a pas de réponse : on recharge, on doute, on
+   recharge encore. Ici elle se lit dans les Réglages. */
+var VERSION = "atelier";
+
 var LS_DB = "cdb.db.v1", LS_ME = "cdb.me", SS = "cdb.session";
 
 function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
@@ -4301,6 +4307,10 @@ function vAdmin() {
   }).join("");
   return '<main class="admin-wrap">' +
     '<div class="tabs" role="tablist">' + tabs + '</div>' + body +
+    (S.tab === "set"
+      ? '<p class="foot" style="margin-bottom:0">Version en ligne : <b class="num">' +
+        esc(VERSION) + '</b></p>'
+      : "") +
     '<p class="foot"><b>' + esc(DB.shop.name) + '</b> — espace boucher' +
     (Store.readonly ? ' · <b>lecture seule</b> sur cet appareil' : "") + '</p></main>';
 }
