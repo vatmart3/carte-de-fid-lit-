@@ -137,6 +137,16 @@ h1,h2,h3{text-wrap:balance;line-height:1.12;font-weight:400;letter-spacing:-.015
 .mark-glyph.has-logo.fond img{display:block;width:auto;height:46px;
   max-width:132px;object-fit:contain}
 @media (max-width:520px){.mark-glyph.has-logo.fond img{height:40px;max-width:104px}}
+/* Le logo de la boucherie porte un fond noir. Sur un téléphone en mode sombre,
+   le bandeau est noir lui aussi : la plaque se fond dedans et le logo s'efface.
+   On lui pose alors un liseré clair, comme une étiquette imprimée collée sur
+   la devanture. En thème clair, le liseré n'a pas lieu d'être. */
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]) .mark-glyph.has-logo.fond{
+    box-shadow:0 0 0 1.5px rgba(255,255,255,.34)}
+}
+:root[data-theme="dark"] .mark-glyph.has-logo.fond{
+  box-shadow:0 0 0 1.5px rgba(255,255,255,.34)}
 .mark-glyph img{width:100%;height:100%;object-fit:contain;display:block}
 /* Certains logos sont dessinés en blanc, pour une devanture sombre. Sur fond
    clair ils disparaissent : on leur pose une plaque foncée dessous. */
@@ -782,7 +792,16 @@ input:-webkit-autofill,input:-webkit-autofill:focus{
 
 /* ─────────── la signature ───────────
    Une vraie case blanche, quel que soit le thème : on signe sur du papier,
-   pas sur un écran noir. */
+   pas sur un écran noir.
+
+   « Blanche » ne suffit pas à le garantir. Un téléphone en mode sombre peut
+   retourner lui-même les couleurs de la page — c'est le cas du mode sombre
+   forcé d'Android, de Samsung Internet, de l'inversion intelligente d'iOS et
+   du contraste élevé de Windows. Une case blanche devient alors noire, et
+   l'encre noire devient blanche : la signature disparaît. On le dit donc
+   explicitement au navigateur : ce coin de page est clair, n'y touche pas.
+   C'est le rôle de color-scheme:light et de forced-color-adjust:none. */
+.sign, .sign-shown{color-scheme:light;forced-color-adjust:none}
 .sign{
   position:relative;background:#FFFFFF;border:1px solid var(--hair-2);
   border-radius:var(--r-sm);aspect-ratio:1000/320;overflow:hidden;
@@ -804,9 +823,10 @@ input:-webkit-autofill,input:-webkit-autofill:focus{
 .sign-clear:hover{background:#E8E8EC;color:#1B1B1F}
 
 /* la signature au repos, telle qu'elle reste sur la fiche */
-.sign-shown{background:#FFFFFF;border:1px solid var(--hair-2);border-radius:var(--r-sm);
+.sign-shown{background:#FFFFFF;border:1px solid #E4E4E8;border-radius:var(--r-sm);
   padding:10px 14px;display:flex;align-items:center;justify-content:center;min-height:96px}
 .sign-ink{color:#1B1B1F;width:100%;height:76px}
+.sign-ink polyline{stroke:#1B1B1F}
 .sign-foot{margin-top:9px;font-size:13.5px;color:var(--muted);text-align:center}
 
 /* ═══════════════════════ sur téléphone ═══════════════════════
@@ -1817,7 +1837,10 @@ function signSVG(str, h) {
   return '<svg class="sign-ink" viewBox="0 0 ' + SIGN_W + ' ' + SIGN_H + '" ' +
     (h ? 'style="height:' + h + 'px" ' : "") +
     'preserveAspectRatio="xMidYMid meet" aria-label="Signature" role="img" ' +
-    'fill="none" stroke="currentColor" stroke-width="7" ' +
+    // L'encre est écrite en toutes lettres plutôt que reprise de la couleur du
+    // texte : la case est blanche dans les deux thèmes, l'encre doit l'être
+    // aussi, sans dépendre de ce qu'un parent aurait décidé.
+    'fill="none" stroke="#1B1B1F" stroke-width="7" ' +
     'stroke-linecap="round" stroke-linejoin="round">' + paths + '</svg>';
 }
 
