@@ -415,13 +415,13 @@ begin
     from public.shop s, jsonb_array_elements(coalesce(s.data->'bonus','[]'::jsonb)) e
    where s.id = 1 and e->>'k' = p_kind
    limit 1;
-  if b is null or coalesce((b->>'on')::boolean, false) is not true then
-    raise exception 'bonus_inconnu';
-  end if;
-
+  -- Une action existe si elle a un lien et des points, un point c'est tout.
+  -- Une case à cocher séparée n'ajoutait rien qu'un oubli possible.
   pts := greatest(0, coalesce((b->>'pts')::int, 0));
   lib := coalesce(nullif(btrim(b->>'label'), ''), 'Bonus');
-  if pts = 0 then raise exception 'bonus_inconnu'; end if;
+  if b is null or pts = 0 or coalesce(btrim(b->>'url'), '') = '' then
+    raise exception 'bonus_inconnu';
+  end if;
 
   begin
     insert into public.moves (client_id, points, label, kind, ref)

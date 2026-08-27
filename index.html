@@ -153,6 +153,11 @@ h1,h2,h3{text-wrap:balance;line-height:1.12;font-weight:400;letter-spacing:-.015
 .bn-row.fait .bn-txt b{color:var(--muted);font-weight:600}
 .bonus-set{padding:14px;border-radius:var(--r-sm);border:1px solid var(--hair);
   background:var(--surface-2);display:flex;flex-direction:column;gap:12px}
+.bonus-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.bonus-head b{font-size:15.5px}
+.bonus-head .pill{font-size:11.5px;font-weight:700;padding:5px 11px;border-radius:99px}
+.bonus-head .pill.ok{background:var(--good-soft);color:var(--good)}
+.bonus-head .pill.off{background:var(--surface-3);color:var(--muted)}
 /* Depuis quand ces chiffres sont-ils vrais. Une caisse qui affiche un total
    sans dire de quand il date invite à s'y fier plus qu'il ne le mérite. */
 .frais{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
@@ -3828,11 +3833,21 @@ function bonusListe() {
   return BONUS.map(function (b) {
     var e = v.filter(function (x) { return x.k === b.k; })[0] || {};
     return { k: b.k, label: e.label || b.label, verbe: b.verbe, ex: b.ex,
-             url: e.url || "", pts: Number(e.pts) || 0, on: !!e.on };
+             url: e.url || "", pts: Number(e.pts) || 0 };
   });
 }
+/* Une action est proposée dès qu'elle a un lien et des points. Il y avait une
+   case à cocher en plus : elle n'ajoutait rien qu'un oubli possible — on
+   remplissait tout, on ne cochait pas, et rien n'apparaissait sans qu'on
+   sache pourquoi. */
 function bonusActifs() {
-  return bonusListe().filter(function (b) { return b.on && b.url && b.pts > 0; });
+  return bonusListe().filter(function (b) { return b.url && b.pts > 0; });
+}
+function bonusEtat(b) {
+  if (b.url && b.pts > 0) return { ok: true, txt: "Proposée aux clients" };
+  if (!b.url && !b.pts) return { ok: false, txt: "Pas proposée — remplissez le lien et les points" };
+  if (!b.url) return { ok: false, txt: "Pas proposée — il manque le lien" };
+  return { ok: false, txt: "Pas proposée — il manque le nombre de points" };
 }
 function bonusPris(c) {
   var p = {};
@@ -3845,12 +3860,14 @@ function bonusPanel() {
   return '<form class="panel panel-pad stack" data-act="save-bonus">' +
     '<div class="sect-head"><h2>Points en plus</h2></div>' +
     '<p class="small muted">Le client gagne des points en s\'abonnant à vos pages ou en ' +
-    'laissant un avis. Collez le lien, fixez les points, cochez pour l\'activer. ' +
-    'Sans lien, l\'action reste invisible.</p>' +
+    'laissant un avis. <b>Collez le lien, mettez un nombre de points, enregistrez</b> : ' +
+    'l\'action apparaît aussitôt sur la carte de vos clients. Laissez le lien vide pour ' +
+    'ne pas la proposer.</p>' +
     l.map(function (b) {
+      var e = bonusEtat(b);
       return '<div class="bonus-set">' +
-        '<label class="check"><input type="checkbox" name="on_' + b.k + '"' + (b.on ? " checked" : "") + '> ' +
-        '<b>' + esc(b.label) + '</b></label>' +
+        '<div class="bonus-head"><b>' + esc(b.label) + '</b>' +
+        '<span class="pill ' + (e.ok ? "ok" : "off") + '">' + esc(e.txt) + '</span></div>' +
         '<div class="grid-2">' +
         '<div class="field"><label for="b-u-' + b.k + '">Lien</label>' +
         '<input id="b-u-' + b.k + '" name="url_' + b.k + '" type="url" inputmode="url" ' +
@@ -3859,6 +3876,15 @@ function bonusPanel() {
         '<input id="b-p-' + b.k + '" name="pts_' + b.k + '" type="number" min="0" step="5" ' +
         'value="' + (b.pts || "") + '"></div></div></div>';
     }).join("") +
+    (function () {
+      var a = bonusActifs();
+      return '<p class="small' + (a.length ? "" : " muted") + '" style="margin-top:2px">' +
+        (a.length
+          ? 'Vos clients voient <b>' + a.length + ' action' + (a.length > 1 ? "s" : "") + '</b> sur leur carte : ' +
+            a.map(function (x) { return esc(x.label) + " (+" + nb(x.pts) + ")"; }).join(", ") + '.'
+          : 'Aucune action n\'est proposée pour l\'instant : la section n\'apparaît pas sur les cartes.') +
+        '</p>';
+    })() +
     '<div class="banner"><span class="ico" aria-hidden="true">i</span><span>' +
     'Ces points sont accordés <b>sur parole</b> : l\'application ouvre le lien et crédite, ' +
     'sans pouvoir vérifier que le client s\'est vraiment abonné. Chaque action n\'est ' +
@@ -4982,8 +5008,7 @@ var FORMS = {
       return {
         k: b.k, label: b.label,
         url: String(f["url_" + b.k].value || "").trim(),
-        pts: Math.max(0, Math.round(Number(f["pts_" + b.k].value) || 0)),
-        on: !!f["on_" + b.k].checked
+        pts: Math.max(0, Math.round(Number(f["pts_" + b.k].value) || 0))
       };
     });
     if (Store.mode === "supabase") return remote(saveShopRemote(sh), "Points en plus enregistrés.");

@@ -438,9 +438,13 @@ page est en pleine fenêtre, en HTTPS, et la caméra s'ouvre au premier appui.
 ## 8 bis. Gagner des points sans acheter
 
 **Réglages → Points en plus.** Trois actions, chacune avec son lien et son
-barème : abonnement Instagram, abonnement Facebook, avis Google. Collez le
-lien, fixez les points, cochez pour activer. **Sans lien, l'action n'apparaît
-pas** chez le client — inutile de désactiver ce qu'on n'a pas rempli.
+barème : abonnement Instagram, abonnement Facebook, avis Google.
+
+**Collez le lien, mettez un nombre de points, enregistrez.** C'est tout : il
+n'y a rien à activer. Une action qui a un lien et des points est proposée,
+une action sans lien ne l'est pas. Chaque ligne affiche son état — *Proposée
+aux clients*, ou ce qu'il lui manque — et le panneau récapitule en une phrase
+ce que vos clients voient réellement sur leur carte.
 
 Sur sa carte, le client voit une section *Gagner des points en plus*. Un appui
 ouvre votre page et crédite les points. Chaque action ne compte **qu'une
