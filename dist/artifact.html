@@ -132,11 +132,19 @@ h1,h2,h3{text-wrap:balance;line-height:1.12;font-weight:400;letter-spacing:-.015
 .bn-row.fait .bn-txt b{color:var(--muted);font-weight:600}
 .bonus-set{padding:14px;border-radius:var(--r-sm);border:1px solid var(--hair);
   background:var(--surface-2);display:flex;flex-direction:column;gap:12px}
-.bonus-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.bonus-head b{font-size:15.5px}
-.bonus-head .pill{font-size:11.5px;font-weight:700;padding:5px 11px;border-radius:99px}
-.bonus-head .pill.ok{background:var(--good-soft);color:var(--good)}
-.bonus-head .pill.off{background:var(--surface-3);color:var(--muted)}
+.bonus-head{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.bonus-head b{font-size:15.5px;min-width:0}
+/* Le nombre de points, court et lisible, contre le nom de l'action. */
+.bonus-pts{display:inline-flex;align-items:center;gap:7px;flex:none}
+/* La règle générale des champs impose 100 % de large : il faut la battre
+   explicitement, sinon le nombre de points s'étale sur toute la ligne. */
+.bonus-pts input[type=number]{width:84px;flex:none;text-align:center;font-size:19px;
+  font-weight:700;font-variant-numeric:tabular-nums;padding:9px 6px}
+.bonus-pts > span{font-size:13px;color:var(--muted);font-weight:600}
+.bonus-set .pill{align-self:flex-start;font-size:11.5px;font-weight:700;
+  padding:5px 11px;border-radius:99px}
+.bonus-set .pill.ok{background:var(--good-soft);color:var(--good)}
+.bonus-set .pill.off{background:var(--surface-3);color:var(--muted)}
 /* Depuis quand ces chiffres sont-ils vrais. Une caisse qui affiche un total
    sans dire de quand il date invite à s'y fier plus qu'il ne le mérite. */
 .frais{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
@@ -3821,16 +3829,19 @@ function bonusPanel() {
       'n\'avez pas enregistré.</span></div>') +
     l.map(function (b) {
       var e = enregistre ? bonusEtat(b) : { ok: false, txt: "À enregistrer" };
+      // Les points d'abord, à côté du nom : sous une adresse de cent
+      // caractères, personne ne les voyait.
       return '<div class="bonus-set">' +
-        '<div class="bonus-head"><b>' + esc(b.label) + '</b>' +
-        '<span class="pill ' + (e.ok ? "ok" : "off") + '">' + esc(e.txt) + '</span></div>' +
-        '<div class="grid-2">' +
+        '<div class="bonus-head"><b class="grow">' + esc(b.label) + '</b>' +
+        '<span class="bonus-pts">' +
+        '<input id="b-p-' + b.k + '" name="pts_' + b.k + '" type="number" min="0" step="5" ' +
+        'inputmode="numeric" value="' + (b.pts || "") + '" placeholder="0" ' +
+        'aria-label="Points pour « ' + esc(b.label) + ' »">' +
+        '<span>points</span></span></div>' +
+        '<span class="pill ' + (e.ok ? "ok" : "off") + '">' + esc(e.txt) + '</span>' +
         '<div class="field"><label for="b-u-' + b.k + '">Lien</label>' +
         '<input id="b-u-' + b.k + '" name="url_' + b.k + '" type="url" inputmode="url" ' +
-        'placeholder="' + esc(b.ex) + '" value="' + esc(b.url) + '"></div>' +
-        '<div class="field"><label for="b-p-' + b.k + '">Points</label>' +
-        '<input id="b-p-' + b.k + '" name="pts_' + b.k + '" type="number" min="0" step="5" ' +
-        'value="' + (b.pts || "") + '"></div></div></div>';
+        'placeholder="' + esc(b.ex) + '" value="' + esc(b.url) + '"></div></div>';
     }).join("") +
     (function () {
       var a = enregistre ? bonusActifs() : [];
