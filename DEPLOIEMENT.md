@@ -435,6 +435,36 @@ connaît pas votre base Supabase.
 Une fois le site publié sur Vercel (partie 3), la question ne se pose plus : la
 page est en pleine fenêtre, en HTTPS, et la caméra s'ouvre au premier appui.
 
+## 8 bis. Gagner des points sans acheter
+
+**Réglages → Points en plus.** Trois actions, chacune avec son lien et son
+barème : abonnement Instagram, abonnement Facebook, avis Google. Collez le
+lien, fixez les points, cochez pour activer. **Sans lien, l'action n'apparaît
+pas** chez le client — inutile de désactiver ce qu'on n'a pas rempli.
+
+Sur sa carte, le client voit une section *Gagner des points en plus*. Un appui
+ouvre votre page et crédite les points. Chaque action ne compte **qu'une
+fois** : ensuite elle reste affichée, marquée « déjà fait » et datée, avec un
+simple lien pour y retourner.
+
+Deux points à savoir avant de fixer le barème :
+
+- **Les points sont accordés sur parole.** L'application ouvre le lien et
+  crédite, sans pouvoir vérifier que le client s'est vraiment abonné — aucun
+  site ne donne cette information à un tiers. Chaque geste laisse une trace
+  dans l'historique de la fiche et dans le journal de la boutique : si vous
+  constatez un abus, retirez les points depuis la fiche du client.
+- **Ce qui, en revanche, n'est pas négociable** : le nombre de points est lu
+  dans la fiche boutique par la base elle-même, jamais reçu du navigateur — un
+  client qui trafique la page ne peut pas s'accorder mille points. Et la règle
+  « une seule fois » est un index d'unicité en base, pas une vérification dans
+  la page. Les deux sont vérifiés par des essais qui tentent la fraude pour de
+  bon.
+
+Pour le lien d'avis Google : sur votre fiche d'établissement, *Demander des
+avis* donne une adresse courte du type `g.page/r/…/review` qui ouvre
+directement la fenêtre de notation.
+
 ## 9. La signature du client
 
 Depuis l'inscription, le client **signe du doigt dans une case blanche**, que la

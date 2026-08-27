@@ -71,9 +71,20 @@ create table if not exists public.moves (
   amount     numeric(10,2) not null default 0,
   points     int not null default 0,
   label      text not null,
-  kind       text not null check (kind in ('buy','reward','gift','ref','welcome','adj')),
+  kind       text not null,
   created_at timestamptz not null default now()
 );
+
+-- Les points gagnés en dehors d'un achat — un abonnement, un avis — portent
+-- « bonus » et gardent la clé de l'action dans « ref ». L'index unique est ce
+-- qui interdit de réclamer deux fois : la règle tient dans la base, pas dans
+-- la page, où n'importe qui pourrait la contourner.
+alter table public.moves add column if not exists ref text;
+alter table public.moves drop constraint if exists moves_kind_check;
+alter table public.moves add constraint moves_kind_check
+  check (kind in ('buy','reward','gift','ref','welcome','adj','bonus'));
+create unique index if not exists moves_bonus_key
+  on public.moves(client_id, ref) where kind = 'bonus';
 create index if not exists moves_client_idx on public.moves(client_id, t desc, id desc);
 
 -- Le journal ne contient jamais de nom : seulement le numéro de carte, pour
@@ -233,7 +244,8 @@ begin
     'filleuls', coalesce((select jsonb_agg(f.name order by f.created)
                           from public.clients f where f.referred_by = c.id), '[]'::jsonb),
     'hist', coalesce((select jsonb_agg(jsonb_build_object(
-              't', m.t, 'a', m.amount, 'p', m.points, 'w', m.label, 'k', m.kind)
+              't', m.t, 'a', m.amount, 'p', m.points, 'w', m.label, 'k', m.kind,
+              'ref', m.ref)
               order by m.t desc, m.id desc)
             from public.moves m where m.client_id = c.id), '[]'::jsonb),
     'shop', (select data - 'pin' from public.shop where id = 1)
@@ -387,6 +399,46 @@ begin
   insert into public.log (m, client_id) values ('Fiche n° ' || c.id ||
     (case when p_on then ' : offres acceptées' else ' : offres refusées' end), c.id);
   return jsonb_build_object('marketing', coalesce(p_on, false));
+end $$;
+
+-- Points gagnés en dehors du comptoir : abonnement, avis. Le nombre de points
+-- est lu dans la fiche boutique et jamais reçu du navigateur — sinon le client
+-- choisirait lui-même sa récompense. L'unicité est garantie par l'index.
+create or replace function public.claim_bonus(p_token uuid, p_kind text) returns jsonb
+  language plpgsql security definer set search_path = public, pg_temp as $$
+declare c public.clients; b jsonb; pts int; lib text;
+begin
+  select * into c from public.clients where token = p_token;
+  if not found then raise exception 'lien_inconnu'; end if;
+
+  select e into b
+    from public.shop s, jsonb_array_elements(coalesce(s.data->'bonus','[]'::jsonb)) e
+   where s.id = 1 and e->>'k' = p_kind
+   limit 1;
+  if b is null or coalesce((b->>'on')::boolean, false) is not true then
+    raise exception 'bonus_inconnu';
+  end if;
+
+  pts := greatest(0, coalesce((b->>'pts')::int, 0));
+  lib := coalesce(nullif(btrim(b->>'label'), ''), 'Bonus');
+  if pts = 0 then raise exception 'bonus_inconnu'; end if;
+
+  begin
+    insert into public.moves (client_id, points, label, kind, ref)
+    values (c.id, pts, lib, 'bonus', p_kind);
+  exception when unique_violation then
+    raise exception 'bonus_deja_pris';
+  end;
+
+  update public.clients
+     set points = points + pts, lifetime = lifetime + pts
+   where id = c.id
+  returning points into pts;
+
+  insert into public.log (m, client_id)
+  values ('Fiche n° ' || c.id || ' : ' || lib, c.id);
+
+  return jsonb_build_object('points', pts, 'gagnes', greatest(0, coalesce((b->>'pts')::int, 0)));
 end $$;
 
 -- Effacement : la fiche et tout son historique disparaissent (cascade).
@@ -598,6 +650,7 @@ grant execute on function public.public_shop(),
                           public.set_marketing(uuid, boolean),
                           public.sign_card(uuid, text),
                           public.set_card_style(uuid, text),
+                          public.claim_bonus(uuid, text),
                           public.delete_card(uuid) to anon, authenticated;
 grant execute on function public.record_purchase(text, numeric, text),
                           public.use_reward(text, int, text),

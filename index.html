@@ -139,6 +139,20 @@ h1,h2,h3{text-wrap:balance;line-height:1.12;font-weight:400;letter-spacing:-.015
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .logo-try .box .mark-glyph{width:40px;height:40px}
 .logo-vide{font-size:13.5px;color:var(--muted)}
+/* Gagner des points en plus : une liste d'actions, pas un mur de boutons. */
+.bn{display:flex;flex-direction:column;gap:10px}
+.bn-row{display:flex;align-items:center;gap:13px;padding:13px 14px;border-radius:var(--r-sm);
+  border:1px solid var(--hair);background:var(--surface-2);flex-wrap:wrap}
+.bn-row .bn-pts{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;flex:none;
+  font-weight:700;font-size:14px;background:var(--ambre-soft);color:var(--ambre);
+  font-variant-numeric:tabular-nums}
+.bn-row.fait .bn-pts{background:var(--good-soft);color:var(--good)}
+.bn-txt{flex:1 1 150px;min-width:0}
+.bn-txt b{display:block;font-size:15.5px}
+.bn-txt span{display:block;font-size:13px;color:var(--muted);margin-top:2px}
+.bn-row.fait .bn-txt b{color:var(--muted);font-weight:600}
+.bonus-set{padding:14px;border-radius:var(--r-sm);border:1px solid var(--hair);
+  background:var(--surface-2);display:flex;flex-direction:column;gap:12px}
 /* Depuis quand ces chiffres sont-ils vrais. Une caisse qui affiche un total
    sans dire de quand il date invite à s'y fier plus qu'il ne le mérite. */
 .frais{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
@@ -255,7 +269,7 @@ input:-webkit-autofill,input:-webkit-autofill:focus{
   --cveil:rgba(255,255,255,.16);            /* le voile de lumière */
   --cchip:rgba(255,255,255,.18);            /* la pastille de statut */
   --cchip-line:rgba(255,255,255,.24);
-  --cmark:rgba(255,255,255,.24);            /* la marque de la maison, en filigrane */
+  --cmark:rgba(255,255,255,.34);            /* la marque de la maison, en filigrane */
   --cglow:rgba(190,43,43,.50);
   --ctex:none;
 }
@@ -305,14 +319,14 @@ input:-webkit-autofill,input:-webkit-autofill:focus{
 [data-style="papier"]{
   --ca:#F6E3D4; --cb:#E9C9B2; --cfg:#4A2A1C; --cdim:rgba(74,42,28,.72);
   --cveil:rgba(255,255,255,.45); --cchip:rgba(74,42,28,.10); --cchip-line:rgba(74,42,28,.18);
-  --cmark:rgba(74,42,28,.20); --cglow:rgba(120,74,50,.32);
+  --cmark:rgba(74,42,28,.26); --cglow:rgba(120,74,50,.32);
   --ctex:repeating-linear-gradient(46deg, rgba(120,74,50,.05) 0 2px, transparent 2px 7px);
 }
 /* Ardoise — le tableau du menu du jour */
 [data-style="ardoise"]{
   --ca:#3A3E42; --cb:#1E2124; --cfg:#F4F2EC; --cdim:rgba(244,242,236,.72);
   --cveil:rgba(255,255,255,.10); --cchip:rgba(255,255,255,.13); --cchip-line:rgba(255,255,255,.20);
-  --cmark:rgba(255,255,255,.22); --cglow:rgba(10,12,14,.55);
+  --cmark:rgba(255,255,255,.30); --cglow:rgba(10,12,14,.55);
   --ctex:radial-gradient(circle at 18% 28%, rgba(255,255,255,.05), transparent 42%),
          radial-gradient(circle at 76% 72%, rgba(255,255,255,.04), transparent 38%);
 }
@@ -320,7 +334,7 @@ input:-webkit-autofill,input:-webkit-autofill:focus{
 [data-style="billot"]{
   --ca:#B98450; --cb:#8A5A32; --cfg:#FFF6EA; --cdim:rgba(255,246,234,.80);
   --cveil:rgba(255,255,255,.22); --cchip:rgba(255,255,255,.18); --cchip-line:rgba(255,255,255,.26);
-  --cmark:rgba(255,255,255,.24); --cglow:rgba(110,70,40,.45);
+  --cmark:rgba(255,255,255,.32); --cglow:rgba(110,70,40,.45);
   --ctex:repeating-linear-gradient(90deg, rgba(60,32,12,.055) 0 4px, transparent 4px 17px),
          repeating-linear-gradient(90deg, rgba(255,235,205,.05) 0 2px, transparent 2px 39px);
 }
@@ -328,7 +342,7 @@ input:-webkit-autofill,input:-webkit-autofill:focus{
 [data-style="marbre"]{
   --ca:#FBFBFC; --cb:#E4E5E9; --cfg:#232327; --cdim:rgba(35,35,39,.66);
   --cveil:rgba(255,255,255,.75); --cchip:rgba(35,35,39,.08); --cchip-line:rgba(35,35,39,.15);
-  --cmark:rgba(35,35,39,.16); --cglow:rgba(60,60,70,.30);
+  --cmark:rgba(35,35,39,.22); --cglow:rgba(60,60,70,.30);
   --ctex:linear-gradient(112deg, transparent 34%, rgba(120,124,136,.20) 35%, transparent 36%),
          linear-gradient(104deg, transparent 58%, rgba(120,124,136,.14) 59%, transparent 61%),
          linear-gradient(126deg, transparent 74%, rgba(120,124,136,.11) 75%, transparent 76%);
@@ -337,7 +351,7 @@ input:-webkit-autofill,input:-webkit-autofill:focus{
 [data-style="laurier"]{
   --ca:#2E6B4F; --cb:#1B4632; --cfg:#F6EFD9; --cdim:rgba(246,239,217,.78);
   --cveil:rgba(255,255,255,.14); --cchip:rgba(246,239,217,.16); --cchip-line:rgba(246,239,217,.30);
-  --cmark:rgba(246,239,217,.22); --cglow:rgba(20,60,42,.48);
+  --cmark:rgba(246,239,217,.30); --cglow:rgba(20,60,42,.48);
   --ctex:none;
 }
 .loyalty[data-style="laurier"]::before{
@@ -368,17 +382,20 @@ input:-webkit-autofill,input:-webkit-autofill:focus{
 .tier{font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;
   padding:7px 13px;border-radius:99px;background:var(--cchip);color:var(--cfg);white-space:nowrap;
   border:1px solid var(--cchip-line)}
-.loyalty-pts{display:flex;align-items:baseline;gap:10px;margin-top:22px}
+/* Sous le filet, trois lignes et rien d'autre : ce qu'on a, qui on est, quel
+   numéro. Le solde d'abord — c'est ce qu'on vient regarder. */
+.loyalty-pts{display:flex;align-items:baseline;gap:10px;margin-top:20px}
+.loyalty-bas{margin-top:18px}
 /* La bande réservée à la bête : rien n'y entre. */
-.loyalty-pts,.loyalty-name,.loyalty-foot,.loyalty-rule{padding-right:112px}
-@media (max-width:400px){.loyalty-pts,.loyalty-name,.loyalty-foot,.loyalty-rule{padding-right:96px}}
+.loyalty-pts,.loyalty-bas,.loyalty-rule{padding-right:112px}
+@media (max-width:400px){.loyalty-pts,.loyalty-bas,.loyalty-rule{padding-right:96px}}
 .loyalty-pts b{font-family:var(--titre);font-weight:700;font-size:62px;line-height:1;
   font-variant-numeric:tabular-nums;letter-spacing:-.03em}
 .loyalty-pts span{font-size:14px;text-transform:uppercase;letter-spacing:.06em;color:var(--cdim);font-weight:700}
-.loyalty-name{margin-top:24px;font-size:18px;font-weight:700}
-.loyalty-foot{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;margin-top:2px}
-.loyalty-no{font-size:25px;font-weight:700;letter-spacing:.12em;font-variant-numeric:tabular-nums}
-.loyalty-since{font-size:12px;color:var(--cdim);text-align:right;line-height:1.5;font-weight:500}
+.loyalty-name{font-size:17px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;
+  line-height:1.25;word-break:break-word}
+.loyalty-ligne{margin-top:5px;font-size:12.5px;color:var(--cdim);font-weight:500}
+.loyalty-no{font-weight:700;letter-spacing:.08em;font-variant-numeric:tabular-nums;color:var(--cfg)}
 
 /* le choix de l'habillage, sur la carte du client */
 .styles{display:grid;grid-template-columns:repeat(auto-fit,minmax(96px,1fr));gap:10px}
@@ -1131,7 +1148,9 @@ var ERRS = {
   solde_insuffisant: "Solde de points insuffisant.",
   cadeau_deja_offert: "Le cadeau d'anniversaire a déjà été offert cette année.",
   points_nuls: "Indiquez un nombre de points.",
-  acces_refuse: "Ce compte n'est pas autorisé. Ajoutez-le à la table « staff »."
+  acces_refuse: "Ce compte n'est pas autorisé. Ajoutez-le à la table « staff ».",
+  bonus_deja_pris: "Ces points sont déjà sur votre carte.",
+  bonus_inconnu: "Cette action n'est plus proposée par la boutique."
 };
 /* Pourquoi la connexion du boucher est refusée. Supabase répond 400 pour des
    raisons qui n'ont rien à voir entre elles ; les confondre sous « mot de passe
@@ -1338,7 +1357,7 @@ function sbLoadAll() {
   return Promise.all([
     sbFetch("/rest/v1/shop?select=data&id=eq.1", {}, true),
     sbFetch("/rest/v1/clients?select=*&order=id.asc&limit=5000", {}, true),
-    sbFetch("/rest/v1/moves?select=client_id,t,amount,points,label,kind&t=gte." + since +
+    sbFetch("/rest/v1/moves?select=client_id,t,amount,points,label,kind,ref&t=gte." + since +
             "&order=t.desc,id.desc&limit=8000", {}, true),
     sbFetch("/rest/v1/moves?select=client_id&kind=eq.gift&t=gte." + yearStart + "&limit=5000", {}, true),
     sbFetch("/rest/v1/log?select=t,m,client_id&order=id.desc&limit=40", {}, true)
@@ -1362,7 +1381,8 @@ function sbLoadAll() {
         };
       }),
       recent: (r[2] || []).map(function (m) {
-        return { cid: m.client_id, t: d10(m.t), a: Number(m.amount), p: m.points, w: m.label, k: m.kind };
+        return { cid: m.client_id, t: d10(m.t), a: Number(m.amount), p: m.points, w: m.label,
+                 k: m.kind, ref: m.ref || "" };
       }),
       log: (r[4] || []).map(function (l) { return { t: d10(l.t), m: l.m, cid: l.client_id || "" }; })
     };
@@ -1373,11 +1393,11 @@ function sbLoadAll() {
 
 /* Historique complet d'une fiche, chargé à l'ouverture. */
 function sbHist(id) {
-  return sbFetch("/rest/v1/moves?select=t,amount,points,label,kind&client_id=eq." + encodeURIComponent(id) +
+  return sbFetch("/rest/v1/moves?select=t,amount,points,label,kind,ref&client_id=eq." + encodeURIComponent(id) +
                  "&order=t.desc,id.desc&limit=500", {}, true)
     .then(function (r) {
       return (r || []).map(function (m) {
-        return { t: d10(m.t), a: Number(m.amount), p: m.points, w: m.label, k: m.kind };
+        return { t: d10(m.t), a: Number(m.amount), p: m.points, w: m.label, k: m.kind, ref: m.ref || "" };
       });
     });
 }
@@ -1399,7 +1419,7 @@ function cardToClient(card, tok) {
     last_visit: d10(card.last_visit), by: "", parrain: card.parrain || "",
     filleuls: card.filleuls || [],
     hist: (card.hist || []).map(function (h) {
-      return { t: d10(h.t), a: Number(h.a), p: h.p, w: h.w, k: h.k };
+      return { t: d10(h.t), a: Number(h.a), p: h.p, w: h.w, k: h.k, ref: h.ref || "" };
     }),
     gift: (card.hist || []).some(function (h) {
       return h.k === "gift" && d10(h.t).slice(0, 4) === today().slice(0, 4);
@@ -2218,9 +2238,10 @@ function specimenHTML() {
     '<span class="tier">Nouveau</span></div>' +
     '<div class="loyalty-rule" aria-hidden="true"></div>' +
     '<div class="loyalty-pts"><b>' + nb(sh.welcome) + '</b><span>points</span></div>' +
+    '<div class="loyalty-bas">' +
     '<div class="loyalty-name">Votre nom</div>' +
-    '<div class="loyalty-foot"><span class="loyalty-no">····</span>' +
-    '<span class="loyalty-since">Client depuis<br>aujourd\'hui</span></div></div>';
+    '<div class="loyalty-ligne"><span class="loyalty-no">n° ····</span> · client depuis aujourd\'hui</div>' +
+    '</div></div>';
 }
 
 function vHome() {
@@ -2438,9 +2459,39 @@ function cardHTML(c) {
     '<span class="tier">' + esc(tierOf(c.lifetime)) + '</span></div>' +
     '<div class="loyalty-rule" aria-hidden="true"></div>' +
     '<div class="loyalty-pts"><b>' + nb(c.points) + '</b><span>points</span></div>' +
+    '<div class="loyalty-bas">' +
     '<div class="loyalty-name">' + esc(c.name) + '</div>' +
-    '<div class="loyalty-foot"><span class="loyalty-no">' + esc(c.id) + '</span>' +
-    '<span class="loyalty-since">Client depuis<br>' + dShort(c.created) + ' ' + c.created.slice(0, 4) + '</span></div></div>';
+    '<div class="loyalty-ligne"><span class="loyalty-no">n° ' + esc(c.id) + '</span>' +
+    ' · client depuis ' + dShort(c.created) + ' ' + c.created.slice(0, 4) + '</div>' +
+    '</div></div>';
+}
+
+/* Ce que le client peut faire pour gagner des points sans acheter. Une action
+   déjà faite reste affichée, barrée et datée : sans cela on se demande si on
+   l'a faite, et on rappuie pour rien. */
+function bonusClient(c) {
+  var l = bonusActifs();
+  if (!l.length) return "";
+  var pris = bonusPris(c);
+  var lignes = l.map(function (b) {
+    var fait = pris[b.k];
+    return '<li class="bn-row' + (fait ? " fait" : "") + '">' +
+      '<span class="bn-pts">' + (fait ? "✓" : "+" + nb(b.pts)) + '</span>' +
+      '<span class="bn-txt"><b>' + esc(b.label) + '</b>' +
+      '<span>' + (fait
+        ? "Déjà fait" + (typeof fait === "string" ? " le " + dShort(fait) : "") + " — merci."
+        : nb(b.pts) + " points, une seule fois") + '</span></span>' +
+      (fait
+        ? '<a class="btn btn-sm btn-ghost" href="' + esc(b.url) + '" target="_blank" rel="noopener noreferrer">Ouvrir</a>'
+        : '<button class="btn btn-sm btn-ink" data-act="bonus-go" data-k="' + esc(b.k) + '" ' +
+          'data-u="' + esc(b.url) + '">' + esc(b.verbe) + '</button>') +
+      '</li>';
+  }).join("");
+  return '<section class="panel panel-pad">' +
+    '<div class="sect-head"><h2>Gagner des points en plus</h2></div>' +
+    '<ul class="bn">' + lignes + '</ul>' +
+    '<p class="small muted" style="margin-top:12px">Sans rien acheter : abonnez-vous, ' +
+    'donnez votre avis, et les points arrivent sur votre carte.</p></section>';
 }
 
 function vCard() {
@@ -2502,6 +2553,8 @@ function vCard() {
     '<p class="small muted">ou donnez votre numéro : <b class="num">' + esc(c.id) + '</b></p>' +
     '</section>' +
     bd + rail +
+
+    bonusClient(c) +
 
     '<section class="panel panel-pad">' +
     '<div class="sect-head"><h2>Vos récompenses</h2></div><ul class="rw">' + rw + '</ul></section>' +
@@ -2757,7 +2810,7 @@ function allMoves() {
   } else {
     DB.clients.forEach(function (c) {
       (c.hist || []).forEach(function (h) {
-        out.push({ t: h.t, a: h.a, p: h.p, w: h.w, k: h.k, c: c });
+        out.push({ t: h.t, a: h.a, p: h.p, w: h.w, k: h.k, ref: h.ref || "", c: c });
       });
     });
   }
@@ -3732,7 +3785,7 @@ function vSet() {
         '<span class="hint">4 chiffres minimum. Notez-le : il n\'y a pas de récupération.</span></div>' +
         '<div id="pin-err"></div>' +
         '<button class="btn btn-ink btn-full" type="submit">Changer le code</button></form>') +
-    sbPanel() + envoiPanel() + rgpdPanel() +
+    bonusPanel() + sbPanel() + envoiPanel() + rgpdPanel() +
 
     '<section class="panel panel-pad stack">' +
     '<div class="sect-head"><h2>Données</h2></div>' +
@@ -3757,6 +3810,61 @@ function staleList() {
   var y = Number(DB.shop.retention_years || 3);
   var limit = new Date(new Date(today()).getTime() - y * 365.25 * 864e5).toISOString().slice(0, 10);
   return DB.clients.filter(function (c) { return (lastVisit(c) || c.created) < limit; });
+}
+
+/* Des points gagnés hors du comptoir : un abonnement, un avis. Trois actions
+   suffisent, ce sont celles qui rapportent à une boutique de quartier. Le
+   boucher met son lien et décide du barème ; sans lien, l'action n'existe pas. */
+var BONUS = [
+  { k: "insta",  label: "Abonnement Instagram", verbe: "Suivre sur Instagram",
+    ex: "https://instagram.com/votre_boutique" },
+  { k: "face",   label: "Abonnement Facebook",  verbe: "Suivre sur Facebook",
+    ex: "https://facebook.com/votreboutique" },
+  { k: "avis",   label: "Avis sur Google",      verbe: "Laisser un avis Google",
+    ex: "https://g.page/r/…/review" }
+];
+function bonusListe() {
+  var v = (DB.shop && DB.shop.bonus) || [];
+  return BONUS.map(function (b) {
+    var e = v.filter(function (x) { return x.k === b.k; })[0] || {};
+    return { k: b.k, label: e.label || b.label, verbe: b.verbe, ex: b.ex,
+             url: e.url || "", pts: Number(e.pts) || 0, on: !!e.on };
+  });
+}
+function bonusActifs() {
+  return bonusListe().filter(function (b) { return b.on && b.url && b.pts > 0; });
+}
+function bonusPris(c) {
+  var p = {};
+  (c && c.hist || []).forEach(function (h) { if (h.k === "bonus" && h.ref) p[h.ref] = h.t || true; });
+  return p;
+}
+
+function bonusPanel() {
+  var l = bonusListe();
+  return '<form class="panel panel-pad stack" data-act="save-bonus">' +
+    '<div class="sect-head"><h2>Points en plus</h2></div>' +
+    '<p class="small muted">Le client gagne des points en s\'abonnant à vos pages ou en ' +
+    'laissant un avis. Collez le lien, fixez les points, cochez pour l\'activer. ' +
+    'Sans lien, l\'action reste invisible.</p>' +
+    l.map(function (b) {
+      return '<div class="bonus-set">' +
+        '<label class="check"><input type="checkbox" name="on_' + b.k + '"' + (b.on ? " checked" : "") + '> ' +
+        '<b>' + esc(b.label) + '</b></label>' +
+        '<div class="grid-2">' +
+        '<div class="field"><label for="b-u-' + b.k + '">Lien</label>' +
+        '<input id="b-u-' + b.k + '" name="url_' + b.k + '" type="url" inputmode="url" ' +
+        'placeholder="' + esc(b.ex) + '" value="' + esc(b.url) + '"></div>' +
+        '<div class="field"><label for="b-p-' + b.k + '">Points</label>' +
+        '<input id="b-p-' + b.k + '" name="pts_' + b.k + '" type="number" min="0" step="5" ' +
+        'value="' + (b.pts || "") + '"></div></div></div>';
+    }).join("") +
+    '<div class="banner"><span class="ico" aria-hidden="true">i</span><span>' +
+    'Ces points sont accordés <b>sur parole</b> : l\'application ouvre le lien et crédite, ' +
+    'sans pouvoir vérifier que le client s\'est vraiment abonné. Chaque action n\'est ' +
+    'comptée qu\'une fois, et apparaît dans son historique — vous pouvez toujours retirer ' +
+    'les points depuis sa fiche.</span></div>' +
+    '<button class="btn btn-ink btn-full" type="submit">Enregistrer</button></form>';
 }
 
 function rgpdPanel() {
@@ -4273,6 +4381,28 @@ var ACTS = {
     lsDel(LS_SB); lsDel(LS_AUTH);
     toast("Connexion oubliée sur cet appareil.", "ok");
     setTimeout(function () { location.replace(location.pathname); }, 600);
+  },
+  /* Le lien s'ouvre et les points tombent. Le lien part en premier : sur
+     téléphone, une fenêtre ouverte après un aller-retour réseau est bloquée
+     par le navigateur, qui ne la relie plus au geste du client. */
+  "bonus-go": function (el) {
+    var k = el.dataset.k, c = byId(S.cid);
+    if (!c) return;
+    try { window.open(el.dataset.u, "_blank", "noopener"); } catch (e) {}
+    var b = bonusActifs().filter(function (x) { return x.k === k; })[0];
+    if (!b) return;
+    if (bonusPris(c)[k]) { toast("Ces points sont déjà sur votre carte.", "bad"); return; }
+    if (Store.mode === "supabase") {
+      return remote(rpc("claim_bonus", { p_token: c.token, p_kind: k }).then(function () {
+        return rpc("get_card", { p_token: c.token }).then(function (card) {
+          DB.clients = [cardToClient(card, c.token)]; return true;
+        });
+      }), "+" + nb(b.pts) + " points. Merci !");
+    }
+    c.points += b.pts; c.lifetime += b.pts;
+    push(c, { t: today(), a: 0, p: b.pts, w: b.label, k: "bonus", ref: k });
+    logIt(b.label + " — n° " + c.id, c.id);
+    persist("+" + nb(b.pts) + " points. Merci !");
   },
   "logout-client": function () { lsDel(LS_ME); S.cid = ""; go("find"); },
   "close": closeModal,
@@ -4845,6 +4975,20 @@ var FORMS = {
     c.sign = sign; c.signed_at = new Date().toISOString();
     logIt("Signature recueillie pour la fiche n° " + c.id, c.id);
     closeModal(); persist("Signature enregistrée.");
+  },
+  "save-bonus": function (f) {
+    var sh = Store.mode === "supabase" ? JSON.parse(JSON.stringify(DB.shop)) : DB.shop;
+    sh.bonus = BONUS.map(function (b) {
+      return {
+        k: b.k, label: b.label,
+        url: String(f["url_" + b.k].value || "").trim(),
+        pts: Math.max(0, Math.round(Number(f["pts_" + b.k].value) || 0)),
+        on: !!f["on_" + b.k].checked
+      };
+    });
+    if (Store.mode === "supabase") return remote(saveShopRemote(sh), "Points en plus enregistrés.");
+    logIt("Points en plus modifiés");
+    persist("Points en plus enregistrés.");
   },
   "save-envoi": function (f) {
     var box = document.getElementById("envoi-err");
