@@ -3828,16 +3828,30 @@ function staleList() {
    boucher met son lien et décide du barème ; sans lien, l'action n'existe pas. */
 var BONUS = [
   { k: "insta",  label: "Abonnement Instagram", verbe: "Suivre sur Instagram",
-    ex: "https://instagram.com/votre_boutique" },
+    ex: "https://instagram.com/votre_boutique",
+    url: "https://www.instagram.com/boucherievatuonesete", pts: 20 },
   { k: "face",   label: "Abonnement Facebook",  verbe: "Suivre sur Facebook",
-    ex: "https://facebook.com/votreboutique" },
+    ex: "https://facebook.com/votreboutique",
+    url: "https://www.facebook.com/share/19Be8YCwWB/", pts: 20 },
   { k: "avis",   label: "Avis sur Google",      verbe: "Laisser un avis Google",
-    ex: "https://g.page/r/…/review" }
+    ex: "https://search.google.com/local/writereview?placeid=…",
+    // L'adresse d'avis directe. Le lien que donne Google en le copiant depuis
+    // un compte connecté passe par un écran de connexion et transporte un
+    // jeton de session : il enverrait chaque client se connecter d'abord.
+    url: "https://search.google.com/local/writereview?placeid=ChIJmV20zp81sRIRWLedkjFqJpU",
+    pts: 50 }
 ];
-function bonusListe() {
+
+/* Les valeurs d'origine ne servent qu'à remplir le formulaire des réglages, et
+   jamais à autoriser quoi que ce soit : ce que voient les clients vient de la
+   fiche boutique, la même que celle où la base lit le barème. Sans cela la
+   page proposerait une action que la base refuserait de créditer. */
+function bonusListe(avecDefauts) {
   var v = (DB.shop && DB.shop.bonus) || [];
   return BONUS.map(function (b) {
-    var e = v.filter(function (x) { return x.k === b.k; })[0] || {};
+    var e = v.filter(function (x) { return x.k === b.k; })[0];
+    if (!e && avecDefauts) e = { url: b.url, pts: b.pts };
+    e = e || {};
     return { k: b.k, label: e.label || b.label, verbe: b.verbe, ex: b.ex,
              url: e.url || "", pts: Number(e.pts) || 0 };
   });
@@ -3862,15 +3876,21 @@ function bonusPris(c) {
 }
 
 function bonusPanel() {
-  var l = bonusListe();
+  var enregistre = !!(DB.shop && DB.shop.bonus && DB.shop.bonus.length);
+  var l = bonusListe(true);
   return '<form class="panel panel-pad stack" data-act="save-bonus">' +
     '<div class="sect-head"><h2>Points en plus</h2></div>' +
     '<p class="small muted">Le client gagne des points en s\'abonnant à vos pages ou en ' +
     'laissant un avis. <b>Collez le lien, mettez un nombre de points, enregistrez</b> : ' +
     'l\'action apparaît aussitôt sur la carte de vos clients. Laissez le lien vide pour ' +
     'ne pas la proposer.</p>' +
+    (enregistre ? "" :
+      '<div class="banner"><span class="ico" aria-hidden="true">i</span><span>' +
+      '<b>Vos trois liens sont déjà remplis ci-dessous.</b> Vérifiez les points, ' +
+      'puis <b>Enregistrer</b> : rien n\'est proposé aux clients tant que vous ' +
+      'n\'avez pas enregistré.</span></div>') +
     l.map(function (b) {
-      var e = bonusEtat(b);
+      var e = enregistre ? bonusEtat(b) : { ok: false, txt: "À enregistrer" };
       return '<div class="bonus-set">' +
         '<div class="bonus-head"><b>' + esc(b.label) + '</b>' +
         '<span class="pill ' + (e.ok ? "ok" : "off") + '">' + esc(e.txt) + '</span></div>' +
@@ -3883,7 +3903,7 @@ function bonusPanel() {
         'value="' + (b.pts || "") + '"></div></div></div>';
     }).join("") +
     (function () {
-      var a = bonusActifs();
+      var a = enregistre ? bonusActifs() : [];
       return '<p class="small' + (a.length ? "" : " muted") + '" style="margin-top:2px">' +
         (a.length
           ? 'Vos clients voient <b>' + a.length + ' action' + (a.length > 1 ? "s" : "") + '</b> sur leur carte : ' +

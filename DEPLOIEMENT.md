@@ -454,8 +454,24 @@ page est en pleine fenêtre, en HTTPS, et la caméra s'ouvre au premier appui.
 **Réglages → Points en plus.** Trois actions, chacune avec son lien et son
 barème : abonnement Instagram, abonnement Facebook, avis Google.
 
-**Collez le lien, mettez un nombre de points, enregistrez.** C'est tout : il
-n'y a rien à activer. Une action qui a un lien et des points est proposée,
+**Les trois liens de la boutique sont déjà remplis** à la première ouverture ;
+il ne reste qu'à vérifier les points et à appuyer sur **Enregistrer**. Rien
+n'est proposé aux clients tant que ce n'est pas enregistré : les valeurs
+proposées remplissent le formulaire, elles n'autorisent rien. C'est
+volontaire — la base lit le barème dans la fiche boutique, et une action que
+la page afficherait sans que la fiche la porte serait refusée au moment de
+créditer.
+
+**Pour une autre boutique : collez le lien, mettez un nombre de points,
+enregistrez.** C'est tout : il n'y a rien à activer.
+
+> **Le lien d'avis Google demande une précaution.** Copié depuis un compte
+> connecté, Google donne une adresse de la forme
+> `accounts.google.com/v3/signin/…?continue=…&dsh=…` : c'est une page de
+> connexion, et le `dsh` est un jeton pris dans *votre* navigateur. Publiée
+> telle quelle, elle enverrait chaque client se connecter d'abord. La bonne
+> adresse est celle qu'elle contient :
+> `https://search.google.com/local/writereview?placeid=VOTRE_PLACE_ID`. Une action qui a un lien et des points est proposée,
 une action sans lien ne l'est pas. Chaque ligne affiche son état — *Proposée
 aux clients*, ou ce qu'il lui manque — et le panneau récapitule en une phrase
 ce que vos clients voient réellement sur leur carte.
