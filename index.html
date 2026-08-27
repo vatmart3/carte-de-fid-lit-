@@ -3811,7 +3811,7 @@ function vSet() {
   var sh = DB.shop;
   var rw = rewards().map(function (r, i) {
     return '<div class="reward-row">' +
-      '<input name="p" type="number" step="10" min="1" value="' + r.p + '" aria-label="Points">' +
+      '<input name="p" type="number" step="1" min="1" value="' + r.p + '" aria-label="Points">' +
       '<span class="ru">points</span>' +
       '<input name="l" value="' + esc(r.label) + '" class="grow" aria-label="Récompense">' +
       '<button class="btn btn-sm btn-danger" type="button" data-act="del-reward" data-i="' + i + '" aria-label="Supprimer">✕</button></div>';
@@ -3850,8 +3850,8 @@ function vSet() {
     'ensuite choisir la sienne depuis son compte.</span></div>' +
     '<hr class="divide"><div class="sect-head" style="margin:0"><h2 style="font-size:16px">Barème</h2></div>' +
     '<div class="grid-2">' +
-    '<div class="field"><label for="s-ppe">Points par euro dépensé</label><input id="s-ppe" name="ppe" type="number" step="0.5" min="0.5" value="' + sh.ppe + '"></div>' +
-    '<div class="field"><label for="s-wel">Points de bienvenue</label><input id="s-wel" name="welcome" type="number" step="5" min="0" value="' + sh.welcome + '"></div>' +
+    '<div class="field"><label for="s-ppe">Points par euro dépensé</label><input id="s-ppe" name="ppe" type="number" step="any" min="0.1" value="' + sh.ppe + '"></div>' +
+    '<div class="field"><label for="s-wel">Points de bienvenue</label><input id="s-wel" name="welcome" type="number" step="1" min="0" value="' + sh.welcome + '"></div>' +
     '<div class="field"><label for="s-lock">Verrouillage automatique</label>' +
     '<select id="s-lock" name="lock_minutes">' +
     [[5, "5 minutes"], [15, "15 minutes"], [30, "30 minutes"], [60, "1 heure"], [0, "jamais"]]
@@ -3859,9 +3859,9 @@ function vSet() {
         return '<option value="' + o[0] + '"' + (lockMinutes() === o[0] ? " selected" : "") + '>' + o[1] + '</option>';
       }).join("") + '</select>' +
     '<span class="hint">Sans activité pendant ce délai, le mot de passe est redemandé.</span></div>' +
-    '<div class="field"><label for="s-bd">Cadeau anniversaire</label><input id="s-bd" name="birthday" type="number" step="5" min="0" value="' + sh.birthday + '"></div>' +
-    '<div class="field"><label for="s-gf">Parrain</label><input id="s-gf" name="godfather" type="number" step="5" min="0" value="' + sh.godfather + '"></div>' +
-    '<div class="field"><label for="s-gc">Filleul</label><input id="s-gc" name="godchild" type="number" step="5" min="0" value="' + sh.godchild + '"></div></div>' +
+    '<div class="field"><label for="s-bd">Cadeau anniversaire</label><input id="s-bd" name="birthday" type="number" step="1" min="0" value="' + sh.birthday + '"></div>' +
+    '<div class="field"><label for="s-gf">Parrain</label><input id="s-gf" name="godfather" type="number" step="1" min="0" value="' + sh.godfather + '"></div>' +
+    '<div class="field"><label for="s-gc">Filleul</label><input id="s-gc" name="godchild" type="number" step="1" min="0" value="' + sh.godchild + '"></div></div>' +
     '<button class="btn btn-ink btn-full" type="submit">Enregistrer</button></form>' +
 
     '<form class="panel panel-pad stack" data-act="save-rewards">' +
@@ -3869,7 +3869,8 @@ function vSet() {
     '<button class="btn btn-sm" type="button" data-act="add-reward">Ajouter</button></div>' +
     '<div class="stack-sm" id="rw-list">' + rw + '</div>' +
     '<button class="btn btn-ink btn-full" type="submit">Enregistrer le barème</button>' +
-    '<p class="small muted">Les paliers s\'appliquent immédiatement sur toutes les cartes.</p></form>' +
+    '<p class="small muted">Mettez le nombre de points que vous voulez : 500, 1 000, 250\u2026 ' +
+    'Les paliers s\'appliquent immédiatement sur toutes les cartes.</p></form>' +
     '</div>' +
 
     '<div class="stack">' +
@@ -3986,7 +3987,7 @@ function bonusPanel() {
       return '<div class="bonus-set">' +
         '<div class="bonus-head"><b class="grow">' + esc(b.label) + '</b>' +
         '<span class="bonus-pts">' +
-        '<input id="b-p-' + b.k + '" name="pts_' + b.k + '" type="number" min="0" step="5" ' +
+        '<input id="b-p-' + b.k + '" name="pts_' + b.k + '" type="number" min="0" step="1" ' +
         'inputmode="numeric" value="' + (b.pts || "") + '" placeholder="0" ' +
         'aria-label="Points pour « ' + esc(b.label) + ' »">' +
         '<span>points</span></span></div>' +
@@ -4877,7 +4878,7 @@ var ACTS = {
     var l = document.getElementById("rw-list");
     var d = document.createElement("div");
     d.className = "reward-row";
-    d.innerHTML = '<input name="p" type="number" step="10" min="1" value="100" aria-label="Points">' +
+    d.innerHTML = '<input name="p" type="number" step="1" min="1" value="100" aria-label="Points">' +
       '<span class="ru">points</span>' +
       '<input name="l" value="" placeholder="Ce que le client gagne" class="grow" aria-label="Récompense">' +
       '<button class="btn btn-sm btn-danger" type="button" data-act="drop-row" aria-label="Supprimer">✕</button>';
@@ -5270,7 +5271,7 @@ var FORMS = {
     var sh = Store.mode === "supabase" ? JSON.parse(JSON.stringify(DB.shop)) : DB.shop;
     sh.name = f.name.value.trim() || sh.name;
     sh.city = f.city.value.trim(); sh.tagline = f.tagline.value.trim();
-    sh.ppe = Math.max(0.5, Number(f.ppe.value) || 1);
+    sh.ppe = Math.max(0.1, Number(f.ppe.value) || 1);
     sh.welcome = Math.max(0, Math.round(Number(f.welcome.value) || 0));
     sh.birthday = Math.max(0, Math.round(Number(f.birthday.value) || 0));
     sh.godfather = Math.max(0, Math.round(Number(f.godfather.value) || 0));

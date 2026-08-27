@@ -325,6 +325,38 @@ l'autre sur fond sombre, montrent tout de suite ce qu'il en est.
 > neutre, remplacez `assets/logo/vatuone.png` et la constante `LOGO_DEFAUT`
 > dans `index.html`.
 
+## 5 ter. Fixer le barème et les récompenses
+
+Espace boucher → **Réglages**. Deux encadrés, l'un sous l'autre.
+
+**Barème** — combien de points le client gagne.
+
+| Champ | Ce qu'il fait |
+| --- | --- |
+| Points par euro dépensé | 1 = un point par euro. On peut mettre 1,5 ou 0,5. |
+| Points de bienvenue | crédités à la création de la carte |
+| Cadeau anniversaire | crédités une fois par an, le jour dit |
+| Parrain / Filleul | crédités aux deux quand un parrainage aboutit |
+
+**Récompenses** — ce que le client obtient, et à quel prix.
+
+Chaque ligne est un palier : un nombre de points, puis ce que le client gagne.
+**Mettez le nombre que vous voulez** : 250, 500, 1 000, 1 500 — n'importe quel
+nombre entier à partir de 1. Le bouton **Ajouter** crée une ligne de plus, la
+croix rouge en supprime une. **Enregistrer le barème** pour valider.
+
+Les paliers se rangent tout seuls du moins cher au plus cher, et s'appliquent
+**immédiatement sur toutes les cartes déjà créées** — les points déjà acquis
+ne bougent pas, c'est seulement le prix des récompenses qui change.
+
+Un ordre de grandeur pour s'y retrouver : à 1 point par euro, un palier à 500
+points, c'est 500 € d'achats. Pour une boucherie où le panier tourne autour de
+25 €, cela fait une vingtaine de passages — soit à peu près cinq mois pour un
+client hebdomadaire. À vous de placer le curseur là où la récompense reste
+atteignable.
+
+---
+
 ## 6. Trouver le bon client
 
 Au comptoir, la file attend : chercher un client ne doit pas prendre plus de
