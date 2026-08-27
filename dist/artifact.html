@@ -228,7 +228,7 @@ input:-webkit-autofill,input:-webkit-autofill:focus{
   --cveil:rgba(255,255,255,.16);            /* le voile de lumière */
   --cchip:rgba(255,255,255,.18);            /* la pastille de statut */
   --cchip-line:rgba(255,255,255,.24);
-  --cmark:rgba(255,255,255,.13);            /* le fer du boucher, en filigrane */
+  --cmark:rgba(255,255,255,.24);            /* la marque de la maison, en filigrane */
   --cglow:rgba(190,43,43,.50);
   --ctex:none;
 }
@@ -255,9 +255,13 @@ input:-webkit-autofill,input:-webkit-autofill:focus{
 /* Le logo en filigrane sur la carte : découpé au pochoir dans la couleur de
    marque du style. Un logo rouge posé tel quel sur une carte rouge ne se
    verrait pas ; découpé, il prend toujours le bon contraste. */
-.loyalty-mark.pochoir{right:20px;width:124px;height:158px;
-  transform:translateY(-52%) rotate(-4deg);background:currentColor;
+/* La bête est entière, jamais coupée : un logo tronqué n'est plus un logo.
+   Elle occupe une bande à droite que le texte ne franchit pas — un filigrane
+   qui passe sous des chiffres abîme les deux. */
+.loyalty-mark.pochoir{right:-6px;top:50%;width:138px;height:176px;
+  transform:translateY(-50%) rotate(-4deg);background:currentColor;
   -webkit-mask:var(--logo) center/contain no-repeat;mask:var(--logo) center/contain no-repeat}
+@media (max-width:400px){.loyalty-mark.pochoir{width:118px;height:150px;right:-10px}}
 /* Même pochoir, en petit, devant le nom de la boutique. */
 .loyalty-sign{background:var(--cfg);
   -webkit-mask:var(--logo) center/contain no-repeat;mask:var(--logo) center/contain no-repeat}
@@ -273,14 +277,14 @@ input:-webkit-autofill,input:-webkit-autofill:focus{
 [data-style="papier"]{
   --ca:#F6E3D4; --cb:#E9C9B2; --cfg:#4A2A1C; --cdim:rgba(74,42,28,.72);
   --cveil:rgba(255,255,255,.45); --cchip:rgba(74,42,28,.10); --cchip-line:rgba(74,42,28,.18);
-  --cmark:rgba(74,42,28,.13); --cglow:rgba(120,74,50,.32);
+  --cmark:rgba(74,42,28,.20); --cglow:rgba(120,74,50,.32);
   --ctex:repeating-linear-gradient(46deg, rgba(120,74,50,.05) 0 2px, transparent 2px 7px);
 }
 /* Ardoise — le tableau du menu du jour */
 [data-style="ardoise"]{
   --ca:#3A3E42; --cb:#1E2124; --cfg:#F4F2EC; --cdim:rgba(244,242,236,.72);
   --cveil:rgba(255,255,255,.10); --cchip:rgba(255,255,255,.13); --cchip-line:rgba(255,255,255,.20);
-  --cmark:rgba(255,255,255,.15); --cglow:rgba(10,12,14,.55);
+  --cmark:rgba(255,255,255,.22); --cglow:rgba(10,12,14,.55);
   --ctex:radial-gradient(circle at 18% 28%, rgba(255,255,255,.05), transparent 42%),
          radial-gradient(circle at 76% 72%, rgba(255,255,255,.04), transparent 38%);
 }
@@ -288,7 +292,7 @@ input:-webkit-autofill,input:-webkit-autofill:focus{
 [data-style="billot"]{
   --ca:#B98450; --cb:#8A5A32; --cfg:#FFF6EA; --cdim:rgba(255,246,234,.80);
   --cveil:rgba(255,255,255,.22); --cchip:rgba(255,255,255,.18); --cchip-line:rgba(255,255,255,.26);
-  --cmark:rgba(255,255,255,.15); --cglow:rgba(110,70,40,.45);
+  --cmark:rgba(255,255,255,.24); --cglow:rgba(110,70,40,.45);
   --ctex:repeating-linear-gradient(90deg, rgba(60,32,12,.055) 0 4px, transparent 4px 17px),
          repeating-linear-gradient(90deg, rgba(255,235,205,.05) 0 2px, transparent 2px 39px);
 }
@@ -296,7 +300,7 @@ input:-webkit-autofill,input:-webkit-autofill:focus{
 [data-style="marbre"]{
   --ca:#FBFBFC; --cb:#E4E5E9; --cfg:#232327; --cdim:rgba(35,35,39,.66);
   --cveil:rgba(255,255,255,.75); --cchip:rgba(35,35,39,.08); --cchip-line:rgba(35,35,39,.15);
-  --cmark:rgba(35,35,39,.10); --cglow:rgba(60,60,70,.30);
+  --cmark:rgba(35,35,39,.16); --cglow:rgba(60,60,70,.30);
   --ctex:linear-gradient(112deg, transparent 34%, rgba(120,124,136,.20) 35%, transparent 36%),
          linear-gradient(104deg, transparent 58%, rgba(120,124,136,.14) 59%, transparent 61%),
          linear-gradient(126deg, transparent 74%, rgba(120,124,136,.11) 75%, transparent 76%);
@@ -305,7 +309,7 @@ input:-webkit-autofill,input:-webkit-autofill:focus{
 [data-style="laurier"]{
   --ca:#2E6B4F; --cb:#1B4632; --cfg:#F6EFD9; --cdim:rgba(246,239,217,.78);
   --cveil:rgba(255,255,255,.14); --cchip:rgba(246,239,217,.16); --cchip-line:rgba(246,239,217,.30);
-  --cmark:rgba(246,239,217,.13); --cglow:rgba(20,60,42,.48);
+  --cmark:rgba(246,239,217,.22); --cglow:rgba(20,60,42,.48);
   --ctex:none;
 }
 .loyalty[data-style="laurier"]::before{
@@ -317,16 +321,29 @@ input:-webkit-autofill,input:-webkit-autofill:focus{
 @keyframes pose{from{opacity:0}to{opacity:1}}
 .loyalty.posed{animation:none}
 .loyalty-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
-.loyalty-shop{font-family:var(--titre);font-weight:700;font-size:19px;line-height:1.25;
-  display:flex;align-items:center;gap:8px}
+/* L'identité de la maison, en bloc : le logo à sa vraie taille, le nom en
+   capitales espacées comme sur une devanture, et — ce qui manquait — le mot
+   « carte de fidélité », sans lequel une carte ne dit pas ce qu'elle est. */
+.loyalty-id{display:flex;align-items:center;gap:12px;min-width:0}
+.loyalty-shop{font-family:var(--titre);font-weight:700;font-size:16px;line-height:1.2;
+  text-transform:uppercase;letter-spacing:.055em;word-break:break-word}
+.loyalty-kind{display:block;margin-top:4px;font-size:10.5px;font-weight:600;
+  text-transform:uppercase;letter-spacing:.16em;color:var(--cdim)}
+.loyalty-rule{height:1px;background:currentColor;opacity:.18;margin:16px 0 0}
 /* Signature au-dessus du nom : c'est ce qui fait lire « carte de la boucherie »
    au premier coup d'œil, avant même de lire le nom. */
-.loyalty-sign{width:22px;height:27px;flex:none;display:block}
-.loyalty-city{font-size:13px;color:var(--cdim);margin-top:3px;font-weight:500}
+.loyalty-sign{width:40px;height:48px;flex:none;display:block}
+@media (max-width:400px){.loyalty-sign{width:34px;height:41px}}
+.loyalty-city{display:block;font-size:12.5px;color:var(--cdim);margin-top:2px;
+  font-weight:500;letter-spacing:.02em}
+.loyalty-shop{display:block}
 .tier{font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;
   padding:7px 13px;border-radius:99px;background:var(--cchip);color:var(--cfg);white-space:nowrap;
   border:1px solid var(--cchip-line)}
-.loyalty-pts{display:flex;align-items:baseline;gap:10px;margin-top:34px}
+.loyalty-pts{display:flex;align-items:baseline;gap:10px;margin-top:22px}
+/* La bande réservée à la bête : rien n'y entre. */
+.loyalty-pts,.loyalty-name,.loyalty-foot,.loyalty-rule{padding-right:112px}
+@media (max-width:400px){.loyalty-pts,.loyalty-name,.loyalty-foot,.loyalty-rule{padding-right:96px}}
 .loyalty-pts b{font-family:var(--titre);font-weight:700;font-size:62px;line-height:1;
   font-variant-numeric:tabular-nums;letter-spacing:-.03em}
 .loyalty-pts span{font-size:14px;text-transform:uppercase;letter-spacing:.06em;color:var(--cdim);font-weight:700}
@@ -2123,11 +2140,13 @@ function specimenHTML() {
   var sh = DB.shop;
   return '<div class="loyalty specimen" aria-hidden="true" data-style="' + styleOf(null) + '">' +
     '<span class="loyalty-mark' + cardMark().cls + '">' + cardMark().html + '</span>' +
-    '<div class="loyalty-top"><div>' +
-    '<div class="loyalty-shop"><span class="loyalty-sign" aria-hidden="true"></span>' +
-    esc(sh.name) + '</div>' +
-    '<div class="loyalty-city">' + esc(sh.city) + '</div></div>' +
+    '<div class="loyalty-top">' +
+    '<div class="loyalty-id"><span class="loyalty-sign" aria-hidden="true"></span>' +
+    '<span><span class="loyalty-shop">' + esc(sh.name) + '</span>' +
+    (sh.city ? '<span class="loyalty-city">' + esc(sh.city) + '</span>' : "") +
+    '<span class="loyalty-kind">Carte de fidélité</span></span></div>' +
     '<span class="tier">Nouveau</span></div>' +
+    '<div class="loyalty-rule" aria-hidden="true"></div>' +
     '<div class="loyalty-pts"><b>' + nb(sh.welcome) + '</b><span>points</span></div>' +
     '<div class="loyalty-name">Votre nom</div>' +
     '<div class="loyalty-foot"><span class="loyalty-no">····</span>' +
@@ -2341,11 +2360,13 @@ function cardHTML(c) {
   var sh = DB.shop;
   return '<div class="loyalty' + (posed ? " posed" : "") + '" data-style="' + styleOf(c) + '">' +
     '<span class="loyalty-mark' + cardMark().cls + '" aria-hidden="true">' + cardMark().html + '</span>' +
-    '<div class="loyalty-top"><div>' +
-    '<div class="loyalty-shop"><span class="loyalty-sign" aria-hidden="true"></span>' +
-    esc(sh.name) + '</div>' +
-    '<div class="loyalty-city">' + esc(sh.city) + '</div></div>' +
+    '<div class="loyalty-top">' +
+    '<div class="loyalty-id"><span class="loyalty-sign" aria-hidden="true"></span>' +
+    '<span><span class="loyalty-shop">' + esc(sh.name) + '</span>' +
+    (sh.city ? '<span class="loyalty-city">' + esc(sh.city) + '</span>' : "") +
+    '<span class="loyalty-kind">Carte de fidélité</span></span></div>' +
     '<span class="tier">' + esc(tierOf(c.lifetime)) + '</span></div>' +
+    '<div class="loyalty-rule" aria-hidden="true"></div>' +
     '<div class="loyalty-pts"><b>' + nb(c.points) + '</b><span>points</span></div>' +
     '<div class="loyalty-name">' + esc(c.name) + '</div>' +
     '<div class="loyalty-foot"><span class="loyalty-no">' + esc(c.id) + '</span>' +
