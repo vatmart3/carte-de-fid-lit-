@@ -126,6 +126,17 @@ h1,h2,h3{text-wrap:balance;line-height:1.12;font-weight:400;letter-spacing:-.015
 /* Le logo de la boutique remplace l'initiale. On lui laisse un cadre carré et
    on l'y pose entier : un logo rogné n'est plus le logo de personne. */
 .mark-glyph.has-logo{background:transparent;box-shadow:none;border-radius:9px;padding:0}
+/* Un logo qui porte son propre fond : on ne lui en ajoute pas un autre, on
+   arrondit simplement ses angles pour qu'il ne fasse pas carré rapporté. */
+/* Le cadre ne dicte rien : c'est l'image qui se donne sa hauteur et le
+   cadre qui se referme dessus. Un cadre en grid imposait une hauteur que le
+   « height:100% » de l'image ne pouvait pas résoudre — elle repartait alors
+   sur sa largeur d'origine et sortait du cadre, tronquée. */
+.mark-glyph.has-logo.fond{display:block;width:auto;height:auto;max-width:none;
+  overflow:hidden;border-radius:9px}
+.mark-glyph.has-logo.fond img{display:block;width:auto;height:46px;
+  max-width:132px;object-fit:contain}
+@media (max-width:520px){.mark-glyph.has-logo.fond img{height:40px;max-width:104px}}
 .mark-glyph img{width:100%;height:100%;object-fit:contain;display:block}
 /* Certains logos sont dessinés en blanc, pour une devanture sombre. Sur fond
    clair ils disparaissent : on leur pose une plaque foncée dessous. */
@@ -138,6 +149,8 @@ h1,h2,h3{text-wrap:balance;line-height:1.12;font-weight:400;letter-spacing:-.015
 .logo-try .box .nm{font-family:var(--titre);font-weight:700;font-size:15px;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .logo-try .box .mark-glyph{width:40px;height:40px}
+.logo-try .box .mark-glyph.fond{width:auto;height:auto}
+.logo-try .box .mark-glyph.fond img{height:40px;max-width:112px}
 .logo-vide{font-size:13.5px;color:var(--muted)}
 /* Gagner des points en plus : une liste d'actions, pas un mur de boutons. */
 .bn{display:flex;flex-direction:column;gap:10px}
@@ -326,6 +339,9 @@ input:-webkit-autofill,input:-webkit-autofill:focus{
   background:#FFFFFF;box-shadow:0 6px 18px -8px rgba(0,0,0,.45);
   transform:translateY(-50%) rotate(-5deg)}
 .loyalty-mark.plaque.sombre{background:#151517}
+.loyalty-mark.plaque.fond{background:transparent;padding:0;overflow:hidden;
+  border-radius:16px;box-shadow:0 8px 22px -10px rgba(0,0,0,.55)}
+.loyalty-mark.plaque.fond .cmark-img{object-fit:cover;height:100%}
 .loyalty-mark .cmark-img{width:100%;height:100%;object-fit:contain;display:block}
 
 /* Papier du boucher — kraft rosé, encre brune */
@@ -379,7 +395,8 @@ input:-webkit-autofill,input:-webkit-autofill:focus{
 /* L'identité de la maison, en bloc : le logo à sa vraie taille, le nom en
    capitales espacées comme sur une devanture, et — ce qui manquait — le mot
    « carte de fidélité », sans lequel une carte ne dit pas ce qu'elle est. */
-.loyalty-id{display:flex;align-items:center;gap:12px;min-width:0}
+.loyalty-id{display:flex;align-items:center;gap:14px;min-width:0}
+.loyalty-id:has(.loyalty-lock){align-items:flex-end}
 .loyalty-shop{font-family:var(--titre);font-weight:700;font-size:16px;line-height:1.2;
   text-transform:uppercase;letter-spacing:.055em;word-break:break-word}
 .loyalty-kind{display:block;margin-top:4px;font-size:10.5px;font-weight:600;
@@ -389,6 +406,12 @@ input:-webkit-autofill,input:-webkit-autofill:focus{
    au premier coup d'œil, avant même de lire le nom. */
 .loyalty-sign{width:40px;height:48px;flex:none;display:block}
 @media (max-width:400px){.loyalty-sign{width:34px;height:41px}}
+/* Le logo complet en en-tête : entier, jamais rogné, assez grand pour se
+   lire. Il porte son propre fond, on ne fait qu'arrondir ses angles. */
+.loyalty-lock{flex:none;display:block;height:124px;max-width:46%;border-radius:13px;
+  overflow:hidden;box-shadow:0 6px 18px -8px rgba(0,0,0,.5)}
+.loyalty-lock img{height:100%;width:auto;max-width:100%;display:block;object-fit:contain}
+@media (max-width:400px){.loyalty-lock{height:104px}}
 .loyalty-city{display:block;font-size:12.5px;color:var(--cdim);margin-top:2px;
   font-weight:500;letter-spacing:.02em}
 .loyalty-shop{display:block}
@@ -400,8 +423,20 @@ input:-webkit-autofill,input:-webkit-autofill:focus{
 .loyalty-pts{display:flex;align-items:baseline;gap:10px;margin-top:20px}
 .loyalty-bas{margin-top:18px}
 /* La bande réservée à la bête : rien n'y entre. */
-.loyalty-pts,.loyalty-bas,.loyalty-rule{padding-right:112px}
-@media (max-width:400px){.loyalty-pts,.loyalty-bas,.loyalty-rule{padding-right:96px}}
+.loyalty:has(.loyalty-mark.pochoir) .loyalty-pts,
+.loyalty:has(.loyalty-mark.pochoir) .loyalty-bas,
+.loyalty:has(.loyalty-mark.pochoir) .loyalty-rule,
+.loyalty:has(.loyalty-mark.plaque) .loyalty-pts,
+.loyalty:has(.loyalty-mark.plaque) .loyalty-bas,
+.loyalty:has(.loyalty-mark.plaque) .loyalty-rule{padding-right:112px}
+@media (max-width:400px){
+  .loyalty:has(.loyalty-mark.pochoir) .loyalty-pts,
+  .loyalty:has(.loyalty-mark.pochoir) .loyalty-bas,
+  .loyalty:has(.loyalty-mark.pochoir) .loyalty-rule,
+  .loyalty:has(.loyalty-mark.plaque) .loyalty-pts,
+  .loyalty:has(.loyalty-mark.plaque) .loyalty-bas,
+  .loyalty:has(.loyalty-mark.plaque) .loyalty-rule{padding-right:96px}
+}
 .loyalty-pts b{font-family:var(--titre);font-weight:700;font-size:62px;line-height:1;
   font-variant-numeric:tabular-nums;letter-spacing:-.03em}
 .loyalty-pts span{font-size:14px;text-transform:uppercase;letter-spacing:.06em;color:var(--cdim);font-weight:700}
@@ -2027,7 +2062,9 @@ function closeModal() {
 function shopLogo() { return String((DB.shop || {}).logo || ""); }
 function markGlyph() {
   var l = shopLogo();
-  return '<span class="mark-glyph has-logo' + (l && DB.shop.logo_clair ? " clair" : "") + '">' +
+  var fond = !!(l && DB.shop.logo_fond);
+  return '<span class="mark-glyph has-logo' + (fond ? " fond" : "") +
+    (l && !fond && DB.shop.logo_clair ? " clair" : "") + '">' +
     '<img src="' + esc(l || LOGO_DEFAUT) + '" alt="' + esc(DB.shop.name) + '"></span>';
 }
 
@@ -2042,6 +2079,8 @@ function topbar() {
       '<button class="btn btn-sm btn-ghost" data-act="leave-admin">Quitter</button>'
     : '<button class="btn btn-sm btn-ghost" data-act="home">Retour</button>';
   return '<header class="topbar"><div class="topbar-in">' +
+    // Le logo se pose à côté du nom, il ne le remplace pas : haut de quarante
+    // pixels, aucun logo ne se lit ; le nom écrit reste le seul lisible.
     '<a class="mark" href="#" data-act="home">' + markGlyph() +
     '<span class="mark-txt"><span class="mark-name">' + esc(sh.name) + '</span>' +
     '<span class="mark-sub">Carte de fidélité</span></span></a>' +
@@ -2249,11 +2288,7 @@ function specimenHTML() {
   var sh = DB.shop;
   return '<div class="loyalty specimen" aria-hidden="true" data-style="' + styleOf(null) + '">' +
     '<span class="loyalty-mark' + cardMark().cls + '">' + cardMark().html + '</span>' +
-    '<div class="loyalty-top">' +
-    '<div class="loyalty-id"><span class="loyalty-sign" aria-hidden="true"></span>' +
-    '<span><span class="loyalty-shop">' + esc(sh.name) + '</span>' +
-    (sh.city ? '<span class="loyalty-city">' + esc(sh.city) + '</span>' : "") +
-    '<span class="loyalty-kind">Carte de fidélité</span></span></div>' +
+    '<div class="loyalty-top">' + carteEnTete(sh) +
     '<span class="tier">Nouveau</span></div>' +
     '<div class="loyalty-rule" aria-hidden="true"></div>' +
     '<div class="loyalty-pts"><b>' + nb(sh.welcome) + '</b><span>points</span></div>' +
@@ -2389,11 +2424,31 @@ function styleOf(c) {
    coupé et le manche fin suffisent à le rendre lisible en filigrane. */
 /* Sur la carte, la marque en filigrane : le logo de la boutique s'il existe,
    le couperet dessiné sinon. */
+/* L'en-tête de la carte. Un logo qui contient déjà le nom de la boutique
+   n'a pas à le voir réécrit à côté de lui : il devient l'en-tête, en grand
+   et entier — un logo rogné ou réduit au point qu'on n'y lise plus rien ne
+   sert à personne. Un logo qui n'est qu'un dessin, lui, accompagne le nom. */
+function carteEnTete(sh) {
+  var l = shopLogo();
+  if (l && DB.shop.logo_fond) {
+    return '<div class="loyalty-id"><span class="loyalty-lock">' +
+      '<img src="' + esc(l) + '" alt="' + esc(sh.name) + '"></span>' +
+      '<span>' + (sh.city ? '<span class="loyalty-city">' + esc(sh.city) + '</span>' : "") +
+      '<span class="loyalty-kind">Carte de fidélité</span></span></div>';
+  }
+  return '<div class="loyalty-id"><span class="loyalty-sign" aria-hidden="true"></span>' +
+    '<span><span class="loyalty-shop">' + esc(sh.name) + '</span>' +
+    (sh.city ? '<span class="loyalty-city">' + esc(sh.city) + '</span>' : "") +
+    '<span class="loyalty-kind">Carte de fidélité</span></span></div>';
+}
+
 function cardMark() {
   // Sur la carte, le logo sert de pochoir : il prend la couleur de l'encre du
   // style choisi. Un logo déposé garde en revanche ses couleurs, sur sa
   // plaque — c'est une marque, pas un motif.
   if (shopLogo()) {
+    // Déjà en en-tête : pas de second exemplaire en filigrane.
+    if (DB.shop.logo_fond) return { cls: "", html: "" };
     return {
       cls: " plaque" + (DB.shop.logo_clair ? " sombre" : ""),
       html: '<img class="cmark-img" src="' + esc(shopLogo()) + '" alt="">'
@@ -2406,31 +2461,56 @@ function cardMark() {
    que le dessin ne touche pas le cadre. Si l'image est vide ou d'une seule
    teinte, on la rend telle quelle plutôt que de renvoyer un cadre impossible. */
 function encadre(img, w, h) {
-  var tout = { x0: 0, y0: 0, x1: w - 1, y1: h - 1, rogne: false };
+  var tout = { x0: 0, y0: 0, x1: w - 1, y1: h - 1, rogne: false, fond: false };
   var cv = document.createElement("canvas");
   cv.width = w; cv.height = h;
   var cx = cv.getContext("2d");
   cx.drawImage(img, 0, 0);
   var d;
   try { d = cx.getImageData(0, 0, w, h).data; } catch (e) { return tout; }
+
   var opaque = true, i;
   for (i = 3; i < d.length; i += 4) { if (d[i] < 250) { opaque = false; break; } }
+
+  /* Le fond d'un logo n'est pas toujours blanc ni transparent : celui de la
+     boucherie est noir, et le dessin y est posé en blanc et en rouge. On
+     interroge donc les quatre coins. S'ils s'accordent, c'est le fond, quelle
+     que soit sa couleur — sinon on rognerait tout sauf le cadre, ou rien. */
+  function pix(x, y) { var k = (y * w + x) * 4; return [d[k], d[k + 1], d[k + 2], d[k + 3]]; }
+  function proche(a, b) {
+    return Math.abs(a[0] - b[0]) < 18 && Math.abs(a[1] - b[1]) < 18 &&
+           Math.abs(a[2] - b[2]) < 18 && Math.abs(a[3] - b[3]) < 24;
+  }
+  var coins = [pix(0, 0), pix(w - 1, 0), pix(0, h - 1), pix(w - 1, h - 1)];
+  var uni = opaque && proche(coins[0], coins[1]) && proche(coins[0], coins[2]) &&
+            proche(coins[0], coins[3]) ? coins[0] : null;
+  /* Un fond blanc n'est pas un fond : c'est du papier. Un logo scanné sur une
+     feuille se détoure comme avant, et garde le droit à sa plaque foncée. Un
+     fond d'une autre couleur, lui, a été voulu par le graphiste : il fait
+     partie du dessin, on le garde et on pose le logo tel quel. */
+  var papier = uni && uni[0] > 240 && uni[1] > 240 && uni[2] > 240;
+  var propre = !!uni && !papier;
+  tout.fond = propre;
+
   var x0 = w, y0 = h, x1 = -1, y1 = -1, x, y;
   for (y = 0; y < h; y++) {
     for (x = 0; x < w; x++) {
       i = (y * w + x) * 4;
-      var encre = d[i + 3] > 20 &&
-        (!opaque || !(d[i] > 240 && d[i + 1] > 240 && d[i + 2] > 240));
+      var p = [d[i], d[i + 1], d[i + 2], d[i + 3]];
+      var encre = uni
+        ? !proche(p, uni)
+        : (p[3] > 20 && (!opaque || !(p[0] > 240 && p[1] > 240 && p[2] > 240)));
       if (!encre) continue;
       if (x < x0) x0 = x; if (x > x1) x1 = x;
       if (y < y0) y0 = y; if (y > y1) y1 = y;
     }
   }
   if (x1 < x0 || y1 < y0) return tout;
-  var m = Math.round(Math.max(x1 - x0, y1 - y0) * 0.02);
+  var m = Math.round(Math.max(x1 - x0, y1 - y0) * (propre ? 0.06 : 0.02));
   var r = {
     x0: Math.max(0, x0 - m), y0: Math.max(0, y0 - m),
-    x1: Math.min(w - 1, x1 + m), y1: Math.min(h - 1, y1 + m)
+    x1: Math.min(w - 1, x1 + m), y1: Math.min(h - 1, y1 + m),
+    fond: propre
   };
   r.rogne = (r.x1 - r.x0 + 1) * (r.y1 - r.y0 + 1) < w * h * 0.92;
   return r;
@@ -2449,7 +2529,18 @@ function logoApercu() {
     '<div class="box clair">' + markGlyph() + '<span class="nm">' + nom + '</span></div>' +
     '<div class="box sombre">' + markGlyph() + '<span class="nm">' + nom + '</span></div>' +
     '</div>' +
-    // le retrait vit ici, avec l'aperçu : les deux se redessinent ensemble
+    // Tout ce qui dépend du fichier vit ici : l'aperçu, le réglage du fond et
+    // le retrait. Un seul bloc à redessiner quand on dépose un logo, donc
+    // aucun de ces trois éléments ne peut rester en retard sur les autres.
+    (DB.shop.logo_fond
+      ? '<p class="small muted" style="margin-top:11px">Ce logo porte son propre fond : ' +
+        'il est posé tel quel, sans plaque ajoutée dessous.</p>'
+      : '<div class="field" style="margin-top:13px"><label class="check">' +
+        '<input type="checkbox" name="logo_clair"' +
+        (DB.shop.logo_clair ? " checked" : "") + ' data-act="logo-clair"> ' +
+        'Mon logo est dessiné en blanc ou en couleurs claires</label>' +
+        '<span class="hint">Cochez si le logo disparaît sur le fond blanc ci-dessus : ' +
+        'l\'application lui posera une plaque foncée dessous.</span></div>') +
     '<button type="button" class="btn btn-sm btn-ghost" data-act="logo-off" ' +
     'style="margin-top:11px">Retirer le logo</button>';
 }
@@ -2470,11 +2561,7 @@ function cardHTML(c) {
   var sh = DB.shop;
   return '<div class="loyalty' + (posed ? " posed" : "") + '" data-style="' + styleOf(c) + '">' +
     '<span class="loyalty-mark' + cardMark().cls + '" aria-hidden="true">' + cardMark().html + '</span>' +
-    '<div class="loyalty-top">' +
-    '<div class="loyalty-id"><span class="loyalty-sign" aria-hidden="true"></span>' +
-    '<span><span class="loyalty-shop">' + esc(sh.name) + '</span>' +
-    (sh.city ? '<span class="loyalty-city">' + esc(sh.city) + '</span>' : "") +
-    '<span class="loyalty-kind">Carte de fidélité</span></span></div>' +
+    '<div class="loyalty-top">' + carteEnTete(sh) +
     '<span class="tier">' + esc(tierOf(c.lifetime)) + '</span></div>' +
     '<div class="loyalty-rule" aria-hidden="true"></div>' +
     '<div class="loyalty-pts"><b>' + nb(c.points) + '</b><span>points</span></div>' +
@@ -3752,11 +3839,6 @@ function vSet() {
     'l\'ouverture du site. Sans fichier, c\'est la tête de vache dessinée qui ' +
     'sert.</span></div>' +
     '<div id="logo-try">' + logoApercu() + '</div>' +
-    '<div class="field"><label class="check"><input type="checkbox" name="logo_clair"' +
-    (DB.shop.logo_clair ? " checked" : "") + ' data-act="logo-clair"> ' +
-    'Mon logo est dessiné en blanc ou en couleurs claires</label>' +
-    '<span class="hint">Cochez si le logo disparaît sur le fond blanc ci-dessus : ' +
-    'l\'application lui posera une plaque foncée dessous.</span></div>' +
     '<hr class="divide">' +
     '<div class="field"><label>Allure de la carte</label>' +
     '<div class="styles">' + CARD_STYLES.map(function (st) {
@@ -4890,6 +4972,9 @@ var ACTS = {
         return;
       }
       DB.shop.logo = png;
+      // Un logo qui porte son propre fond n'a pas besoin de la plaque : on
+      // l'arrondit et on le pose tel quel, c'est ainsi qu'il a été dessiné.
+      DB.shop.logo_fond = !!b.fond;
       var nom = document.getElementById("logo-nom");
       if (nom) {
         nom.textContent = f.name + (b.rogne ? " · marge retirée" : "") +
@@ -4915,7 +5000,7 @@ var ACTS = {
     if (box) box.innerHTML = logoApercu();
   },
   "logo-off": function () {
-    DB.shop.logo = ""; DB.shop.logo_clair = false;
+    DB.shop.logo = ""; DB.shop.logo_clair = false; DB.shop.logo_fond = false;
     var box = document.getElementById("logo-try");
     if (box) box.innerHTML = logoApercu();
     toast("Logo retiré. Enregistrez pour valider.", "ok");
@@ -5196,6 +5281,7 @@ var FORMS = {
     // le logo a été posé dans DB.shop au moment du choix du fichier
     sh.logo = DB.shop.logo || "";
     sh.logo_clair = !!DB.shop.logo_clair;
+    sh.logo_fond = !!DB.shop.logo_fond;
     if (Store.mode === "supabase") return remote(saveShopRemote(sh), "Réglages enregistrés.");
     logIt("Réglages de la boutique modifiés");
     persist("Réglages enregistrés.");
