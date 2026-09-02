@@ -753,6 +753,43 @@ Le reste — registre des traitements, contrats de sous-traitance, affichette au
 comptoir, conduite à tenir en cas de fuite — est détaillé dans
 [RGPD.md](RGPD.md), avec un registre prérempli à imprimer.
 
+### Le numéro d'un client qui refuse les offres
+
+À l'inscription, le client peut cocher ou non « j'accepte de recevoir les
+offres et les nouveautés ». **S'il ne coche pas, son numéro de téléphone
+n'apparaît nulle part côté boucher** : ni dans le fichier clients, ni sur sa
+fiche, ni dans les anniversaires, ni à la caisse, ni dans les exports CSV, ni
+dans l'envoi de SMS. À la place s'affiche « numéro masqué ».
+
+Ce qui continue de marcher :
+
+- **La carte fonctionne normalement.** Points, récompenses, encaissement,
+  anniversaire : rien ne change.
+- **La caisse trouve toujours le client par son numéro.** Le client annonce
+  « 06 12 48 03 77 », le boucher le tape, la bonne fiche s'ouvre — sans que le
+  numéro soit réaffiché.
+- **Le client retrouve sa carte** avec téléphone + date de naissance, comme
+  avant.
+- **Le client voit son propre numéro** sur sa carte, et peut le corriger.
+- **Le boucher peut corriger la fiche** : le champ Téléphone est vide, il en
+  saisit un nouveau s'il le faut, et le laisser vide conserve l'ancien.
+
+Ce qui ne marche plus, et c'est voulu :
+
+- **Le boucher ne peut plus appeler ni envoyer de SMS à ce client** — même
+  pour un message de service comme « votre commande est prête ». S'il a une
+  adresse e-mail, ce canal reste ouvert ; sinon, le client n'est joignable
+  qu'au comptoir.
+
+Le client peut changer d'avis à tout moment depuis sa carte : la case
+recochée, le numéro réapparaît immédiatement côté boucher.
+
+> **Une limite à connaître.** C'est une règle que l'application applique, pas
+> un coffre-fort. Le numéro reste enregistré dans la base — il le faut, c'est
+> la clé de la carte. Qui ouvre le tableau de bord Supabase voit la colonne.
+> La boutique reste propriétaire et responsable de sa base ; le masquage
+> protège du geste ordinaire, pas de la volonté d'aller voir.
+
 ## Vérifier que tout est bien fermé
 
 Espace boucher → Réglages → Base en ligne → **Vérifier l'installation**.

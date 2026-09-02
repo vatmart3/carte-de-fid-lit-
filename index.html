@@ -829,6 +829,10 @@ input:-webkit-autofill,input:-webkit-autofill:focus{
 .sign-ink polyline{stroke:#1B1B1F}
 .sign-foot{margin-top:9px;font-size:13.5px;color:var(--muted);text-align:center}
 
+/* Un numéro masqué : une mention en creux, pour qu'on lise une décision et
+   non une fiche incomplète. */
+.tel-off{font-style:italic;color:var(--muted);letter-spacing:0}
+
 /* ═══════════════════════ sur téléphone ═══════════════════════
    Trois règles : rien ne saute pendant le chargement, rien ne déborde sur
    le côté, et tout ce qui est à l'écran se lit sans faire glisser la page.
@@ -1983,6 +1987,30 @@ function daysAgo(iso) { if (!iso) return 9999; return Math.round((new Date(today
 function initials(n) { return n.trim().split(/\s+/).map(function (w) { return w[0]; }).join("").slice(0, 2).toUpperCase(); }
 function normPhone(p) { return String(p || "").replace(/[^0-9+]/g, ""); }
 function prettyPhone(p) { var s = normPhone(p); return s.length === 10 ? s.replace(/(\d{2})(?=\d)/g, "$1 ").trim() : s; }
+
+/* ── Le numéro d'un client qui refuse les offres ──
+   Le client qui décoche « je souhaite recevoir les offres » ne donne pas son
+   numéro pour être démarché : il le donne pour que sa carte existe. Son
+   numéro est donc masqué partout où le boucher pourrait le lire — la fiche,
+   le fichier, les anniversaires, la caisse, l'export, l'envoi de messages.
+
+   Il reste enregistré : c'est la clé de la carte. Le client s'en sert pour
+   retrouver sa carte, la caisse s'en sert pour le trouver quand il l'annonce.
+   Ce que le boucher perd, c'est de pouvoir le lire, le copier ou l'écrire.
+
+   Ce que cela ne fait pas : ce n'est pas un coffre-fort. La boutique reste
+   propriétaire de sa base ; qui ouvre le tableau de bord Supabase voit la
+   colonne. C'est une règle que l'application tient, pas un mur. */
+function telVisible(c) { return !!(c && c.marketing); }
+var TEL_MASQUE = "numéro masqué";
+/* En clair, pour un export ou un texte brut. */
+function telAffiche(c) { return telVisible(c) ? prettyPhone(c.phone) : TEL_MASQUE; }
+/* Dans la page : masqué se lit comme une décision, pas comme une fiche vide. */
+function telHtml(c) {
+  return telVisible(c) ? esc(prettyPhone(c.phone))
+    : '<span class="tel-off" title="Ce client n\'a pas accepté de recevoir les ' +
+      'offres : son numéro ne vous est pas montré.">' + esc(TEL_MASQUE) + '</span>';
+}
 function slug(n) { return n.normalize("NFD").replace(/[^A-Za-z]/g, "").slice(0, 3).toUpperCase(); }
 
 function tierOf(life) {
@@ -2416,7 +2444,9 @@ function vSignup() {
     'et j\'ai lu la <button type="button" class="linklike" data-act="go-privacy">politique de confidentialité</button>. *</span></label>' +
     '<label class="check"><input type="checkbox" name="pub" value="1">' +
     '<span>J\'accepte de recevoir les offres et les nouveautés de la boutique. ' +
-    '<span class="muted">Facultatif, et révocable à tout moment depuis ma carte.</span></span></label>' +
+    '<span class="muted">Facultatif, et révocable à tout moment depuis ma carte. ' +
+    'Si vous refusez, votre numéro de téléphone ne sera pas montré à la boutique : ' +
+    'il servira seulement à retrouver votre carte.</span></span></label>' +
     '<div id="signup-err"></div>' +
     '<button class="btn btn-primary btn-full" type="submit">Créer ma carte</button>' +
     '<button class="btn btn-ghost btn-full" type="button" data-act="go-find">J\'ai déjà une carte</button>' +
@@ -2741,7 +2771,8 @@ function vCard() {
     '<label class="check" style="margin-top:14px"><input type="checkbox" data-act="toggle-pub"' +
     (c.marketing ? " checked" : "") + '>' +
     '<span>Je souhaite recevoir les offres et les nouveautés de la boutique. ' +
-    '<span class="muted">Vos points ne changent pas si vous refusez.</span></span></label>' +
+    '<span class="muted">Vos points ne changent pas si vous refusez. Tant que cette case ' +
+    'est décochée, votre numéro de téléphone n\'est pas montré à la boutique.</span></span></label>' +
     '<div class="btn-row" style="margin-top:14px">' +
     '<button class="btn btn-sm" data-act="my-edit">Corriger mes informations</button>' +
     '<button class="btn btn-sm" data-act="my-export">Télécharger mes données</button>' +
@@ -3165,7 +3196,7 @@ function suggHtml(q, par) {
       'data-act="till-pick" data-id="' + c.id + '">' +
       '<span class="av" aria-hidden="true">' + esc(initials(c.name)) + '</span>' +
       '<span class="who"><b>' + (par === "nom" ? surligne(c.name, qq, par) : esc(c.name)) + '</b>' +
-      '<span class="small muted num">n° ' + c.id + ' · ' + esc(prettyPhone(c.phone)) +
+      '<span class="small muted num">n° ' + c.id + ' · ' + telHtml(c) +
       ' · ' + nb(c.points) + ' points</span></span></button>';
   }).join("") +
     (r.total > r.list.length
@@ -3381,7 +3412,7 @@ function vClients() {
       'role="checkbox" aria-checked="' + on + '" aria-label="Sélectionner ' + esc(c.name) + '">' +
       '<span class="tick"></span></td>' +
       '<td class="no hd-a">' + c.id + '</td>' +
-      '<td class="hd-b"><b>' + esc(c.name) + '</b><br><span class="small muted num">' + esc(prettyPhone(c.phone)) + '</span></td>' +
+      '<td class="hd-b"><b>' + esc(c.name) + '</b><br><span class="small muted num">' + telHtml(c) + '</span></td>' +
       '<td class="r num c-a" data-l="Points"><b>' + nb(c.points) + '</b></td>' +
       '<td class="r num c-b" data-l="Passages">' + nb(c.visits) + '</td>' +
       '<td class="r num c-c" data-l="D\u00e9pens\u00e9">' + eur(c.spent) + '</td>' +
@@ -3453,7 +3484,7 @@ function clientModal(id) {
     '<div><b>' + eur0(c.spent) + '</b><span>dépensé</span></div></div>' +
     facts([
       ["Carte", '<span class="num">n° ' + c.id + '</span>'],
-      ["Téléphone", '<span class="num">' + esc(prettyPhone(c.phone)) + '</span>'],
+      ["Téléphone", '<span class="num">' + telHtml(c) + '</span>'],
       c.email ? ["E-mail", esc(c.email)] : null,
       ["Anniversaire", bdayLabel(c)],
       ["Client depuis", dFull(c.created)],
@@ -3492,7 +3523,12 @@ function editModal(id) {
   modal("Modifier la fiche", '<form data-act="save-client" data-id="' + c.id + '" class="stack">' +
     '<div class="field"><label for="e-name">Nom et prénom</label><input id="e-name" name="name" value="' + esc(c.name) + '" required></div>' +
     '<div class="grid-2">' +
-    '<div class="field"><label for="e-phone">Téléphone</label><input id="e-phone" name="phone" value="' + esc(c.phone) + '" required></div>' +
+    // Le numéro masqué ne s'écrit pas dans le champ : le boucher peut toujours
+    // en saisir un nouveau, mais laisser vide garde celui d'avant intact.
+    '<div class="field"><label for="e-phone">Téléphone</label><input id="e-phone" name="phone" value="' +
+    (telVisible(c) ? esc(c.phone) : "") + '"' +
+    (telVisible(c) ? ' required' : ' placeholder="' + esc(TEL_MASQUE) + ' — laissez vide pour le garder"') +
+    '></div>' +
     '<div class="field"><label for="e-bd">Anniversaire</label><div style="display:flex;gap:8px">' +
     '<select id="e-bd" name="bd" class="grow"><option value="">Jour</option>' + dayOpts(c.bday_day) + '</select>' +
     '<select name="bm" style="flex:2"><option value="">Mois</option>' + monthOpts(c.bday_month) + '</select></div></div></div>' +
@@ -3527,7 +3563,8 @@ function newClientModal() {
     'sa carte de fidélité, et a été informé de la politique de confidentialité. *</span></label>' +
     '<label class="check"><input type="checkbox" name="pub" value="1">' +
     '<span>Le client accepte de recevoir les offres de la boutique. ' +
-    '<span class="muted">Facultatif.</span></span></label>' +
+    '<span class="muted">Facultatif. Sans cet accord, son numéro sera masqué ' +
+    'dans le fichier : la carte fonctionnera, mais vous ne pourrez pas l\'appeler.</span></span></label>' +
     '<div id="an-err"></div>' +
     '<button class="btn btn-primary btn-full" type="submit">Créer la carte</button></form>');
 }
@@ -3563,7 +3600,10 @@ function msgSplit() {
     if (com && !c.marketing) out.push(c); else keep.push(c);
   });
   return { keep: keep, out: out,
-    tel: keep.filter(function (c) { return normPhone(c.phone).length >= 9; }),
+    // Un numéro masqué ne part nulle part : ni dans l'application SMS du
+    // téléphone, ni dans le presse-papier, ni chez Brevo. Le masquer à
+    // l'écran pour le recopier ailleurs ne masquerait rien.
+    tel: keep.filter(function (c) { return telVisible(c) && normPhone(c.phone).length >= 9; }),
     mail: keep.filter(function (c) { return (c.email || "").indexOf("@") > 0; }) };
 }
 
@@ -3579,6 +3619,10 @@ function msgModal() {
 
 function msgBody() {
   var sp = msgSplit(), com = msgKind() === "commercial";
+  // Retenus pour l'envoi, mais injoignables par SMS : leur numéro est masqué.
+  var masques = sp.keep.filter(function (c) {
+    return !telVisible(c) && normPhone(c.phone).length >= 9;
+  }).length;
   var modeles = MSG_MODELES.filter(function (m) { return m[1] === msgKind(); })
     .map(function (m, i) {
       return '<button type="button" class="chip" data-act="msg-modele" data-t="' + esc(m[2]) + '">' +
@@ -3622,7 +3666,14 @@ function msgBody() {
     '<div class="facts">' +
     '<div class="fact"><span class="k">Destinataires</span><span class="v"><b>' + nb(sp.keep.length) + '</b>' +
       (sp.out.length ? ' <span class="muted">sur ' + nb(sp.keep.length + sp.out.length) + ' cochés</span>' : '') + '</span></div>' +
-    '<div class="fact"><span class="k">Par SMS</span><span class="v">' + nb(sp.tel.length) + ' ont un téléphone</span></div>' +
+    // Un message de service peut partir à un client qui refuse les offres —
+    // mais pas par SMS : son numéro est masqué. Le dire, plutôt que de le
+    // faire disparaître du compte sans explication.
+    '<div class="fact"><span class="k">Par SMS</span><span class="v">' + nb(sp.tel.length) + ' ont un téléphone' +
+      (masques ? '<br><span class="small muted">' + nb(masques) + ' numéro' + (masques > 1 ? "s" : "") +
+        ' masqué' + (masques > 1 ? "s" : "") + ' : ' + (masques > 1 ? "ces clients" : "ce client") +
+        ' refuse' + (masques > 1 ? "nt" : "") + ' les offres. Écrivez-leur par e-mail.</span>' : '') +
+    '</span></div>' +
     '<div class="fact"><span class="k">Par e-mail</span><span class="v">' + nb(sp.mail.length) + ' ont une adresse</span></div>' +
     '</div>' +
 
@@ -3769,7 +3820,7 @@ function vBday() {
     return '<div class="rw-row' + (isToday ? " on" : "") + '">' +
       '<span class="rw-seal">' + Number(c.bday_day) + '</span>' +
       '<span class="rw-txt"><b>' + esc(c.name) + '</b>' +
-      '<span class="num">n° ' + c.id + ' · ' + esc(prettyPhone(c.phone)) + (c.email ? ' · ' + esc(c.email) : "") +
+      '<span class="num">n° ' + c.id + ' · ' + telHtml(c) + (c.email ? ' · ' + esc(c.email) : "") +
       (c.marketing ? '' : ' · <b>refuse les offres</b>') + '</span></span>' +
       (done ? '<span class="pill good"><i></i>offert</span>'
         : '<button class="btn btn-sm btn-brass-o" data-act="gift-bday" data-id="' + c.id + '">Offrir ' + nb(sh.birthday) + ' pts</button>') +
@@ -4330,7 +4381,8 @@ function csvClients(garde) {
     "Offres acceptees", "Consentement", "Signee le"]];
   DB.clients.filter(garde || function () { return true; }).forEach(function (c) {
     var p = c.by ? byId(c.by) : null;
-    rows.push([c.id, c.name, c.phone, c.email, bdayLabel(c), c.created, c.points, c.lifetime,
+    // Masquer à l'écran et tout livrer dans le tableur, ce serait du décor.
+    rows.push([c.id, c.name, telAffiche(c), c.email, bdayLabel(c), c.created, c.points, c.lifetime,
       String(c.spent).replace(".", ","), c.visits, lastVisit(c), tierOf(c.lifetime), c.code, p ? p.name : "",
       c.marketing ? "oui" : "non", d10(c.consent_at), d10(c.signed_at)]);
   });
@@ -5186,14 +5238,16 @@ var FORMS = {
   },
   "save-client": function (f, el) {
     var c = byId(el.dataset.id);
+    // Champ laissé vide sur une fiche au numéro masqué : on garde l'ancien.
+    var tel = normPhone(f.phone.value) || c.phone;
     if (Store.mode === "supabase")
       return remote(sbFetch("/rest/v1/clients?id=eq." + encodeURIComponent(c.id), {
         method: "PATCH", prefer: "return=minimal",
-        body: { name: f.name.value.trim(), phone: normPhone(f.phone.value),
+        body: { name: f.name.value.trim(), phone: tel,
                 email: f.email.value.trim() || null,
                 bday_day: Number(f.bd.value) || null, bday_month: Number(f.bm.value) || null }
       }, true), "Fiche mise à jour.");
-    c.name = f.name.value.trim(); c.phone = normPhone(f.phone.value);
+    c.name = f.name.value.trim(); c.phone = tel;
     c.email = f.email.value.trim();
     c.bday_day = Number(f.bd.value) || null; c.bday_month = Number(f.bm.value) || null;
     logIt("Fiche n° " + c.id + " modifiée", c.id);
