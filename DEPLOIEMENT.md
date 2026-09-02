@@ -781,6 +781,19 @@ Ce qui ne marche plus, et c'est voulu :
   adresse e-mail, ce canal reste ouvert ; sinon, le client n'est joignable
   qu'au comptoir.
 
+**L'adresse e-mail, elle, reste visible.** C'est un choix : sans elle, un
+client qui refuse les offres et n'a pas d'e-mail ne serait plus joignable du
+tout. La règle ne porte que sur le téléphone.
+
+**Les clients déjà inscrits sont concernés.** Une fiche sur laquelle aucun
+accord n'a jamais été enregistré compte comme un refus : son numéro est
+masqué. Cela peut faire disparaître des numéros que vous voyiez la veille.
+Pour en rendre un visible, il suffit que le client coche la case depuis sa
+carte, ou que vous la cochiez avec lui au comptoir.
+
+Une **sauvegarde JSON** transporte l'accord de chaque client : la restaurer ne
+remet pas les compteurs à zéro et ne fait pas disparaître tous les numéros.
+
 Le client peut changer d'avis à tout moment depuis sa carte : la case
 recochée, le numéro réapparaît immédiatement côté boucher.
 
