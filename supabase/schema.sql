@@ -40,6 +40,10 @@ alter table public.clients add column if not exists consent_at timestamptz;
 -- d'octets, et la preuve de l'accord du client (RGPD art. 7.1).
 alter table public.clients add column if not exists signature text;
 alter table public.clients add column if not exists signed_at timestamptz;
+-- Le message de bienvenue n'est envoyé qu'une fois. La marque est ici plutôt
+-- que dans la page : un navigateur rechargé, un appel rejoué, et la boutique
+-- paierait deux fois le même SMS. C'est la base qui tranche.
+alter table public.clients add column if not exists welcome_at timestamptz;
 alter table public.clients add column if not exists card_style text;
 alter table public.clients add column if not exists notice     text;
 alter table public.clients add column if not exists marketing  boolean not null default false;
@@ -441,6 +445,39 @@ begin
   return jsonb_build_object('points', pts, 'gagnes', greatest(0, coalesce((b->>'pts')::int, 0)));
 end $$;
 
+-- Le message de bienvenue, réservé puis envoyé. Deux précautions tiennent ici :
+--   1. le numéro n'est jamais reçu du navigateur, il est relu dans la fiche.
+--      Sinon n'importe qui ferait envoyer des SMS aux frais de la boutique.
+--   2. « update … where welcome_at is null » ne rend une ligne qu'au premier
+--      appel : un deuxième repart les mains vides, sans rien envoyer.
+-- Le jeton de la carte est le mot de passe : le connaître, c'est être le
+-- client. Ce qui revient, ce sont ses propres coordonnées, rien d'autre.
+create or replace function public.claim_welcome(p_token uuid) returns jsonb
+  language plpgsql security definer set search_path = public, pg_temp as $$
+declare c public.clients; d jsonb;
+begin
+  update public.clients
+     set welcome_at = now()
+   where token = p_token and welcome_at is null
+  returning * into c;
+  if not found then return null; end if;
+
+  select data into d from public.shop where id = 1;
+  return jsonb_build_object(
+    'id', c.id, 'name', c.name, 'phone', c.phone, 'email', c.email,
+    'token', c.token, 'points', c.points,
+    'shop_name', coalesce(d->>'name', 'La boutique'),
+    'envoi', coalesce(d->'envoi', '{}'::jsonb));
+end $$;
+
+-- Le message n'a pas pu partir : on rend la carte à son état d'avant, sinon
+-- une panne de Brevo priverait le client de son message pour toujours.
+create or replace function public.unclaim_welcome(p_token uuid) returns void
+  language plpgsql security definer set search_path = public, pg_temp as $$
+begin
+  update public.clients set welcome_at = null where token = p_token;
+end $$;
+
 -- Effacement : la fiche et tout son historique disparaissent (cascade).
 -- La boutique n'en garde qu'une trace anonyme, sans nom ni coordonnées.
 create or replace function public.delete_card(p_token uuid) returns jsonb
@@ -651,6 +688,8 @@ grant execute on function public.public_shop(),
                           public.sign_card(uuid, text),
                           public.set_card_style(uuid, text),
                           public.claim_bonus(uuid, text),
+                          public.claim_welcome(uuid),
+                          public.unclaim_welcome(uuid),
                           public.delete_card(uuid) to anon, authenticated;
 grant execute on function public.record_purchase(text, numeric, text),
                           public.use_reward(text, int, text),

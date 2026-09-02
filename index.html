@@ -2812,7 +2812,11 @@ function doSignup(f) {
     rpc("create_card", { p_name: name, p_phone: phone, p_day: bd, p_month: bm,
                          p_email: email || null, p_ref: ref || null,
                          p_marketing: pub, p_notice: NOTICE_VERSION, p_sign: sign })
-      .then(function (r) { delete signCache["f-sign"]; location.replace(cardLink(r.token)); })
+      .then(function (r) {
+        delete signCache["f-sign"];
+        bienvenueEnvoi(r.token);
+        location.replace(cardLink(r.token));
+      })
       ["catch"](function (e) { bad(errMsg(e)); });
     return;
   }
@@ -4148,8 +4152,18 @@ function modeText() {
    La clé n'apparaît jamais ici : elle vit dans les secrets Supabase, lue par
    la fonction « envoyer » et par elle seule. Ce panneau ne règle que ce qui
    n'est pas secret : qui signe les messages, et sous quel nom. */
+/* Les textes par défaut, montrés en filigrane dans les champs : le boucher voit
+   ce qui partira s'il n'écrit rien, au lieu de deviner. Ils sont répétés dans la
+   fonction serveur, qui est seule à décider — une page peut être ancienne. */
+var BV_SMS = "{boutique} : votre carte de fidélité n° {carte} est prête, " +
+  "avec {points} points offerts. Retrouvez-la ici : {lien}";
+var BV_MAIL = "Bonjour {prenom},\n\nVotre carte de fidélité n° {carte} est prête, " +
+  "avec {points} points offerts.\n\nGardez ce lien, c'est votre carte : {lien}" +
+  "\n\nÀ bientôt,\n{boutique}";
+
 function envoiPanel() {
   var e = (DB.shop && DB.shop.envoi) || {};
+  var bv = e.bienvenue || {};
   var actif = brevoPret();
   if (Store.mode !== "supabase") {
     return '<section class="panel panel-pad stack">' +
@@ -4185,6 +4199,36 @@ function envoiPanel() {
     '<input id="e-site" name="site_url" value="' + esc(e.site_url || "") + '" placeholder="https://carte.laboucherie.fr">' +
     '<span class="hint">Sert au lien de désinscription, obligatoire sur les offres.</span></div>' +
     '</div>' +
+    '<hr class="divide">' +
+    '<div class="sect-head" style="margin:0"><h2 style="font-size:16px">Message de bienvenue</h2></div>' +
+    '<p class="small muted">Envoyé une seule fois, au moment où la carte est créée. ' +
+    'Il compte surtout pour une carte créée au comptoir : sans lui, le client repart ' +
+    'sans rien sur son téléphone. C\'est un message de service, pas une offre : ' +
+    'il part aussi aux clients qui refusent les offres.</p>' +
+    '<label class="check"><input type="checkbox" name="bv_sms"' + (bv.sms ? " checked" : "") + '> ' +
+    '<span>Par SMS <span class="muted">— arrive toujours, le téléphone est obligatoire. ' +
+    'Chaque SMS est facturé par Brevo.</span></span></label>' +
+    '<label class="check"><input type="checkbox" name="bv_email"' + (bv.email ? " checked" : "") + '> ' +
+    '<span>Par e-mail <span class="muted">— gratuit, mais seulement si le client a ' +
+    'donné une adresse.</span></span></label>' +
+    '<div class="field"><label for="bv-sms">Texte du SMS</label>' +
+    '<textarea id="bv-sms" name="bv_texte_sms" rows="3" ' +
+    'placeholder="' + esc(BV_SMS) + '">' + esc(bv.texte_sms || "") + '</textarea>' +
+    '<span class="hint">Vide, c\'est le texte ci-dessus qui part. Au-delà de 160 ' +
+    'caractères, Brevo facture deux SMS.</span></div>' +
+    '<div class="grid-2">' +
+    '<div class="field"><label for="bv-suj">Objet du courriel</label>' +
+    '<input id="bv-suj" name="bv_sujet" value="' + esc(bv.sujet || "") + '" ' +
+    'placeholder="Votre carte de fidélité — ' + esc(DB.shop.name) + '"></div>' +
+    '<div class="field"><label for="bv-mail">Texte du courriel</label>' +
+    '<textarea id="bv-mail" name="bv_texte_email" rows="3" ' +
+    'placeholder="' + esc(BV_MAIL) + '">' + esc(bv.texte_email || "") + '</textarea></div>' +
+    '</div>' +
+    '<span class="hint">Mots remplacés automatiquement : ' +
+    '<span class="num">{prenom}</span>, <span class="num">{nom}</span>, ' +
+    '<span class="num">{boutique}</span>, <span class="num">{carte}</span>, ' +
+    '<span class="num">{points}</span>, <span class="num">{lien}</span> — le lien ' +
+    'personnel vers sa carte. Il demande l\'adresse du site renseignée ci-dessus.</span>' +
     '<div id="envoi-err"></div>' +
     '<div class="btn-row">' +
     '<button class="btn btn-ink" type="submit">Enregistrer</button>' +
@@ -4197,6 +4241,28 @@ function envoiPanel() {
 function brevoPret() {
   var e = (DB.shop && DB.shop.envoi) || {};
   return Store.mode === "supabase" && !!(e.from_email || e.sms_sender);
+}
+
+/* Le message de bienvenue, demandé juste après la création de la carte.
+
+   Appelé par le client, qui n'a aucune session : on n'envoie que le jeton de
+   sa carte. La fonction relit le numéro dans la base et n'envoie qu'une fois —
+   la page ne décide de rien, elle ne fait que sonner.
+
+   Rien ici ne doit retarder ni empêcher l'ouverture de la carte : le client a
+   sa carte, le message n'est qu'un supplément. Un échec est donc avalé. */
+function bienvenueEnvoi(token) {
+  try {
+    if (Store.mode !== "supabase" || !SB.url || !token) return;
+    var bv = ((DB.shop && DB.shop.envoi) || {}).bienvenue || {};
+    if (!bv.sms && !bv.email) return;
+    fetch(SB.url.replace(/\/+$/, "") + "/functions/v1/envoyer", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", apikey: SB.key,
+                 Authorization: "Bearer " + SB.key },
+      body: JSON.stringify({ mode: "bienvenue", token: token })
+    })["catch"](function () {});
+  } catch (e) { /* la carte passe avant le message */ }
 }
 
 /* Appelle la fonction « envoyer » avec le jeton du boucher. */
@@ -5223,13 +5289,32 @@ var FORMS = {
       from_email: f.from_email.value.trim(),
       from_name: f.from_name.value.trim(),
       sms_sender: f.sms_sender.value.trim().toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 11),
-      site_url: f.site_url.value.trim().replace(/\/+$/, "")
+      site_url: f.site_url.value.trim().replace(/\/+$/, ""),
+      bienvenue: {
+        sms: !!f.bv_sms.checked,
+        email: !!f.bv_email.checked,
+        texte_sms: f.bv_texte_sms.value.trim().slice(0, 1000),
+        sujet: f.bv_sujet.value.trim().slice(0, 200),
+        texte_email: f.bv_texte_email.value.trim().slice(0, 1000)
+      }
     };
     if (e.from_email && e.from_email.indexOf("@") < 1) {
       box.innerHTML = '<p class="err">Adresse d\'expédition invalide.</p>'; return;
     }
     if (e.site_url && !/^https?:\/\//.test(e.site_url)) {
       box.innerHTML = '<p class="err">L\'adresse du site doit commencer par https://.</p>'; return;
+    }
+    // Un message de bienvenue sans lien vers la carte n'a plus d'objet : c'est
+    // le lien que le client doit garder. Mieux vaut le dire avant l'envoi.
+    if ((e.bienvenue.sms || e.bienvenue.email) && !e.site_url) {
+      box.innerHTML = '<p class="err">Renseignez l\'adresse du site : sans elle, le message ' +
+        'de bienvenue partirait sans le lien vers la carte.</p>'; return;
+    }
+    if (e.bienvenue.sms && !e.sms_sender) {
+      box.innerHTML = '<p class="err">Un SMS de bienvenue demande le nom court, ci-dessus.</p>'; return;
+    }
+    if (e.bienvenue.email && !e.from_email) {
+      box.innerHTML = '<p class="err">Un courriel de bienvenue demande l\'adresse d\'expédition, ci-dessus.</p>'; return;
     }
     DB.shop.envoi = e;
     return remote(sbFetch("/rest/v1/shop?id=eq.1", {
@@ -5286,7 +5371,12 @@ var FORMS = {
         p_name: name, p_phone: phone, p_day: Number(f.bd.value) || null, p_month: Number(f.bm.value) || null,
         p_email: f.email.value.trim() || null, p_ref: f.ref.value.trim() || null,
         p_marketing: pub, p_notice: NOTICE_VERSION, p_sign: sign
-      }, true).then(function (r) { delete signCache["n-sign"]; S.till = { cid: r.id }; S.tab = "till"; return r; }),
+      // Créée au comptoir : c'est ici que le message compte le plus, le client
+      // repart sinon avec sa carte ouverte sur la tablette du boucher.
+      }, true).then(function (r) {
+        delete signCache["n-sign"]; bienvenueEnvoi(r.token);
+        S.till = { cid: r.id }; S.tab = "till"; return r;
+      }),
         function (r) { return "Carte n° " + r.id + " créée pour " + name + "."; });
     }
     var parrain = f.ref.value.trim() ? DB.clients.filter(function (c) {

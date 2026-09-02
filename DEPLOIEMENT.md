@@ -667,7 +667,8 @@ serveur ; ni la page, ni le navigateur, ni personne d'autre n'y a accès.
 **4. Publier la fonction** : toujours dans **Edge Functions**, *Deploy a new
 function* → *Via Editor*. Nom de la fonction : `envoyer`, exactement.
 Effacez l'exemple, collez tout le contenu du fichier
-`supabase/functions/envoyer/index.ts` de ce dépôt, puis **Deploy**.
+`supabase/functions/envoyer/index.ts` de ce dépôt, **décochez _Verify JWT_**
+(voir plus bas pourquoi), puis **Deploy**.
 
 **5. Dans l'application**, Réglages → **Envoi automatique** : l'adresse
 d'expédition, le nom affiché, le nom court des SMS et l'adresse du site (elle
@@ -710,11 +711,65 @@ supabase secrets set BREVO_KEY=xkeysib-votre-cle-ici
 **5. Publier la fonction** :
 
 ```bash
-supabase functions deploy envoyer
+supabase functions deploy envoyer --no-verify-jwt
 ```
+
+`--no-verify-jwt` est indispensable au message de bienvenue : c'est le client
+qui vient de créer sa carte qui déclenche l'appel, et il n'a aucune session
+ouverte — il n'est pas inscrit, il est client. Sans cette option, la passerelle
+refuserait l'appel avant même d'atteindre la fonction. Ce n'est pas une porte
+ouverte : la fonction ne fait rien sans le jeton de la carte, et l'envoi
+groupé, lui, continue de vérifier que l'appelant est bien du personnel. Avec
+l'éditeur en ligne, décochez *Verify JWT* au moment de publier.
 
 **6. Dans l'application**, Réglages → **Envoi automatique**, comme à l'étape 5
 plus haut.
+
+### Le message de bienvenue à la création d'une carte
+
+Une fois Brevo en place, l'application peut envoyer au client un message au
+moment où sa carte est créée. **Désactivé au départ** : rien ne part tant que
+vous n'avez rien coché.
+
+Réglages → **Envoi automatique** → *Message de bienvenue*. Deux cases, SMS et
+e-mail, indépendantes : vous pouvez n'en cocher qu'une, ou les deux.
+
+|  | SMS | E-mail |
+| --- | --- | --- |
+| Coût | **facturé à l'unité** par Brevo, à chaque nouvelle carte | compris dans le forfait gratuit |
+| Arrive à | tout le monde — le téléphone est obligatoire | seulement à qui a donné une adresse |
+| Demande | le nom court déclaré chez Brevo | l'adresse d'expédition vérifiée |
+
+L'adresse du site est **obligatoire** dès qu'une case est cochée : c'est elle
+qui fabrique le lien personnel vers la carte, et ce lien est tout l'intérêt du
+message. L'application refuse d'enregistrer sans.
+
+Les textes sont libres. Laissés vides, ce sont ceux montrés en filigrane qui
+partent. Six mots sont remplacés automatiquement : `{prenom}`, `{nom}`,
+`{boutique}`, `{carte}`, `{points}` et `{lien}`.
+
+**C'est au comptoir que ce message compte le plus.** Quand vous créez la carte
+sur votre tablette, elle s'ouvre… sur votre tablette. Le client repart sans
+rien sur son téléphone. Le SMS lui donne son lien.
+
+**Il part aussi aux clients qui refusent les offres.** Ce n'est pas une
+publicité : c'est la carte qu'ils viennent de demander, avec le lien pour la
+retrouver. Un message de service, comme « votre commande est prête ».
+
+Trois garanties, et aucune ne repose sur le navigateur :
+
+- **Une seule fois par carte.** La base pose une marque au premier envoi
+  (`welcome_at`) et ne la rend plus. Un client qui recharge sa page, un double
+  clic, un appel rejoué : rien ne repart, vous ne payez pas deux fois.
+- **Le numéro n'est jamais reçu du navigateur.** L'appel ne transporte que le
+  jeton de la carte ; la fonction relit le numéro dans la base. Sans cela,
+  n'importe qui pourrait faire envoyer des SMS à vos frais.
+- **Un échec rend la marque.** Si Brevo refuse, la carte redevient éligible :
+  une panne ne prive pas le client de son message pour toujours.
+
+Si vous modifiez ces réglages, il n'y a rien à republier : ils vivent dans la
+fiche boutique. En revanche, la **fonction doit être republiée** avec
+`--no-verify-jwt` pour que le message de bienvenue fonctionne.
 
 ### Ce que la fonction refuse de faire
 

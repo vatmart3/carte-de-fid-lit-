@@ -1,0 +1,16 @@
+# La fonction « envoyer » sert deux appelants très différents.
+#
+# L'envoi groupé vient du boucher, connecté : la fonction relit son jeton et
+# vérifie elle-même qu'il figure dans la table « staff ».
+#
+# Le message de bienvenue vient du client qui vient de créer sa carte. Il n'a
+# aucune session — il n'est pas inscrit, il est client. La passerelle ne doit
+# donc pas exiger de jeton d'authentification, sinon l'appel n'atteindrait
+# jamais la fonction.
+#
+# Ce n'est pas une porte ouverte : la fonction ne fait rien sans le jeton de la
+# carte, qui est un UUID connu du seul client, et claim_welcome ne rend les
+# coordonnées qu'au tout premier appel. Le contrôle est dans la fonction et
+# dans la base, pas dans la passerelle.
+[functions.envoyer]
+verify_jwt = false

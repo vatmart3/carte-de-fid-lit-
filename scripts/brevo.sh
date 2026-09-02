@@ -55,7 +55,10 @@ CLE=""
 echo "       Clé rangée dans les secrets Supabase."
 
 echo "  4/4  Publication de la fonction d'envoi"
-supabase functions deploy envoyer
+# --no-verify-jwt : le message de bienvenue est déclenché par le client qui
+# vient de créer sa carte, et il n'a aucune session ouverte. Le contrôle se
+# fait dans la fonction et dans la base, pas dans la passerelle.
+supabase functions deploy envoyer --no-verify-jwt
 
 echo
 echo "  ✓ Terminé."
