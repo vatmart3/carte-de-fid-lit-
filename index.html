@@ -833,6 +833,18 @@ input:-webkit-autofill,input:-webkit-autofill:focus{
    non une fiche incomplète. */
 .tel-off{font-style:italic;color:var(--muted);letter-spacing:0}
 
+/* La liste de vérification de l'envoi : une ligne par étape, chacune se
+   prononçant pour elle-même. Un « ça ne marche pas » sans détail oblige à
+   tout refaire ; une liste montre où reprendre. */
+.verif{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:9px}
+.verif li{display:flex;gap:10px;align-items:flex-start;font-size:14px;line-height:1.5}
+.verif li b{flex:none;width:19px;height:19px;border-radius:50%;display:grid;place-items:center;
+  font-size:11px;margin-top:2px}
+.verif .vok b{background:var(--good-soft);color:var(--good)}
+.verif .vko b{background:var(--crit-soft);color:var(--crit)}
+.verif .vinfo b{background:var(--warn-soft);color:var(--warn)}
+.verif .vko>span{color:var(--ink)}
+
 /* ═══════════════════════ sur téléphone ═══════════════════════
    Trois règles : rien ne saute pendant le chargement, rien ne déborde sur
    le côté, et tout ce qui est à l'écran se lit sans faire glisser la page.
@@ -4282,11 +4294,45 @@ function envoiAppel(corps) {
   }).then(function (r) {
     return r.text().then(function (t) {
       var d = null;
-      try { d = t ? JSON.parse(t) : null; } catch (e) { d = { erreur: t }; }
-      if (!r.ok) throw new Error(envoiErr((d && d.erreur) || ("HTTP " + r.status), d));
+      try { d = t ? JSON.parse(t) : null; } catch (e) { d = null; }
+      // Un refus de la fonction elle-même porte un code que l'on sait traduire.
+      if (!r.ok && d && d.erreur) throw new Error(envoiErr(d.erreur, d));
+      // Sinon, c'est la passerelle Supabase qui a répondu avant la fonction :
+      // « HTTP 404 » n'apprend rien à personne, on dit ce qu'il faut faire.
+      if (!r.ok) throw new Error(envoiPasserelle(r.status, d && (d.message || d.error)));
       return d;
     });
+  }, function () {
+    // Ni réponse ni statut : la requête n'est jamais partie.
+    throw new Error("La fonction d'envoi n'a pas pu être jointe. Vérifiez votre connexion " +
+      "Internet ; si elle est bonne, c'est que la fonction « envoyer » n'est pas publiée " +
+      "sur ce projet Supabase.");
   });
+}
+
+/* Ce que dit la passerelle Supabase quand la fonction n'a pas répondu.
+   Le boucher n'a pas à savoir ce qu'est un code HTTP : il a besoin de savoir
+   quelle étape de l'installation manque, et laquelle refaire. */
+function envoiPasserelle(code, detail) {
+  var d = detail ? ' (Supabase dit : « ' + detail + ' »)' : "";
+  if (code === 404) {
+    return "La fonction « envoyer » n'est pas publiée sur votre projet Supabase, " +
+      "ou elle porte un autre nom. Republiez-la : elle doit s'appeler exactement " +
+      "« envoyer ». Voyez DEPLOIEMENT.md, section Brevo." + d;
+  }
+  if (code === 401 || code === 403) {
+    return "La passerelle Supabase a refusé l'appel avant la fonction. Deux causes " +
+      "possibles : votre session a expiré — déconnectez-vous et reconnectez-vous ; " +
+      "ou la fonction a été publiée avec « Verify JWT » coché alors que la clé du " +
+      "site est une clé publiable. Republiez-la en décochant « Verify JWT »." + d;
+  }
+  if (code === 500 || code === 503 || code === 546) {
+    return "La fonction a répondu par une erreur interne. C'est presque toujours " +
+      "un secret manquant : vérifiez que BREVO_KEY est bien posée dans Supabase → " +
+      "Edge Functions → Secrets, puis republiez la fonction." + d;
+  }
+  if (code === 429) return "Trop d'appels d'affilée. Attendez une minute." + d;
+  return "La fonction d'envoi a répondu " + code + " sans explication." + d;
 }
 
 var ENVOI_ERRS = {
@@ -4914,22 +4960,56 @@ var ACTS = {
     }
   },
 
+  /* « Tout est en place » ou une phrase d'erreur : entre les deux il n'y avait
+     rien, et le boucher qui a suivi les étapes ne savait pas laquelle a raté.
+     On déroule donc la liste, et chaque ligne dit oui ou non pour elle-même.
+
+     L'envoi à zéro destinataire est le sondage : la fonction déroule tous ses
+     contrôles — personnel, clé, expéditeur — sans qu'un seul message ne parte,
+     et sans rien coûter. */
   "envoi-test": function (el) {
     var box = document.getElementById("envoi-err");
     box.innerHTML = '<p class="small muted">Vérification…</p>';
-    // Un envoi à zéro destinataire : la fonction déroule tous ses contrôles —
-    // personnel, clé, expéditeur — sans qu'un seul message ne parte.
+    var e = (DB.shop && DB.shop.envoi) || {};
+    var lignes = [];
+    function pose(ok, quoi, remede) {
+      lignes.push('<li class="' + (ok ? "vok" : "vko") + '"><b>' + (ok ? "✓" : "✕") + '</b> ' +
+        '<span>' + quoi + (ok || !remede ? "" : '<br><span class="muted">' + remede + '</span>') +
+        '</span></li>');
+    }
+    function rendu(fini) {
+      box.innerHTML = '<ul class="verif">' + lignes.join("") + '</ul>' +
+        (fini ? "" : '<p class="small muted">Vérification…</p>');
+    }
+    pose(Store.mode === "supabase", "La base en ligne est connectée",
+      "Reliez d'abord l'application à Supabase.");
+    pose(!!SB.token, "Vous êtes connecté en tant que boucher",
+      "Déconnectez-vous puis reconnectez-vous.");
+    pose(!!e.from_email || !!e.sms_sender, "Un expéditeur est renseigné ci-dessus",
+      "Remplissez l'adresse d'expédition, ou le nom court pour les SMS.");
+    rendu(false);
+
+    function verdict(sonde) {
+      // « Aucun destinataire » veut dire que la fonction est allée au bout de
+      // ses contrôles : c'est le succès que l'on cherchait.
+      var bon = sonde === null || sonde === "Aucun destinataire.";
+      pose(bon, "La fonction « envoyer » répond sur Supabase", bon ? "" : sonde);
+      if (bon && e.from_email) pose(true, "Brevo accepte l'adresse d'expédition <span class=\"num\">" +
+        esc(e.from_email) + "</span>");
+      if (bon && e.sms_sender) {
+        lignes.push('<li class="vinfo"><b>i</b><span>Le nom court ' +
+          '<span class="num">' + esc(e.sms_sender) + '</span> ne peut être confirmé que par Brevo, ' +
+          'au premier SMS. S\'il n\'est pas déclaré chez eux, l\'envoi le dira.</span></li>');
+      }
+      if (bon) {
+        lignes.push('<li class="vok"><b>✓</b><span><b>Tout est en place.</b> ' +
+          'Les messages peuvent partir d\'ici.</span></li>');
+      }
+      rendu(true);
+    }
     envoiAppel({ canal: "email", nature: "service", ids: [], sujet: "essai", texte: "essai" })
-      .then(function () { box.innerHTML = '<p class="small" style="color:var(--good)">Tout est en place.</p>'; })
-      ["catch"](function (err) {
-        var m = String(err.message || err);
-        if (m === "Aucun destinataire.") {
-          box.innerHTML = '<p class="small" style="color:var(--good)">Tout est en place : ' +
-            'la fonction répond, la clé est là, l\'expéditeur est accepté.</p>';
-        } else {
-          box.innerHTML = '<p class="err">' + esc(m) + '</p>';
-        }
-      });
+      .then(function () { verdict(null); })
+      ["catch"](function (err) { verdict(String(err.message || err)); });
   },
   "new-client": function () { newClientModal(); },
   "till-pick": function (el) {

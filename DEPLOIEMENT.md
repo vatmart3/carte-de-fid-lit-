@@ -672,8 +672,22 @@ Effacez l'exemple, collez tout le contenu du fichier
 
 **5. Dans l'application**, Réglages → **Envoi automatique** : l'adresse
 d'expédition, le nom affiché, le nom court des SMS et l'adresse du site (elle
-sert au lien de désinscription). Puis **Vérifier la connexion** : l'application
-dit si tout est en place, ou nomme ce qui manque.
+sert au lien de désinscription). Puis **Vérifier la connexion**.
+
+> **Si l'envoi direct n'apparaît pas, appuyez sur « Vérifier la connexion ».**
+> Elle déroule la liste des étapes, une par une, et marque d'une croix rouge
+> celle qui bloque, avec le geste à faire. Les trois causes les plus
+> fréquentes, dans l'ordre :
+>
+> | Ce que la liste dit | Ce qu'il faut faire |
+> | --- | --- |
+> | La fonction n'est pas publiée | La republier, nommée exactement `envoyer` |
+> | La passerelle a refusé l'appel | Republier en décochant **Verify JWT**, ou se reconnecter |
+> | Erreur interne de la fonction | Poser `BREVO_KEY` dans les secrets, puis republier |
+>
+> Le nom court des SMS ne peut pas être vérifié d'avance : seul Brevo le
+> confirme, au premier SMS envoyé. S'il n'est pas déclaré chez eux, le message
+> d'échec de l'envoi le dira mot pour mot.
 
 Ces cinq étapes ne se font qu'une fois. Ensuite, dans la fenêtre d'écriture,
 les boutons **Envoyer les courriels** et **Envoyer les SMS** partent d'ici, au
