@@ -20,7 +20,7 @@ de lui.
 | **Preuve du consentement** (art. 7.1) | Date, heure et version de la notice sont enregistrées à l'inscription. L'acceptation des offres est horodatée séparément. |
 | **Information** (art. 13) | Politique de confidentialité et mentions légales accessibles depuis le bas de chaque page et depuis le formulaire d'inscription, rédigées à partir des informations de la boutique. |
 | **Accès et portabilité** (art. 15 et 20) | Le client télécharge l'intégralité de ses données en JSON depuis sa carte, en un clic. |
-| **Rectification** (art. 16) | Le client corrige lui-même nom, téléphone, e-mail et anniversaire. |
+| **Rectification** (art. 16) | Le client corrige lui-même nom, téléphone, e-mail, adresse de livraison et anniversaire. |
 | **Effacement** (art. 17) | Le client supprime sa carte lui-même. Fiche et historique disparaissent ; la boutique n'en garde qu'une ligne de journal sans nom. |
 | **Opposition** (art. 21) | Case « je souhaite recevoir les offres » activable et désactivable à tout moment depuis la carte, sans perte de points. |
 | **Conservation limitée** (art. 5.1.e) | Durée réglable, **trois ans par défaut** après le dernier passage. Les fiches dépassées sont signalées dans les réglages et supprimables en un clic ; purge automatique possible via `pg_cron`. |
@@ -76,9 +76,9 @@ Personne ne peut le faire à sa place.
 | **Responsable de traitement** | [Raison sociale], [adresse], [SIRET] — représenté par [nom du gérant] |
 | **Contact** | [e-mail] — [téléphone] |
 | **Finalités** | Gestion des cartes de fidélité : cumul de points, récompenses, cadeau d'anniversaire, parrainage, historique d'achats. Information des clients (commande prête, horaires). Envoi d'offres commerciales aux seuls clients l'ayant accepté. |
-| **Base légale** | Exécution du programme de fidélité souscrit par le client. Consentement pour les offres commerciales. Obligation du responsable de démontrer le consentement (art. 7.1) pour la signature et l'horodatage. |
+| **Base légale** | Exécution du programme de fidélité souscrit par le client. Exécution de la livraison demandée, pour l'adresse postale. Consentement pour les offres commerciales. Obligation du responsable de démontrer le consentement (art. 7.1) pour la signature et l'horodatage. |
 | **Personnes concernées** | Clients de la boutique ayant adhéré au programme |
-| **Catégories de données** | Identité : nom et prénom. Coordonnées : téléphone, e-mail (facultatif). Vie personnelle : jour et mois de naissance. Données d'achat : date, montant, nature des achats, points, récompenses. Parrainage : lien entre clients. Preuve du consentement : case cochée, horodatage, signature manuscrite. |
+| **Catégories de données** | Identité : nom et prénom. Coordonnées : téléphone, e-mail (facultatif), adresse postale de livraison (facultative, recueillie seulement auprès des clients qui demandent à être livrés). Vie personnelle : jour et mois de naissance. Données d'achat : date, montant, nature des achats, points, récompenses. Parrainage : lien entre clients. Preuve du consentement : case cochée, horodatage, signature manuscrite. |
 | **Données sensibles** | Aucune. La signature est conservée comme simple preuve d'accord (art. 7.1) : elle n'est ni analysée, ni comparée, ni utilisée pour identifier qui que ce soit. Elle ne constitue donc pas une donnée biométrique au sens de l'article 9. |
 | **Destinataires** | Le gérant et le personnel habilité de la boutique. Pour les envois groupés : soit l'opérateur téléphonique ou le fournisseur de messagerie du gérant, qui achemine le message depuis son propre téléphone ; soit Brevo si l'envoi automatique est activé, qui reçoit alors le nom et l'adresse ou le téléphone des seuls destinataires de l'envoi. |
 | **Sous-traitants** | Supabase (hébergement de la base, région [région]) ; Vercel (hébergement de la page) ; Brevo (acheminement des courriels et SMS, société française, données en Union européenne) — seulement si l'envoi automatique est activé |

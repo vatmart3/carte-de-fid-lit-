@@ -1122,6 +1122,7 @@ function migrate(d) {
     }
     if (c.marketing === undefined) c.marketing = false;
     if (c.sign === undefined) c.sign = "";
+    if (c.address === undefined) c.address = "";
     if (c.style === undefined) c.style = "";
   });
   return d;
@@ -1461,6 +1462,7 @@ function sbLoadAll() {
       clients: (r[1] || []).map(function (c) {
         return {
           id: c.id, token: c.token, name: c.name, phone: c.phone, email: c.email || "",
+          address: c.address || "",
           bday_day: c.bday_day, bday_month: c.bday_month,
           marketing: !!c.marketing, consent_at: c.consent_at || "",
           sign: c.signature || "", signed_at: c.signed_at || "", style: c.card_style || "",
@@ -1501,6 +1503,7 @@ function saveShopRemote(sh) {
 function cardToClient(card, tok) {
   return {
     id: card.id, token: tok, name: card.name, phone: card.phone, email: card.email || "",
+    address: card.address || "",
     bday_day: card.bday_day, bday_month: card.bday_month,
     marketing: !!card.marketing, consent_at: card.consent_at || "",
     sign: card.sign || "", signed_at: card.signed_at || "", style: card.card_style || "",
@@ -2445,6 +2448,11 @@ function vSignup() {
     nb(sh.birthday) + ' points offerts chaque année.</span></div>' +
     '<div class="field"><label for="f-email">E-mail <span class="muted">(facultatif)</span></label>' +
     '<input id="f-email" name="email" type="email" autocomplete="email" placeholder="marie@exemple.fr"></div>' +
+    '<div class="field"><label for="f-adr">Adresse de livraison <span class="muted">(facultatif)</span></label>' +
+    '<textarea id="f-adr" name="address" rows="2" autocomplete="street-address" ' +
+    'placeholder="12 rue de la Mer, 34200 Sète"></textarea>' +
+    '<span class="hint">À remplir seulement si vous souhaitez être livré. ' +
+    'Vous pourrez l\'ajouter ou la changer plus tard depuis votre carte.</span></div>' +
     '<div class="field"><label for="f-code">Code parrain <span class="muted">(facultatif)</span></label>' +
     '<input id="f-code" name="ref" type="text" autocomplete="off" placeholder="MAR-1006">' +
     '<span class="hint">Vous recevez ' + nb(sh.godchild) + ' points, votre parrain ' + nb(sh.godfather) + '.</span></div>' +
@@ -2780,6 +2788,13 @@ function vCard() {
     '<div class="sect-head"><h2>Mes données</h2></div>' +
     '<p class="small muted">' + esc(prettyPhone(c.phone)) + (c.email ? ' · ' + esc(c.email) : "") +
     ' · anniversaire le ' + bdayLabel(c) + '</p>' +
+    // L'adresse ne sert qu'à la livraison : on la montre quand elle existe, et
+    // on la propose sans l'imposer quand elle manque.
+    (c.address
+      ? '<p class="small" style="margin-top:8px"><b>Livraison</b><br>' +
+        esc(c.address).replace(/\n/g, "<br>") + '</p>'
+      : '<p class="small muted" style="margin-top:8px">Aucune adresse de livraison. ' +
+        'Ajoutez-la avec « Corriger mes informations » si vous souhaitez être livré.</p>') +
     '<label class="check" style="margin-top:14px"><input type="checkbox" data-act="toggle-pub"' +
     (c.marketing ? " checked" : "") + '>' +
     '<span>Je souhaite recevoir les offres et les nouveautés de la boutique. ' +
@@ -2801,6 +2816,7 @@ function doSignup(f) {
       bd = Number(f.bd.value), bm = Number(f.bm.value),
       email = f.email.value.trim(), ref = f.ref.value.trim(),
       ok = f.ok.checked, pub = f.pub.checked,
+      adresse = f.address ? f.address.value.trim() : "",
       sign = f.sign ? f.sign.value : "";
   var box = document.getElementById("signup-err");
   function bad(m) { box.innerHTML = '<p class="err">' + esc(m) + '</p>'; }
@@ -2823,7 +2839,8 @@ function doSignup(f) {
     box.innerHTML = '<p class="small muted">Création en cours…</p>';
     rpc("create_card", { p_name: name, p_phone: phone, p_day: bd, p_month: bm,
                          p_email: email || null, p_ref: ref || null,
-                         p_marketing: pub, p_notice: NOTICE_VERSION, p_sign: sign })
+                         p_marketing: pub, p_notice: NOTICE_VERSION, p_sign: sign,
+                         p_address: adresse || null })
       .then(function (r) {
         delete signCache["f-sign"];
         bienvenueEnvoi(r.token);
@@ -2838,7 +2855,7 @@ function doSignup(f) {
   var id = String(DB.seq);
   var c = {
     id: id, name: name, phone: phone, email: email, bday_day: bd, bday_month: bm,
-    sign: sign, signed_at: new Date().toISOString(),
+    sign: sign, signed_at: new Date().toISOString(), address: adresse,
     consent_at: new Date().toISOString(), notice: NOTICE_VERSION,
     marketing: pub, marketing_at: pub ? new Date().toISOString() : null,
     created: today(), points: sh.welcome, lifetime: sh.welcome, spent: 0, visits: 0,
@@ -2895,6 +2912,8 @@ function vPrivacy() {
     sec("Ce qui est enregistré", '<ul class="rw">' +
       [["Votre nom et votre téléphone", "pour retrouver votre carte en caisse"],
        ["Votre e-mail", "facultatif — seulement si vous le donnez"],
+       ["Votre adresse de livraison", "facultative — seulement si vous souhaitez être livré. " +
+        "Elle ne sert qu'à la livraison, et à rien d'autre"],
        ["Le jour et le mois de votre anniversaire", "pour le cadeau annuel. L\'année n\'est ni demandée ni conservée"],
        ["Vos achats : date, montant, nature", "pour calculer vos points et votre historique"],
        ["Votre parrain et vos filleuls", "pour créditer les points de parrainage"],
@@ -2914,6 +2933,9 @@ function vPrivacy() {
       'La signature disparaît en même temps que le reste si vous supprimez votre carte.<br><br>' +
       '<b>Vous prévenir</b> — un SMS ou un courriel quand votre commande est prête, ou pour un changement ' +
       'd\'horaires. Base légale : l\'exécution du service que vous avez demandé.<br><br>' +
+      '<b>Vous livrer</b> — si, et seulement si, vous avez donné une adresse. ' +
+      'Base légale : l\'exécution de la livraison que vous avez demandée. Laissez ce champ vide ' +
+      'et aucune adresse n\'est enregistrée ; videz-le et l\'adresse enregistrée est effacée.<br><br>' +
       '<b>Vous envoyer des offres</b> — arrivages, promotions, nouveautés, par SMS ou par courriel, et ' +
       '<b>uniquement si vous avez coché la case prévue à l\'inscription</b>. Base légale : votre consentement, ' +
       'que vous pouvez retirer à tout moment depuis votre carte, sans perdre vos points. ' +
@@ -3502,6 +3524,9 @@ function clientModal(id) {
       ["Carte", '<span class="num">n° ' + c.id + '</span>'],
       ["Téléphone", '<span class="num">' + telHtml(c) + '</span>'],
       c.email ? ["E-mail", esc(c.email)] : null,
+      // L'adresse est là pour livrer : elle reste lisible, y compris pour un
+      // client qui refuse les offres — livrer n'est pas démarcher.
+      c.address ? ["Livraison", '<span style="white-space:pre-line">' + esc(c.address) + '</span>'] : null,
       ["Anniversaire", bdayLabel(c)],
       ["Client depuis", dFull(c.created)],
       ["Statut", esc(tierOf(c.lifetime)) + ' · ' + nb(c.lifetime) + ' points cumulés'],
@@ -3549,6 +3574,9 @@ function editModal(id) {
     '<select id="e-bd" name="bd" class="grow"><option value="">Jour</option>' + dayOpts(c.bday_day) + '</select>' +
     '<select name="bm" style="flex:2"><option value="">Mois</option>' + monthOpts(c.bday_month) + '</select></div></div></div>' +
     '<div class="field"><label for="e-mail">E-mail</label><input id="e-mail" name="email" type="email" value="' + esc(c.email || "") + '"></div>' +
+    '<div class="field"><label for="e-adr">Adresse de livraison</label>' +
+    '<textarea id="e-adr" name="address" rows="2" ' +
+    'placeholder="12 rue de la Mer, 34200 Sète">' + esc(c.address || "") + '</textarea></div>' +
     '<button class="btn btn-ink btn-full" type="submit">Enregistrer</button></form>');
 }
 
@@ -3571,6 +3599,9 @@ function newClientModal() {
     '<select id="n-bd" name="bd"><option value="">Jour</option>' + dayOpts() + '</select>' +
     '<select name="bm"><option value="">Mois</option>' + monthOpts() + '</select></div></div></div>' +
     '<div class="field"><label for="n-mail">E-mail</label><input id="n-mail" name="email" type="email"></div>' +
+    '<div class="field"><label for="n-adr">Adresse de livraison</label>' +
+    '<textarea id="n-adr" name="address" rows="2" placeholder="12 rue de la Mer, 34200 Sète"></textarea>' +
+    '<span class="hint">Seulement si le client veut être livré.</span></div>' +
     '<div class="field"><label for="n-ref">Code parrain</label><input id="n-ref" name="ref"></div>' +
     signField("n-sign", "Signature du client *",
       "Faites signer le client sur cet écran. Sans son accord, la carte ne peut pas être créée.") +
@@ -4488,13 +4519,13 @@ function telInter(tel) {
 }
 
 function csvClients(garde) {
-  var rows = [["Numero", "Nom", "Telephone", "Email", "Anniversaire", "Inscription", "Points", "Points cumules",
+  var rows = [["Numero", "Nom", "Telephone", "Email", "Adresse de livraison", "Anniversaire", "Inscription", "Points", "Points cumules",
     "Total depense", "Passages", "Dernier passage", "Statut", "Code parrain", "Parraine par",
     "Offres acceptees", "Consentement", "Signee le"]];
   DB.clients.filter(garde || function () { return true; }).forEach(function (c) {
     var p = c.by ? byId(c.by) : null;
     // Masquer à l'écran et tout livrer dans le tableur, ce serait du décor.
-    rows.push([c.id, c.name, telAffiche(c), c.email, bdayLabel(c), c.created, c.points, c.lifetime,
+    rows.push([c.id, c.name, telAffiche(c), c.email, c.address || "", bdayLabel(c), c.created, c.points, c.lifetime,
       String(c.spent).replace(".", ","), c.visits, lastVisit(c), tierOf(c.lifetime), c.code, p ? p.name : "",
       c.marketing ? "oui" : "non", d10(c.consent_at), d10(c.signed_at)]);
   });
@@ -4788,6 +4819,11 @@ var ACTS = {
       '<div class="field"><label for="m-bd">Anniversaire</label><div style="display:flex;gap:8px">' +
       '<select id="m-bd" name="bd" class="grow">' + dayOpts(c.bday_day) + '</select>' +
       '<select name="bm" style="flex:2">' + monthOpts(c.bday_month) + '</select></div></div>' +
+      '<div class="field"><label for="m-adr">Adresse de livraison</label>' +
+      '<textarea id="m-adr" name="address" rows="2" autocomplete="street-address" ' +
+      'placeholder="12 rue de la Mer, 34200 Sète">' + esc(c.address || "") + '</textarea>' +
+      '<span class="hint">Laissez vide si vous ne vous faites pas livrer. ' +
+      'La vider efface l\'adresse enregistrée.</span></div>' +
       '<div id="my-err"></div>' +
       '<button class="btn btn-ink btn-full" type="submit">Enregistrer</button></form>');
   },
@@ -4832,6 +4868,7 @@ var ACTS = {
       exporte_le: new Date().toISOString(),
       boutique: DB.shop.name,
       carte: { numero: c.id, nom: c.name, telephone: c.phone, email: c.email || null,
+               adresse_livraison: c.address || null,
         anniversaire: bdayLabel(c), inscription: c.created, code_parrain: c.code,
         points: c.points, points_cumules: c.lifetime, total_depense: c.spent,
         passages: c.visits, offres_acceptees: !!c.marketing, consentement: c.consent_at || null,
@@ -5308,16 +5345,20 @@ var FORMS = {
     var box = document.getElementById("my-err");
     var name = f.name.value.trim(), phone = normPhone(f.phone.value);
     var bd = Number(f.bd.value), bm = Number(f.bm.value), email = f.email.value.trim();
+    // Une chaîne vide est une décision — « effacez mon adresse » — et doit
+    // voyager telle quelle : c'est « null » qui veut dire « n'y touche pas ».
+    var adresse = f.address ? f.address.value.trim() : null;
     if (name.length < 3) { box.innerHTML = '<p class="err">Nom trop court.</p>'; return; }
     if (phone.length < 9) { box.innerHTML = '<p class="err">Téléphone incomplet.</p>'; return; }
     if (Store.mode === "supabase")
       return remote(rpc("update_card", { p_token: c.token, p_name: name, p_email: email || null,
-        p_phone: phone, p_day: bd, p_month: bm }).then(function () {
+        p_phone: phone, p_day: bd, p_month: bm, p_address: adresse }).then(function () {
           return rpc("get_card", { p_token: c.token }).then(function (card) {
             DB.clients = [cardToClient(card, c.token)]; return true;
           });
         }), "Informations mises à jour.");
     c.name = name; c.phone = phone; c.email = email; c.bday_day = bd; c.bday_month = bm;
+    if (adresse !== null) c.address = adresse;
     closeModal(); persist("Informations mises à jour.");
   },
   "my-sign-save": function (f) {
@@ -5410,10 +5451,12 @@ var FORMS = {
         method: "PATCH", prefer: "return=minimal",
         body: { name: f.name.value.trim(), phone: tel,
                 email: f.email.value.trim() || null,
+                address: (f.address ? f.address.value.trim() : "") || null,
                 bday_day: Number(f.bd.value) || null, bday_month: Number(f.bm.value) || null }
       }, true), "Fiche mise à jour.");
     c.name = f.name.value.trim(); c.phone = tel;
     c.email = f.email.value.trim();
+    if (f.address) c.address = f.address.value.trim();
     c.bday_day = Number(f.bd.value) || null; c.bday_month = Number(f.bm.value) || null;
     logIt("Fiche n° " + c.id + " modifiée", c.id);
     closeModal(); persist("Fiche mise à jour.");
@@ -5450,7 +5493,8 @@ var FORMS = {
       return remote(rpc("create_card", {
         p_name: name, p_phone: phone, p_day: Number(f.bd.value) || null, p_month: Number(f.bm.value) || null,
         p_email: f.email.value.trim() || null, p_ref: f.ref.value.trim() || null,
-        p_marketing: pub, p_notice: NOTICE_VERSION, p_sign: sign
+        p_marketing: pub, p_notice: NOTICE_VERSION, p_sign: sign,
+        p_address: (f.address ? f.address.value.trim() : "") || null
       // Créée au comptoir : c'est ici que le message compte le plus, le client
       // repart sinon avec sa carte ouverte sur la tablette du boucher.
       }, true).then(function (r) {
@@ -5466,6 +5510,7 @@ var FORMS = {
     DB.seq = (DB.seq || 1000) + 1;
     var id = String(DB.seq);
     var c = { id: id, name: name, phone: phone, email: f.email.value.trim(),
+      address: f.address ? f.address.value.trim() : "",
       bday_day: Number(f.bd.value) || null, bday_month: Number(f.bm.value) || null,
       sign: sign, signed_at: new Date().toISOString(),
       consent_at: new Date().toISOString(), notice: NOTICE_VERSION,

@@ -44,6 +44,10 @@ alter table public.clients add column if not exists signed_at timestamptz;
 -- que dans la page : un navigateur rechargé, un appel rejoué, et la boutique
 -- paierait deux fois le même SMS. C'est la base qui tranche.
 alter table public.clients add column if not exists welcome_at timestamptz;
+-- L'adresse de livraison. Facultative : elle ne sert qu'à ceux qui se font
+-- livrer, et n'est demandée à personne d'autre. Un seul champ libre plutôt
+-- que rue / code postal / ville : c'est le boucher qui lit, pas une machine.
+alter table public.clients add column if not exists address text;
 alter table public.clients add column if not exists card_style text;
 alter table public.clients add column if not exists notice     text;
 alter table public.clients add column if not exists marketing  boolean not null default false;
@@ -241,6 +245,7 @@ begin
     'bday_day', c.bday_day, 'bday_month', c.bday_month,
     'marketing', c.marketing, 'consent_at', c.consent_at,
     'sign', c.signature, 'signed_at', c.signed_at, 'card_style', c.card_style,
+    'address', c.address,
     'created', c.created, 'code', c.code,
     'points', c.points, 'lifetime', c.lifetime, 'spent', c.spent, 'visits', c.visits,
     'last_visit', c.last_visit,
@@ -273,7 +278,7 @@ create or replace function public.create_card(
     p_name text, p_phone text, p_day int, p_month int,
     p_email text default null, p_ref text default null,
     p_marketing boolean default false, p_notice text default null,
-    p_sign text default null) returns jsonb
+    p_sign text default null, p_address text default null) returns jsonb
   language plpgsql security definer set search_path = public, pg_temp as $$
 declare
   s jsonb; nid text; ncode text; ph text; par public.clients;
@@ -306,13 +311,14 @@ begin
   insert into public.clients (id, name, phone, email, bday_day, bday_month, code,
                               points, lifetime, referred_by,
                               consent_at, notice, marketing, marketing_at,
-                              signature, signed_at)
+                              signature, signed_at, address)
     values (nid, btrim(p_name), ph, nullif(btrim(coalesce(p_email,'')), ''), p_day, p_month,
             ncode, total, total, par.id,
             now(), coalesce(p_notice, 'v1'), coalesce(p_marketing, false),
             case when p_marketing then now() end,
             nullif(btrim(coalesce(p_sign,'')), ''),
-            case when nullif(btrim(coalesce(p_sign,'')), '') is not null then now() end);
+            case when nullif(btrim(coalesce(p_sign,'')), '') is not null then now() end,
+            nullif(btrim(coalesce(p_address,'')), ''));
   insert into public.moves (client_id, amount, points, label, kind)
     values (nid, 0, welcome, 'Bienvenue — carte créée', 'welcome');
 
@@ -338,7 +344,7 @@ end $$;
 
 create or replace function public.update_card(
     p_token uuid, p_name text, p_email text, p_phone text,
-    p_day int, p_month int) returns jsonb
+    p_day int, p_month int, p_address text default null) returns jsonb
   language plpgsql security definer set search_path = public, pg_temp as $$
 declare c public.clients; ph text;
 begin
@@ -355,7 +361,11 @@ begin
   update public.clients
      set name = btrim(p_name), phone = ph,
          email = nullif(btrim(coalesce(p_email, '')), ''),
-         bday_day = p_day, bday_month = p_month
+         bday_day = p_day, bday_month = p_month,
+         -- Le client est seul maître de son adresse : « null » veut dire
+         -- « je n'y touche pas », une chaîne vide veut dire « efface-la ».
+         address = case when p_address is null then c.address
+                        else nullif(btrim(p_address), '') end
    where id = c.id;
   insert into public.log (m, client_id) values ('Fiche n° ' || c.id || ' modifiée par le client', c.id);
   return jsonb_build_object('ok', true);
@@ -682,8 +692,8 @@ revoke execute on function
 grant execute on function public.public_shop(),
                           public.get_card(uuid),
                           public.find_card(text, int, int),
-                          public.create_card(text, text, int, int, text, text, boolean, text, text),
-                          public.update_card(uuid, text, text, text, int, int),
+                          public.create_card(text, text, int, int, text, text, boolean, text, text, text),
+                          public.update_card(uuid, text, text, text, int, int, text),
                           public.set_marketing(uuid, boolean),
                           public.sign_card(uuid, text),
                           public.set_card_style(uuid, text),

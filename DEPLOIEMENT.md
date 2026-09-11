@@ -325,6 +325,30 @@ l'autre sur fond sombre, montrent tout de suite ce qu'il en est.
 > neutre, remplacez `assets/logo/vatuone.png` et la constante `LOGO_DEFAUT`
 > dans `index.html`.
 
+## 5 quater. L'adresse de livraison
+
+Le client peut donner une adresse, **et seulement s'il veut être livré**. Le
+champ est facultatif partout : à l'inscription en ligne, au comptoir, et depuis
+sa carte (« Corriger mes informations »).
+
+- **Rempli**, il apparaît sur la fiche du client, sous l'étiquette *Livraison*,
+  et dans la colonne *Adresse de livraison* de l'export CSV — de quoi préparer
+  une tournée dans un tableur.
+- **Laissé vide**, rien n'est enregistré et la fiche n'affiche aucune ligne.
+- **Vidé**, l'adresse enregistrée est effacée : c'est le client qui décide.
+
+Vous pouvez la corriger vous-même depuis *Modifier la fiche* — utile quand le
+client la dicte au comptoir.
+
+**Elle reste visible même pour un client qui refuse les offres**, contrairement
+à son numéro de téléphone. La raison : livrer n'est pas démarcher. Son adresse
+ne sert qu'à la livraison qu'il a demandée.
+
+C'est une donnée personnelle : la politique de confidentialité et le registre
+RGPD la déclarent déjà, vous n'avez rien à ajouter.
+
+---
+
 ## 5 ter. Fixer le barème et les récompenses
 
 Espace boucher → **Réglages**. Deux encadrés, l'un sous l'autre.
