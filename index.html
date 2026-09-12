@@ -846,6 +846,8 @@ input:-webkit-autofill,input:-webkit-autofill:focus{
 .verif .vok > b{background:var(--good-soft);color:var(--good)}
 .verif .vko > b{background:var(--crit-soft);color:var(--crit)}
 .verif .vinfo > b{background:var(--warn-soft);color:var(--warn)}
+.verif .vsep{margin-top:6px;padding-top:11px;border-top:1px solid var(--hair)}
+.verif .vsep > b{background:transparent;color:var(--muted)}
 .verif .vko>span{color:var(--ink)}
 
 /* ═══════════════════════ sur téléphone ═══════════════════════
@@ -4311,6 +4313,32 @@ function bienvenueEnvoi(token) {
   } catch (e) { /* la carte passe avant le message */ }
 }
 
+/* Sonde le chemin du message de bienvenue sans rien envoyer et sans rien
+   consommer. Deux réponses suffisent à distinguer les trois pannes :
+
+   — un jeton qui n'est pas un UUID : la fonction à jour répond « jeton_invalide ».
+     Toute autre réponse signifie que c'est l'ancienne version qui est publiée,
+     celle qui ne connaît pas le message de bienvenue.
+   — un UUID tiré au hasard : la base à jour répond « rien à faire, carte
+     inconnue ». Si elle répond « réservation impossible », c'est que
+     claim_welcome n'existe pas : le schéma n'a pas été rejoué.
+
+   Ne jette jamais : une sonde qui échoue est une réponse, pas une panne. */
+function bienvenueSonde(jeton) {
+  if (!SB.url) return Promise.resolve({ code: 0, corps: null });
+  return fetch(SB.url.replace(/\/+$/, "") + "/functions/v1/envoyer", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", apikey: SB.key,
+               Authorization: "Bearer " + (SB.token || SB.key) },
+    body: JSON.stringify({ mode: "bienvenue", token: jeton })
+  }).then(function (r) {
+    return r.text().then(function (t) {
+      var d = null; try { d = t ? JSON.parse(t) : null; } catch (e) { d = null; }
+      return { code: r.status, corps: d };
+    });
+  })["catch"](function () { return { code: 0, corps: null }; });
+}
+
 /* Appelle la fonction « envoyer » avec le jeton du boucher. */
 function envoiAppel(corps) {
   if (!SB.url) return Promise.reject(new Error("Base en ligne non configurée."));
@@ -4379,7 +4407,10 @@ var ENVOI_ERRS = {
   texte_vide: "Le message est vide.",
   sujet_vide: "Indiquez un objet pour le courriel.",
   boutique_introuvable: "La fiche boutique est introuvable en base.",
-  lecture_impossible: "Lecture des fiches refusée par la base."
+  lecture_impossible: "Lecture des fiches refusée par la base.",
+  jeton_invalide: "Lien de carte invalide.",
+  reservation_impossible: "La base ne connaît pas claim_welcome : rejouez supabase/schema.sql.",
+  service_role_manquant: "La fonction n'a pas accès au secret SUPABASE_SERVICE_ROLE_KEY."
 };
 function envoiErr(code, d) {
   if (code === "trop_de_sms") return "Trop de SMS d'un coup (" + d.demandes + "). Maximum " + d.limite + " : faites deux envois.";
@@ -5042,11 +5073,54 @@ var ACTS = {
           'au premier SMS. S\'il n\'est pas déclaré chez eux, l\'envoi le dira.</span></li>');
       }
       if (bon) {
-        lignes.push('<li class="vok"><b>✓</b><span><b>Tout est en place.</b> ' +
-          'Les messages peuvent partir d\'ici.</span></li>');
+        lignes.push('<li class="vok"><b>✓</b><span><b>Les envois groupés peuvent partir.</b></span></li>');
       }
       rendu(true);
+      // Le message de bienvenue emprunte un autre chemin : il a ses propres
+      // conditions, et c'est là que « rien n'est parti » se joue.
+      if (bon) return bienvenueVerif();
     }
+
+    /* Les trois raisons pour lesquelles un message de bienvenue ne part pas,
+       vérifiées une par une. La dernière est la plus fréquente : le boucher a
+       tout installé, mais n'a coché aucune case. */
+    function bienvenueVerif() {
+      var bv = e.bienvenue || {};
+      lignes.push('<li class="vsep"><b>·</b><span><b>Message de bienvenue</b></span></li>');
+      rendu(false);
+      return bienvenueSonde("pas-un-uuid").then(function (r1) {
+        var connait = !!(r1.corps && r1.corps.erreur === "jeton_invalide");
+        pose(connait, "La fonction publiée connaît le message de bienvenue",
+          "C'est l'ancienne version qui est en ligne. Republiez la fonction " +
+          "« envoyer » depuis le dépôt, en décochant « Verify JWT ».");
+        if (!connait) { rendu(true); return; }
+        var faux = "00000000-0000-4000-8000-0000000000" +
+          String(10 + Math.floor(Math.random() * 89));
+        return bienvenueSonde(faux).then(function (r2) {
+          var c = r2.corps || {};
+          var schema = !(c.erreur === "reservation_impossible");
+          pose(schema, "Le schéma de la base est à jour",
+            "La fonction claim_welcome manque : rejouez supabase/schema.sql " +
+            "dans le SQL Editor de Supabase." +
+            (c.detail ? ' <span class="muted">(' + esc(String(c.detail).slice(0, 120)) + ')</span>' : ""));
+          if (c.erreur === "service_role_manquant") {
+            pose(false, "Le secret SUPABASE_SERVICE_ROLE_KEY est lisible par la fonction",
+              "Supabase le pose tout seul : republiez la fonction.");
+          }
+          var actif = !!(bv.sms || bv.email);
+          pose(actif, "Au moins un canal est coché ci-dessus",
+            "Cochez « Par SMS » ou « Par e-mail » : sans cela, rien n'est envoyé " +
+            "à la création d'une carte. C'est la cause la plus fréquente.");
+          if (schema && actif) {
+            lignes.push('<li class="vok"><b>✓</b><span><b>Le message de bienvenue partira</b> ' +
+              'à la prochaine carte créée' + (bv.sms && bv.email ? ", par SMS et par e-mail"
+                : bv.sms ? ", par SMS" : ", par e-mail") + '.</span></li>');
+          }
+          rendu(true);
+        });
+      });
+    }
+
     envoiAppel({ canal: "email", nature: "service", ids: [], sujet: "essai", texte: "essai" })
       .then(function () { verdict(null); })
       ["catch"](function (err) { verdict(String(err.message || err)); });

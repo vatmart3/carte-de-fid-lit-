@@ -809,6 +809,28 @@ Si vous modifiez ces réglages, il n'y a rien à republier : ils vivent dans la
 fiche boutique. En revanche, la **fonction doit être republiée** avec
 `--no-verify-jwt` pour que le message de bienvenue fonctionne.
 
+### Un client a créé sa carte et n'a rien reçu
+
+L'envoi ne peut jamais faire échouer la création d'une carte : le client a sa
+carte quoi qu'il arrive, et le message n'est qu'un supplément. Mais il ne doit
+pas échouer en silence pour autant. Deux endroits répondent :
+
+**Réglages → Envoi automatique → Vérifier la connexion.** Sous le trait
+*Message de bienvenue*, trois lignes se prononcent :
+
+| Ligne rouge | Ce qu'il faut faire |
+| --- | --- |
+| La fonction publiée connaît le message de bienvenue | C'est l'ancienne version qui est en ligne : republiez `envoyer`, en décochant **Verify JWT** |
+| Le schéma de la base est à jour | Rejouez `supabase/schema.sql` dans le SQL Editor : `claim_welcome` manque |
+| Au moins un canal est coché ci-dessus | Cochez **Par SMS** ou **Par e-mail**. **C'est la cause la plus fréquente** : tout est installé, mais rien n'est activé |
+
+Quand les trois sont vertes, la liste l'annonce : « Le message de bienvenue
+partira à la prochaine carte créée, par SMS et par e-mail. »
+
+**Le journal**, en bas des Réglages, garde la trace des envois — et depuis peu
+des échecs : *« Message de bienvenue NON envoyé : sms — … »*, avec la raison
+donnée par Brevo. Ni numéro ni adresse n'y figurent.
+
 ### Ce que la fonction refuse de faire
 
 - Envoyer si l'appelant n'est pas dans la table `staff` — même avec une clé

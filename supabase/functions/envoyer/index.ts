@@ -184,8 +184,16 @@ async function bienvenue(jeton: string, cle: string) {
   }
 
   // Rien n'est parti : on rend la réservation, le message pourra repartir.
+  // Et on l'écrit au journal — sinon l'échec est muet des deux côtés : le
+  // client n'a rien reçu, et la boutique ne sait même pas qu'il manque
+  // quelque chose. Le journal ne porte ni numéro ni adresse.
   if (!partis.length) {
     await db.rpc("unclaim_welcome", { p_token: jeton });
+    await db.from("log").insert({
+      m: "Message de bienvenue NON envoyé : " +
+         (echecs.map((e) => e.canal + " — " + e.raison).join(" ; ") || "cause inconnue"),
+      client_id: f.id,
+    });
     return reponse({ envoye: false, echecs });
   }
 
