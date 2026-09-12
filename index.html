@@ -5111,12 +5111,37 @@ var ACTS = {
           pose(actif, "Au moins un canal est coché ci-dessus",
             "Cochez « Par SMS » ou « Par e-mail » : sans cela, rien n'est envoyé " +
             "à la création d'une carte. C'est la cause la plus fréquente.");
-          if (schema && actif) {
-            lignes.push('<li class="vok"><b>✓</b><span><b>Le message de bienvenue partira</b> ' +
-              'à la prochaine carte créée' + (bv.sms && bv.email ? ", par SMS et par e-mail"
-                : bv.sms ? ", par SMS" : ", par e-mail") + '.</span></li>');
-          }
-          rendu(true);
+          rendu(false);
+          // Qui déclenche : la base elle-même, ou seulement la page ?
+          return rpc("bienvenue_etat", {}, true).then(function (et) { return et || {}; })
+            ["catch"](function () { return {}; })
+            .then(function (et) {
+              var auto = !!(et.declencheur && et.pg_net && et.projet_url);
+              if (auto) {
+                pose(true, "La base déclenche elle-même l'envoi, quelle que soit " +
+                  "l'origine de la fiche");
+              } else if (et.declencheur === false) {
+                pose(false, "La base déclenche elle-même l'envoi",
+                  "Rejouez supabase/schema.sql : le déclencheur n'est pas posé. " +
+                  "En attendant, c'est la page qui sonne la fonction — cela marche, " +
+                  "mais seulement si le navigateur reste ouvert le temps de l'envoi.");
+              } else if (et.pg_net === false) {
+                pose(false, "La base déclenche elle-même l'envoi",
+                  "L'extension pg_net n'est pas active sur ce projet. " +
+                  "Supabase → Database → Extensions → activez <b>pg_net</b>, puis " +
+                  "rejouez supabase/schema.sql.");
+              } else if (et.projet_url === "") {
+                pose(false, "La base connaît l'adresse du projet",
+                  "Appuyez sur « Enregistrer » ci-dessus : l'application la posera " +
+                  "toute seule.");
+              }
+              if (schema && actif) {
+                lignes.push('<li class="vok"><b>✓</b><span><b>Le message de bienvenue partira</b> ' +
+                  'à la prochaine carte créée' + (bv.sms && bv.email ? ", par SMS et par e-mail"
+                    : bv.sms ? ", par SMS" : ", par e-mail") + '.</span></li>');
+              }
+              rendu(true);
+            });
         });
       });
     }
@@ -5488,6 +5513,10 @@ var FORMS = {
       from_name: f.from_name.value.trim(),
       sms_sender: f.sms_sender.value.trim().toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 11),
       site_url: f.site_url.value.trim().replace(/\/+$/, ""),
+      // L'adresse du projet Supabase, pour que la base sache où joindre la
+      // fonction quand c'est elle qui déclenche le message de bienvenue.
+      // Elle n'est pas saisie : l'application la connaît déjà.
+      projet_url: String(SB.url || "").replace(/\/+$/, ""),
       bienvenue: {
         sms: !!f.bv_sms.checked,
         email: !!f.bv_email.checked,

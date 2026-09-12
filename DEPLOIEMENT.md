@@ -809,6 +809,21 @@ Si vous modifiez ces réglages, il n'y a rien à republier : ils vivent dans la
 fiche boutique. En revanche, la **fonction doit être republiée** avec
 `--no-verify-jwt` pour que le message de bienvenue fonctionne.
 
+**C'est la base qui déclenche, pas la page.** Dès qu'une fiche arrive dans la
+table des clients, la base appelle elle-même la fonction d'envoi — que la carte
+ait été créée par le client sur son téléphone, par vous au comptoir, ou
+autrement. Rien ne dépend d'un navigateur resté ouvert.
+
+Cela demande l'extension **pg_net**, que Supabase fournit : `schema.sql`
+l'active tout seul. Si elle n'est pas disponible, rien ne casse — la page
+continue de sonner la fonction comme avant, et « Vérifier la connexion » vous
+le dit.
+
+**Une reprise de fichier ne déclenche rien.** Importer cinq cents clients
+existants ne part pas en cinq cents SMS : ces fiches sont marquées comme déjà
+saluées au moment de l'import. Le message de bienvenue est réservé aux
+nouvelles cartes.
+
 ### Un client a créé sa carte et n'a rien reçu
 
 L'envoi ne peut jamais faire échouer la création d'une carte : le client a sa
@@ -823,6 +838,7 @@ pas échouer en silence pour autant. Deux endroits répondent :
 | La fonction publiée connaît le message de bienvenue | C'est l'ancienne version qui est en ligne : republiez `envoyer`, en décochant **Verify JWT** |
 | Le schéma de la base est à jour | Rejouez `supabase/schema.sql` dans le SQL Editor : `claim_welcome` manque |
 | Au moins un canal est coché ci-dessus | Cochez **Par SMS** ou **Par e-mail**. **C'est la cause la plus fréquente** : tout est installé, mais rien n'est activé |
+| La base déclenche elle-même l'envoi | Rejouez `supabase/schema.sql` (déclencheur absent), ou activez **pg_net** dans Supabase → Database → Extensions |
 
 Quand les trois sont vertes, la liste l'annonce : « Le message de bienvenue
 partira à la prochaine carte créée, par SMS et par e-mail. »

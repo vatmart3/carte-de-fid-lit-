@@ -488,6 +488,73 @@ begin
   update public.clients set welcome_at = null where token = p_token;
 end $$;
 
+-- ── Le message de bienvenue, déclenché par la base elle-même ──────────
+--
+-- Jusqu'ici c'était la page qui sonnait la fonction après avoir créé la carte.
+-- Cela marche, mais seulement si une page est là : un navigateur fermé trop
+-- vite, une fiche créée autrement, et personne n'appelle. Ici, c'est l'arrivée
+-- de la ligne dans la table qui déclenche, quelle qu'en soit l'origine.
+--
+-- pg_net poste la requête après la validation de la transaction, sans faire
+-- attendre personne. Et la fonction ne fait rien sans le jeton de la carte :
+-- aucune clé ne dort donc dans la base.
+do $$ begin
+  create extension if not exists pg_net with schema extensions;
+exception when others then
+  raise notice 'pg_net indisponible : le message de bienvenue restera déclenché par la page.';
+end $$;
+
+create or replace function public.bienvenue_auto() returns trigger
+  language plpgsql security definer set search_path = public, extensions, pg_temp as $$
+declare e jsonb; base text;
+begin
+  -- Une fiche reprise d'un ancien fichier porte déjà sa marque : on passe.
+  if new.welcome_at is not null then return new; end if;
+
+  select data->'envoi' into e from public.shop where id = 1;
+  if e is null then return new; end if;
+  -- Aucun canal coché : le boucher n'a rien demandé.
+  if coalesce((e->'bienvenue'->>'sms')::boolean, false) is not true
+     and coalesce((e->'bienvenue'->>'email')::boolean, false) is not true then
+    return new;
+  end if;
+
+  base := rtrim(coalesce(e->>'projet_url', ''), '/');
+  if base = '' then return new; end if;
+
+  perform net.http_post(
+    url := base || '/functions/v1/envoyer',
+    headers := jsonb_build_object('Content-Type', 'application/json'),
+    body := jsonb_build_object('mode', 'bienvenue', 'token', new.token));
+  return new;
+exception when others then
+  -- Un message raté ne doit jamais empêcher une carte d'exister.
+  insert into public.log (m, client_id)
+  values ('Message de bienvenue : déclenchement impossible (' || sqlerrm || ')', new.id);
+  return new;
+end $$;
+
+drop trigger if exists bienvenue_auto on public.clients;
+create trigger bienvenue_auto
+  after insert on public.clients
+  for each row execute function public.bienvenue_auto();
+
+-- L'état du déclenchement automatique, pour que l'application puisse le dire
+-- au boucher au lieu de le laisser deviner. Aucune donnée personnelle ici.
+create or replace function public.bienvenue_etat() returns jsonb
+  language sql stable security definer set search_path = public, pg_temp as $$
+  select jsonb_build_object(
+    'declencheur', exists (select 1 from pg_trigger
+       where tgrelid = 'public.clients'::regclass
+         and tgname = 'bienvenue_auto' and not tgisinternal),
+    -- On regarde la fonction réellement appelable, pas la ligne de catalogue :
+    -- c'est elle que le déclencheur invoque, et c'est donc elle qui compte.
+    'pg_net', exists (select 1 from pg_proc p
+       join pg_namespace n on n.oid = p.pronamespace
+      where n.nspname = 'net' and p.proname = 'http_post'),
+    'projet_url', coalesce((select data->'envoi'->>'projet_url' from public.shop where id = 1), ''));
+$$;
+
 -- Effacement : la fiche et tout son historique disparaissent (cascade).
 -- La boutique n'en garde qu'une trace anonyme, sans nom ni coordonnées.
 create or replace function public.delete_card(p_token uuid) returns jsonb
@@ -583,7 +650,7 @@ begin
   for c in select * from jsonb_array_elements(p_data->'clients') loop
     insert into public.clients (id, name, phone, email, bday_day, bday_month, created, code,
                                 points, lifetime, spent, visits, last_visit, referred_by,
-                                consent_at, notice, marketing)
+                                consent_at, notice, marketing, welcome_at)
     values (c->>'id', c->>'name', regexp_replace(c->>'phone', '[^0-9+]', '', 'g'),
             nullif(c->>'email',''),
             -- sauvegarde récente (jour/mois) ou ancienne (date complète)
@@ -598,7 +665,11 @@ begin
                from jsonb_array_elements(coalesce(c->'hist','[]'::jsonb)) mv
               where mv->>'k' = 'buy'), null,
             nullif(c->>'consent_at','')::timestamptz, c->>'notice',
-            coalesce((c->>'marketing')::boolean, false))
+            coalesce((c->>'marketing')::boolean, false),
+            -- Reprendre un fichier existant n'est pas accueillir un nouveau
+            -- client : on marque ces fiches comme déjà saluées. Sans cela, une
+            -- reprise de cinq cents clients partirait en cinq cents SMS.
+            now())
     on conflict (id) do nothing;
     n := n + 1;
     maxid := greatest(maxid, coalesce((c->>'id')::bigint, 1000));
@@ -706,6 +777,7 @@ grant execute on function public.record_purchase(text, numeric, text),
                           public.adjust_points(text, int, text),
                           public.gift_birthday(text),
                           public.import_clients(jsonb),
+                          public.bienvenue_etat(),
                           public.stale_cards(int),
                           public.purge_stale(int),
                           public.is_staff() to authenticated;
