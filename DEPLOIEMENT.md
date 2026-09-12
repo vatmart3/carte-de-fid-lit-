@@ -832,6 +832,21 @@ existants ne part pas en cinq cents SMS : ces fiches sont marquées comme déjà
 saluées au moment de l'import. Le message de bienvenue est réservé aux
 nouvelles cartes.
 
+**Trois chemins, pour que ce soit systématique.** Un message peut se perdre :
+réseau coupé, onglet fermé au mauvais instant. L'application n'essaie donc pas
+une seule fois.
+
+1. **À la création**, tout de suite. Au comptoir, c'est le même appel que
+   « Envoyer les SMS » après avoir coché un client — celui qui marche déjà.
+   Côté client, la demande est marquée pour survivre au changement de page :
+   sans cela elle partait une fois sur deux, tuée par l'ouverture de la carte.
+2. **Le déclencheur de la base**, dès que la fiche arrive dans la table.
+3. **Le rattrapage** : à chaque ouverture du tableau de bord, les cartes des
+   deux derniers jours restées sans message sont reprises.
+
+Les trois visent la même réservation en base : **le client ne reçoit jamais
+deux fois le même message**, quel que soit le chemin qui aboutit le premier.
+
 ### Un client a créé sa carte et n'a rien reçu
 
 L'envoi ne peut jamais faire échouer la création d'une carte : le client a sa

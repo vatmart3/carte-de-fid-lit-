@@ -1422,6 +1422,9 @@ function relire(force, apres) {
     luLe = Date.now(); relitEnCours = false;
     if (!S.admin) return;
     S.scroll = window.scrollY; render();
+    // Le fichier vient d'être relu : c'est le moment de voir si une carte
+    // récente attend toujours son message.
+    bienvenueRattrapage();
     if (apres) apres();
   })["catch"](function (e) {
     relitEnCours = false;
@@ -1467,7 +1470,7 @@ function sbLoadAll() {
       clients: (r[1] || []).map(function (c) {
         return {
           id: c.id, token: c.token, name: c.name, phone: c.phone, email: c.email || "",
-          address: c.address || "",
+          address: c.address || "", welcome_at: c.welcome_at,
           bday_day: c.bday_day, bday_month: c.bday_month,
           marketing: !!c.marketing, consent_at: c.consent_at || "",
           sign: c.signature || "", signed_at: c.signed_at || "", style: c.card_style || "",
@@ -4306,6 +4309,12 @@ function bienvenueEnvoi(token) {
     if (!bv.sms && !bv.email) return;
     fetch(SB.url.replace(/\/+$/, "") + "/functions/v1/envoyer", {
       method: "POST",
+      /* La ligne suivante ouvre la carte du client, donc quitte cette page — et
+         un navigateur tue les requêtes encore en vol quand on le quitte. La
+         demande partait donc une fois sur deux, au hasard de la vitesse du
+         réseau. « keepalive » existe exactement pour cela : la requête est
+         menée à son terme même si la page disparaît. */
+      keepalive: true,
       headers: { "Content-Type": "application/json", apikey: SB.key,
                  Authorization: "Bearer " + SB.key },
       body: JSON.stringify({ mode: "bienvenue", token: token })
@@ -4381,6 +4390,32 @@ function bienvenueDirect(c) {
         return res;
       });
     })["catch"](function () { return null; });
+}
+
+/* Le rattrapage : les cartes récentes restées sans message de bienvenue.
+
+   Même parti au bon moment, un message peut se perdre — réseau coupé, onglet
+   fermé au mauvais instant, fonction momentanément muette. « Systématique »
+   veut dire que l'application y revient d'elle-même : à chaque ouverture du
+   tableau de bord, elle repère les cartes des deux derniers jours qui n'ont
+   jamais reçu leur message, et les envoie par le chemin direct.
+
+   Deux garde-fous. La réservation en base empêche tout doublon : une carte
+   déjà servie n'est jamais reprise. Et si la colonne welcome_at n'existe pas
+   — schéma pas encore rejoué — on ne fait rien du tout : sans elle, aucune
+   carte ne peut être dite « déjà servie », et on écrirait à tout le fichier. */
+function bienvenueRattrapage() {
+  try {
+    var bv = ((DB.shop && DB.shop.envoi) || {}).bienvenue || {};
+    if (Store.mode !== "supabase" || !SB.token || (!bv.sms && !bv.email)) return;
+    var liste = DB.clients || [];
+    if (!liste.length || liste[0].welcome_at === undefined) return;
+    var limite = new Date(Date.now() - 2 * 864e5).toISOString().slice(0, 10);
+    var enRetard = liste.filter(function (c) {
+      return !c.welcome_at && String(c.created || "") >= limite;
+    }).slice(0, 5);
+    enRetard.forEach(function (c) { bienvenueDirect(c); });
+  } catch (e) { /* le tableau de bord passe avant le rattrapage */ }
 }
 
 /* Sonde le chemin du message de bienvenue sans rien envoyer et sans rien
@@ -5953,6 +5988,9 @@ function bootRemote() {
       S.tab = S.tab || "dash";
       if (till) applyTill(till);
       render();
+      // À l'ouverture de l'espace boucher : les cartes récentes restées sans
+      // message rattrapent ici leur retard.
+      bienvenueRattrapage();
     });
   })["catch"](bootFail);
 }
