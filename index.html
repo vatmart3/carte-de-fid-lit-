@@ -838,11 +838,14 @@ input:-webkit-autofill,input:-webkit-autofill:focus{
    tout refaire ; une liste montre où reprendre. */
 .verif{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:9px}
 .verif li{display:flex;gap:10px;align-items:flex-start;font-size:14px;line-height:1.5}
-.verif li b{flex:none;width:19px;height:19px;border-radius:50%;display:grid;place-items:center;
+/* « > b » et non « b » : la pastille est l'enfant direct de la ligne. Sans le
+   chevron, un mot mis en gras dans le texte héritait de la pastille et se
+   retrouvait écrasé dans un rond de dix-neuf pixels. */
+.verif li > b{flex:none;width:19px;height:19px;border-radius:50%;display:grid;place-items:center;
   font-size:11px;margin-top:2px}
-.verif .vok b{background:var(--good-soft);color:var(--good)}
-.verif .vko b{background:var(--crit-soft);color:var(--crit)}
-.verif .vinfo b{background:var(--warn-soft);color:var(--warn)}
+.verif .vok > b{background:var(--good-soft);color:var(--good)}
+.verif .vko > b{background:var(--crit-soft);color:var(--crit)}
+.verif .vinfo > b{background:var(--warn-soft);color:var(--warn)}
 .verif .vko>span{color:var(--ink)}
 
 /* ═══════════════════════ sur téléphone ═══════════════════════

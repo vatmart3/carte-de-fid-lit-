@@ -93,6 +93,15 @@ async function brevo(chemin: string, cle: string, corps: unknown) {
    tout premier appel. Un rechargement de page, un double clic, un appel rejoué
    : les suivants repartent les mains vides. Si Brevo refuse, on rend la
    réservation pour que le message puisse repartir plus tard. */
+/* Les textes envoyés quand le boucher n'en a écrit aucun. Ils sont montrés mot
+   pour mot en filigrane dans les Réglages : ce qu'il lit là est ce qui part.
+   Toute divergence ferait de l'aperçu un mensonge. */
+const DEFAUT_SMS = "{boutique} : votre carte de fidélité n° {carte} est prête, " +
+  "avec {points} points offerts. Retrouvez-la ici : {lien}";
+const DEFAUT_MAIL = "Bonjour {prenom},\n\nVotre carte de fidélité n° {carte} est prête, " +
+  "avec {points} points offerts.\n\nGardez ce lien, c'est votre carte : {lien}" +
+  "\n\nÀ bientôt,\n{boutique}";
+
 async function bienvenue(jeton: string, cle: string) {
   if (!/^[0-9a-f-]{36}$/i.test(jeton)) return reponse({ erreur: "jeton_invalide" }, 400);
 
@@ -147,8 +156,7 @@ async function bienvenue(jeton: string, cle: string) {
           // Confirmation d'une carte que le client vient de demander : c'est
           // un message de service, pas une offre. Il part donc aussi à qui a
           // refusé les offres — il n'en contient aucune.
-          content: remplace(String(bv.texte_sms || "")) ||
-            (f.shop_name + " : votre carte de fidélité n° " + f.id + " est prête. " + lien),
+          content: remplace(String(bv.texte_sms || "") || DEFAUT_SMS),
           type: "transactional",
         });
         partis.push("sms");
@@ -159,9 +167,7 @@ async function bienvenue(jeton: string, cle: string) {
   }
 
   if (veutMail) {
-    const brut = remplace(String(bv.texte_email || "")) ||
-      ("Bonjour " + prenom + ",\n\nVotre carte de fidélité n° " + f.id +
-       " est prête.\n\n" + lien + "\n\n" + f.shop_name);
+    const brut = remplace(String(bv.texte_email || "") || DEFAUT_MAIL);
     try {
       await brevo("/smtp/email", cle, {
         sender: { name: conf.from_name || f.shop_name, email: conf.from_email },
