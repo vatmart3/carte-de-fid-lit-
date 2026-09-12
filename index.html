@@ -4313,6 +4313,76 @@ function bienvenueEnvoi(token) {
   } catch (e) { /* la carte passe avant le message */ }
 }
 
+/* Le texte du message de bienvenue, mots remplacés. Le même côté page et côté
+   serveur : ce que le boucher lit dans les Réglages est ce qui part. */
+function bienvenueTexte(modele, c) {
+  var sh = DB.shop, e = (sh.envoi || {});
+  var site = String(e.site_url || "").replace(/\/+$/, "");
+  var prenom = String(c.name || "").trim().split(/\s+/)[0] || "";
+  return String(modele || "")
+    .replace(/\{prenom\}/g, prenom)
+    .replace(/\{nom\}/g, c.name || "")
+    .replace(/\{boutique\}/g, sh.name || "")
+    .replace(/\{carte\}/g, c.id || "")
+    .replace(/\{points\}/g, String(c.points || 0))
+    .replace(/\{lien\}/g, site ? site + "?c=" + c.token : "");
+}
+
+/* Le message de bienvenue par le chemin de l'envoi direct.
+
+   C'est le même appel que « Envoyer les SMS » après avoir coché un client :
+   le boucher est connecté, la fonction relit la fiche en base et envoie. Ce
+   chemin a un avantage décisif : il marche avec la fonction déjà publiée,
+   sans rien redéployer, et il parle — le boucher voit partir le message.
+
+   On réserve d'abord l'envoi dans la base, pour ne pas doubler celui que le
+   déclencheur aurait déjà lancé. Si la base ne connaît pas encore
+   claim_welcome, on envoie quand même : le déclencheur n'existe pas non plus,
+   il n'y a donc personne pour faire double emploi. */
+function bienvenueDirect(c) {
+  var bv = ((DB.shop && DB.shop.envoi) || {}).bienvenue || {};
+  if (Store.mode !== "supabase" || !c || (!bv.sms && !bv.email)) return Promise.resolve(null);
+
+  return rpc("claim_welcome", { p_token: c.token }, true)
+    .then(function (r) { return { reserve: !!r, connue: true }; })
+    ["catch"](function () { return { reserve: true, connue: false }; })
+    .then(function (etat) {
+      if (!etat.reserve) return null;   // déjà parti par le déclencheur
+      var envois = [];
+      if (bv.sms) {
+        envois.push(envoiAppel({ canal: "sms", nature: "service", ids: [c.id],
+          texte: bienvenueTexte(bv.texte_sms || BV_SMS, c) })
+          .then(function (r) { return { canal: "SMS", n: r.envoyes || 0, r: r }; },
+                function (e) { return { canal: "SMS", n: 0, err: String(e.message || e) }; }));
+      }
+      if (bv.email && (c.email || "").indexOf("@") > 0) {
+        envois.push(envoiAppel({ canal: "email", nature: "service", ids: [c.id],
+          sujet: bv.sujet || ("Votre carte de fidélité — " + DB.shop.name),
+          texte: bienvenueTexte(bv.texte_email || BV_MAIL, c) })
+          .then(function (r) { return { canal: "e-mail", n: r.envoyes || 0, r: r }; },
+                function (e) { return { canal: "e-mail", n: 0, err: String(e.message || e) }; }));
+      }
+      if (!envois.length) return null;
+      return Promise.all(envois).then(function (res) {
+        var partis = res.filter(function (x) { return x.n > 0; });
+        var rates = res.filter(function (x) { return !x.n; });
+        // Rien n'est parti : on rend la réservation, le message pourra repartir.
+        if (!partis.length && etat.connue) {
+          rpc("unclaim_welcome", { p_token: c.token }, true)["catch"](function () {});
+        }
+        if (partis.length) {
+          toast("Message de bienvenue envoyé par " +
+            partis.map(function (x) { return x.canal; }).join(" et ") + ".", "ok");
+        } else if (rates.length) {
+          var pq = rates[0].err || (rates[0].r && rates[0].r.echecs && rates[0].r.echecs.length
+            ? rates[0].r.echecs[0].raison : "");
+          toast("Message de bienvenue non envoyé" + (pq ? " : " + pq : "") + ".", "bad");
+        }
+        return res;
+      });
+    })["catch"](function () { return null; });
+}
+
 /* Sonde le chemin du message de bienvenue sans rien envoyer et sans rien
    consommer. Deux réponses suffisent à distinguer les trois pannes :
 
@@ -5618,8 +5688,14 @@ var FORMS = {
         p_address: (f.address ? f.address.value.trim() : "") || null
       // Créée au comptoir : c'est ici que le message compte le plus, le client
       // repart sinon avec sa carte ouverte sur la tablette du boucher.
+      //
+      // Et ici le boucher est connecté : on emprunte donc le chemin de l'envoi
+      // direct, celui qui marche déjà, au lieu de l'appel anonyme. Il a aussi
+      // le mérite de parler — le boucher voit si le message est parti.
       }, true).then(function (r) {
-        delete signCache["n-sign"]; bienvenueEnvoi(r.token);
+        delete signCache["n-sign"];
+        bienvenueDirect({ id: r.id, token: r.token, name: name,
+          email: f.email.value.trim(), points: DB.shop.welcome });
         S.till = { cid: r.id }; S.tab = "till"; return r;
       }),
         function (r) { return "Carte n° " + r.id + " créée pour " + name + "."; });
