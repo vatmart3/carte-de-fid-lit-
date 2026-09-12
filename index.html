@@ -4365,10 +4365,25 @@ function envoiAppel(corps) {
       return d;
     });
   }, function () {
-    // Ni réponse ni statut : la requête n'est jamais partie.
-    throw new Error("La fonction d'envoi n'a pas pu être jointe. Vérifiez votre connexion " +
-      "Internet ; si elle est bonne, c'est que la fonction « envoyer » n'est pas publiée " +
-      "sur ce projet Supabase.");
+    /* Aucun code de réponse du tout : ce n'est pas un refus de la fonction,
+       c'est le navigateur qui a bloqué l'échange.
+
+       Avant d'envoyer un message, le navigateur demande la permission par un
+       appel préparatoire — et cet appel-là ne porte jamais de jeton de session.
+       Si la fonction est publiée avec « Verify JWT » coché, la passerelle le
+       rejette sans donner la permission, et le navigateur abandonne. C'est de
+       loin la cause la plus fréquente, et elle bloque tous les envois, pas
+       seulement le message de bienvenue.
+
+       La base, elle, répond sur le même serveur : si sa ligne est verte
+       au-dessus, ni le réseau ni l'adresse ne sont en cause. */
+    throw new Error("Le navigateur n'a pas obtenu l'autorisation d'appeler la fonction. " +
+      "Presque toujours : la fonction « envoyer » a été publiée avec « Verify JWT » " +
+      "coché. Republiez-la en le décochant. " +
+      "Pour en avoir le cœur net, ouvrez cette adresse dans un nouvel onglet : " +
+      (SB.url ? SB.url.replace(/\/+$/, "") + "/functions/v1/envoyer" : "…") +
+      " — si vous lisez « Function not found », c'est qu'elle n'est pas publiée du tout ; " +
+      "toute autre réponse veut dire qu'elle existe et que c'est bien Verify JWT.");
   });
 }
 

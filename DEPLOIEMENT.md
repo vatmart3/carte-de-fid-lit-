@@ -752,10 +752,18 @@ supabase secrets set BREVO_KEY=xkeysib-votre-cle-ici
 supabase functions deploy envoyer --no-verify-jwt
 ```
 
-`--no-verify-jwt` est indispensable au message de bienvenue : c'est le client
-qui vient de créer sa carte qui déclenche l'appel, et il n'a aucune session
-ouverte — il n'est pas inscrit, il est client. Sans cette option, la passerelle
-refuserait l'appel avant même d'atteindre la fonction. Ce n'est pas une porte
+`--no-verify-jwt` n'est pas optionnel, et pas seulement pour le message de
+bienvenue : **avec « Verify JWT » coché, plus aucun envoi ne part depuis le
+site, y compris les envois groupés.** Avant d'appeler la fonction, le
+navigateur demande la permission par un appel préparatoire — et cet appel-là ne
+porte jamais de jeton de session, aucun navigateur n'en met. La passerelle le
+rejette, le navigateur abandonne, et l'application ne reçoit même pas de code
+d'erreur : juste un silence. C'est la panne la plus déroutante de toute
+l'installation, parce qu'elle ressemble à « la fonction n'existe pas ».
+
+C'est aussi le client qui vient de créer sa carte qui déclenche l'appel du
+message de bienvenue, et il n'a aucune session ouverte — il n'est pas inscrit,
+il est client. Ce n'est pas une porte
 ouverte : la fonction ne fait rien sans le jeton de la carte, et l'envoi
 groupé, lui, continue de vérifier que l'appelant est bien du personnel. Avec
 l'éditeur en ligne, décochez *Verify JWT* au moment de publier.
